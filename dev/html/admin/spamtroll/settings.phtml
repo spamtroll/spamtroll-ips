@@ -1,0 +1,57 @@
+<ips:template parameters="$form" />
+
+<div class="ipsBox">
+    <div class="ipsBox_content">
+        {$form}
+    </div>
+</div>
+
+<div class="ipsPad">
+    <button type="button" class="ipsButton ipsButton_primary" id="spamtrollTestConnection">
+        <i class="fa fa-plug"></i> {lang="spamtroll_test_connection"}
+    </button>
+    <span id="spamtrollTestResult" class="ipsType_light" style="margin-left: 10px;"></span>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var testBtn = document.getElementById('spamtrollTestConnection');
+    var resultSpan = document.getElementById('spamtrollTestResult');
+
+    if (testBtn) {
+        testBtn.addEventListener('click', function() {
+            resultSpan.innerHTML = '<i class="fa fa-spinner fa-spin"></i> {lang="spamtroll_testing" jsEscape="true"}';
+            testBtn.disabled = true;
+
+            var apiKey = document.querySelector('[name="spamtroll_api_key"]');
+            var apiUrl = document.querySelector('[name="spamtroll_api_url"]');
+
+            var params = new URLSearchParams();
+            params.append('csrfKey', ips.getSetting('csrfKey'));
+            if (apiKey) params.append('api_key', apiKey.value);
+            if (apiUrl) params.append('api_url', apiUrl.value);
+
+            fetch('{url="app=spamtroll&module=spamtroll&controller=settings&do=testConnection" csrf="true"}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    resultSpan.innerHTML = '<span class="ipsType_success"><i class="fa fa-check"></i> ' + data.message + '</span>';
+                } else {
+                    resultSpan.innerHTML = '<span class="ipsType_warning"><i class="fa fa-times"></i> ' + data.message + '</span>';
+                }
+                testBtn.disabled = false;
+            })
+            .catch(function(error) {
+                resultSpan.innerHTML = '<span class="ipsType_warning"><i class="fa fa-times"></i> Connection error</span>';
+                testBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>

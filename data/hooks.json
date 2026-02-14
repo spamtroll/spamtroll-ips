@@ -1,0 +1,14 @@
+{
+    "Post": {
+        "type": "C",
+        "class": "\\IPS\\forums\\Topic\\Post"
+    },
+    "Message": {
+        "type": "C",
+        "class": "\\IPS\\core\\Messenger\\Message"
+    },
+    "Member": {
+        "type": "C",
+        "class": "\\IPS\\Member"
+    }
+}

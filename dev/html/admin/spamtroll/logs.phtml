@@ -1,0 +1,17 @@
+<ips:template parameters="$table" />
+
+<div class="ipsBox">
+    <div class="ipsBox_content">
+        <div class="ipsPad ipsAreaBackground_light">
+            <div class="ipsButtonBar">
+                <a href="{url="app=spamtroll&module=spamtroll&controller=logs&do=export" csrf="true"}" class="ipsButton ipsButton_small ipsButton_light" data-confirm>
+                    <i class="fa fa-download"></i> {lang="spamtroll_export_logs"}
+                </a>
+                <a href="{url="app=spamtroll&module=spamtroll&controller=logs&do=clearAll" csrf="true"}" class="ipsButton ipsButton_small ipsButton_negative" data-confirm data-confirmMessage="{lang='spamtroll_delete_log_confirm'}">
+                    <i class="fa fa-trash"></i> {lang="spamtroll_clear_all_logs"}
+                </a>
+            </div>
+        </div>
+        {$table}
+    </div>
+</div>

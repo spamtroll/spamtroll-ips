@@ -1,0 +1,184 @@
+{
+    "spamtroll_logs": {
+        "name": "spamtroll_logs",
+        "columns": {
+            "log_id": {
+                "name": "log_id",
+                "type": "BIGINT",
+                "length": 20,
+                "decimals": null,
+                "values": [],
+                "allow_null": false,
+                "default": null,
+                "comment": "Primary key",
+                "unsigned": true,
+                "auto_increment": true
+            },
+            "log_member_id": {
+                "name": "log_member_id",
+                "type": "INT",
+                "length": 11,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Member ID",
+                "unsigned": true,
+                "auto_increment": false
+            },
+            "log_content_type": {
+                "name": "log_content_type",
+                "type": "VARCHAR",
+                "length": 50,
+                "decimals": null,
+                "values": [],
+                "allow_null": false,
+                "default": "",
+                "comment": "Content type: post, message, registration",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_content_id": {
+                "name": "log_content_id",
+                "type": "BIGINT",
+                "length": 20,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Content ID",
+                "unsigned": true,
+                "auto_increment": false
+            },
+            "log_ip_address": {
+                "name": "log_ip_address",
+                "type": "VARCHAR",
+                "length": 46,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "IP address",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_status": {
+                "name": "log_status",
+                "type": "VARCHAR",
+                "length": 20,
+                "decimals": null,
+                "values": [],
+                "allow_null": false,
+                "default": "safe",
+                "comment": "Status: blocked, safe, suspicious",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_spam_score": {
+                "name": "log_spam_score",
+                "type": "DECIMAL",
+                "length": 5,
+                "decimals": 4,
+                "values": [],
+                "allow_null": false,
+                "default": "0.0000",
+                "comment": "Spam score",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_symbols": {
+                "name": "log_symbols",
+                "type": "TEXT",
+                "length": null,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Symbols JSON",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_threat_categories": {
+                "name": "log_threat_categories",
+                "type": "TEXT",
+                "length": null,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Threat categories JSON",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_action_taken": {
+                "name": "log_action_taken",
+                "type": "VARCHAR",
+                "length": 20,
+                "decimals": null,
+                "values": [],
+                "allow_null": false,
+                "default": "allow",
+                "comment": "Action taken: block, moderate, warn, allow",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_content_preview": {
+                "name": "log_content_preview",
+                "type": "TEXT",
+                "length": null,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Content preview",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "log_date": {
+                "name": "log_date",
+                "type": "INT",
+                "length": 11,
+                "decimals": null,
+                "values": [],
+                "allow_null": false,
+                "default": "0",
+                "comment": "Timestamp",
+                "unsigned": true,
+                "auto_increment": false
+            }
+        },
+        "indexes": {
+            "PRIMARY": {
+                "type": "primary",
+                "name": "PRIMARY",
+                "columns": ["log_id"],
+                "length": [null]
+            },
+            "log_member_id": {
+                "type": "key",
+                "name": "log_member_id",
+                "columns": ["log_member_id"],
+                "length": [null]
+            },
+            "log_date": {
+                "type": "key",
+                "name": "log_date",
+                "columns": ["log_date"],
+                "length": [null]
+            },
+            "log_status": {
+                "type": "key",
+                "name": "log_status",
+                "columns": ["log_status"],
+                "length": [null]
+            },
+            "log_content_type": {
+                "type": "key",
+                "name": "log_content_type",
+                "columns": ["log_content_type"],
+                "length": [null]
+            }
+        },
+        "collation": "utf8mb4_unicode_ci"
+    }
+}

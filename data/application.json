@@ -1,0 +1,9 @@
+{
+    "application_title": "Spamtroll Anti-Spam",
+    "app_author": "Spamtroll",
+    "app_directory": "spamtroll",
+    "app_protected": 0,
+    "app_website": "https://spamtroll.io/",
+    "app_update_check": "https://api.spamtroll.io/ips/version",
+    "app_hide_tab": 0
+}

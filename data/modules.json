@@ -1,0 +1,9 @@
+{
+    "admin": {
+        "spamtroll": {
+            "default_controller": "dashboard",
+            "protected": 0,
+            "default": 0
+        }
+    }
+}

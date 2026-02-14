@@ -1,0 +1,7 @@
+{
+    "spamtroll": {
+        "spamtroll_dashboard": "spamtroll_dashboard",
+        "spamtroll_settings": "spamtroll_settings",
+        "spamtroll_logs": "spamtroll_logs"
+    }
+}

@@ -1,0 +1,87 @@
+<ips:template parameters="$log, $member" />
+
+<div class="ipsPad">
+    <table class="ipsTable ipsTable_zebra">
+        <tr>
+            <th style="width: 30%;">{lang="spamtroll_log_id"}</th>
+            <td>{$log['log_id']}</td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_date"}</th>
+            <td>{datetime="$log['log_date']"}</td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_member_id"}</th>
+            <td>
+                {{if $member}}
+                {template="userPhoto" app="core" group="global" location="global" params="$member, 'tiny'"} {$member->name}
+                {{elseif $log['log_member_id']}}
+                {lang="spamtroll_deleted_member"} (ID: {$log['log_member_id']})
+                {{else}}
+                {lang="spamtroll_guest"}
+                {{endif}}
+            </td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_content_type"}</th>
+            <td>{lang="spamtroll_content_type_{$log['log_content_type']}"}</td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_status"}</th>
+            <td>
+                {{if $log['log_status'] == 'blocked'}}
+                <span class="ipsBadge ipsBadge_negative">{lang="spamtroll_status_blocked"}</span>
+                {{elseif $log['log_status'] == 'suspicious'}}
+                <span class="ipsBadge ipsBadge_warning">{lang="spamtroll_status_suspicious"}</span>
+                {{else}}
+                <span class="ipsBadge ipsBadge_positive">{lang="spamtroll_status_safe"}</span>
+                {{endif}}
+            </td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_spam_score"}</th>
+            <td>
+                <div class="ipsProgressBar {{if $log['log_spam_score'] >= 0.7}}ipsProgressBar_negative{{elseif $log['log_spam_score'] >= 0.4}}ipsProgressBar_warning{{else}}ipsProgressBar_positive{{endif}}" style="max-width: 200px;">
+                    <div class="ipsProgressBar_progress" style="width: {expression="round($log['log_spam_score'] * 100)"}%;"></div>
+                </div>
+                <span class="ipsType_light">{expression="round($log['log_spam_score'] * 100)"}%</span>
+            </td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_action_taken"}</th>
+            <td>{lang="spamtroll_action_{$log['log_action_taken']}"}</td>
+        </tr>
+        <tr>
+            <th>{lang="spamtroll_log_ip_address"}</th>
+            <td>{$log['log_ip_address']}</td>
+        </tr>
+        {{if $log['log_content_preview']}}
+        <tr>
+            <th>{lang="spamtroll_log_content_preview"}</th>
+            <td>
+                <div class="ipsType_code" style="max-height: 150px; overflow-y: auto; white-space: pre-wrap;">{{$log['log_content_preview']}}</div>
+            </td>
+        </tr>
+        {{endif}}
+        {{if $log['log_symbols'] && count($log['log_symbols'])}}
+        <tr>
+            <th>{lang="spamtroll_log_symbols"}</th>
+            <td>
+                {{foreach $log['log_symbols'] as $symbol}}
+                <span class="ipsBadge ipsBadge_neutral">{$symbol}</span>
+                {{endforeach}}
+            </td>
+        </tr>
+        {{endif}}
+        {{if $log['log_threat_categories'] && count($log['log_threat_categories'])}}
+        <tr>
+            <th>{lang="spamtroll_log_threat_categories"}</th>
+            <td>
+                {{foreach $log['log_threat_categories'] as $category}}
+                <span class="ipsBadge ipsBadge_warning">{$category}</span>
+                {{endforeach}}
+            </td>
+        </tr>
+        {{endif}}
+    </table>
+</div>

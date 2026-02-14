@@ -1,0 +1,22 @@
+{
+    "spamtroll": {
+        "dashboard": {
+            "tab": "community",
+            "controller": "dashboard",
+            "do": "",
+            "restriction": "spamtroll_dashboard"
+        },
+        "settings": {
+            "tab": "community",
+            "controller": "settings",
+            "do": "",
+            "restriction": "spamtroll_settings"
+        },
+        "logs": {
+            "tab": "community",
+            "controller": "logs",
+            "do": "",
+            "restriction": "spamtroll_logs"
+        }
+    }
+}

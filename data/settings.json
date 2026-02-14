@@ -1,0 +1,54 @@
+[
+    {
+        "key": "spamtroll_api_key",
+        "default": ""
+    },
+    {
+        "key": "spamtroll_api_url",
+        "default": "http://spamtroll-api.local/api/v1"
+    },
+    {
+        "key": "spamtroll_enabled",
+        "default": "0"
+    },
+    {
+        "key": "spamtroll_spam_threshold",
+        "default": "0.7"
+    },
+    {
+        "key": "spamtroll_suspicious_threshold",
+        "default": "0.4"
+    },
+    {
+        "key": "spamtroll_check_posts",
+        "default": "1"
+    },
+    {
+        "key": "spamtroll_check_messages",
+        "default": "1"
+    },
+    {
+        "key": "spamtroll_check_registrations",
+        "default": "1"
+    },
+    {
+        "key": "spamtroll_action_blocked",
+        "default": "block"
+    },
+    {
+        "key": "spamtroll_action_suspicious",
+        "default": "moderate"
+    },
+    {
+        "key": "spamtroll_bypass_groups",
+        "default": ""
+    },
+    {
+        "key": "spamtroll_log_retention_days",
+        "default": "30"
+    },
+    {
+        "key": "spamtroll_timeout",
+        "default": "5"
+    }
+]
