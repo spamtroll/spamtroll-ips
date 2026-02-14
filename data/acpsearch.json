@@ -1,0 +1,92 @@
+[
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_enabled",
+        "keywords": ["spam", "spamtroll", "anti-spam", "enable", "disable"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_api_key",
+        "keywords": ["spam", "spamtroll", "api", "api key", "authentication"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_api_url",
+        "keywords": ["spam", "spamtroll", "api", "api url", "endpoint"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_spam_threshold",
+        "keywords": ["spam", "spamtroll", "threshold", "score", "detection", "sensitivity"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_suspicious_threshold",
+        "keywords": ["spam", "spamtroll", "threshold", "suspicious", "score", "detection"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_check_posts",
+        "keywords": ["spam", "spamtroll", "posts", "forum", "content checking", "detection"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_check_messages",
+        "keywords": ["spam", "spamtroll", "messages", "private messages", "content checking", "detection"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_check_registrations",
+        "keywords": ["spam", "spamtroll", "registration", "sign up", "content checking", "detection"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_action_blocked",
+        "keywords": ["spam", "spamtroll", "block", "action", "moderation", "anti-spam"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_action_suspicious",
+        "keywords": ["spam", "spamtroll", "suspicious", "action", "moderation", "anti-spam"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_bypass_groups",
+        "keywords": ["spam", "spamtroll", "bypass", "groups", "whitelist", "exclude"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_log_retention_days",
+        "keywords": ["spam", "spamtroll", "logs", "retention", "cleanup", "maintenance"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=settings",
+        "restriction": "spamtroll_settings",
+        "lang_key": "spamtroll_timeout",
+        "keywords": ["spam", "spamtroll", "api", "timeout", "connection"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=dashboard",
+        "restriction": "spamtroll_dashboard",
+        "lang_key": "spamtroll_dashboard_title",
+        "keywords": ["spam", "spamtroll", "dashboard", "statistics", "overview"]
+    },
+    {
+        "url": "app=spamtroll&module=spamtroll&controller=logs",
+        "restriction": "spamtroll_logs",
+        "lang_key": "spamtroll_logs_title",
+        "keywords": ["spam", "spamtroll", "logs", "history", "activity"]
+    }
+]

@@ -1,0 +1,9 @@
+{
+    "spamtrollStats": {
+        "class": "\\IPS\\spamtroll\\widgets\\spamtrollStats",
+        "restrict": [],
+        "allow_reuse": false,
+        "menu_tab": "spamtroll",
+        "default_area": "sidebar"
+    }
+}

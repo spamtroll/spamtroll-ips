@@ -1,0 +1,73 @@
+/**
+ * Spamtroll Admin Styles
+ *
+ * @package     IPS Community Suite
+ * @subpackage  Spamtroll Anti-Spam
+ */
+
+/* Dashboard - Stat cards */
+.spamtroll-stat-card {
+    text-align: center;
+}
+
+.spamtroll-stat-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.spamtroll-stat-total {
+    color: #3498db;
+}
+
+.spamtroll-stat-blocked {
+    color: #e74c3c;
+}
+
+.spamtroll-stat-suspicious {
+    color: #f39c12;
+}
+
+.spamtroll-stat-safe {
+    color: #27ae60;
+}
+
+/* Settings - Test connection */
+.spamtroll-test-result {
+    margin-left: 10px;
+}
+
+/* Log details */
+.spamtroll-detail-label {
+    width: 30%;
+}
+
+.spamtroll-content-preview {
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.spamtroll-content-preview-php {
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    background: #f5f5f5;
+    padding: 10px;
+}
+
+.spamtroll-progress-bar {
+    max-width: 200px;
+}
+
+/* Widget - Stat summary */
+.spamtroll-widget-total {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.spamtroll-widget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

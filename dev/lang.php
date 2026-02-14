@@ -143,6 +143,10 @@ $lang = array(
     'spamtroll_connection_success' => 'Connection successful! API is working correctly.',
     'spamtroll_connection_failed' => 'Connection failed. Please check your API key and URL.',
 
+    // Widget
+    'block_spamtrollStats' => 'Spamtroll Statistics',
+    'block_spamtrollStats_desc' => 'Shows recent spam detection statistics.',
+
     // Misc
     'spamtroll_no_data' => 'No data available',
     'spamtroll_refresh' => 'Refresh',

@@ -216,7 +216,7 @@ class _logs extends \IPS\Dispatcher\Controller
             $html = '<div class="ipsPad">
                 <table class="ipsTable ipsTable_zebra">
                     <tr>
-                        <th style="width: 30%;">' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_id') . '</th>
+                        <th class="spamtroll-detail-label">' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_id') . '</th>
                         <td>' . (int) $log['log_id'] . '</td>
                     </tr>
                     <tr>
@@ -259,7 +259,7 @@ class _logs extends \IPS\Dispatcher\Controller
             if ($log['log_content_preview']) {
                 $html .= '<tr>
                         <th>' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_content_preview') . '</th>
-                        <td><div style="max-height: 150px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; background: #f5f5f5; padding: 10px;">' . htmlspecialchars($log['log_content_preview']) . '</div></td>
+                        <td><div class="spamtroll-content-preview-php">' . htmlspecialchars($log['log_content_preview']) . '</div></td>
                     </tr>';
             }
 

@@ -234,37 +234,16 @@ class _settings extends \IPS\Dispatcher\Controller
         }
 
         // Test connection button
+        $testUrl = \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=settings&do=testConnection')->csrf();
+        $testingText = \IPS\Member::loggedIn()->language()->addToStack('spamtroll_testing');
         $testButton = '<div class="ipsPad">
-            <button type="button" class="ipsButton ipsButton_primary" onclick="testSpamtrollConnection()">
+            <button type="button" class="ipsButton ipsButton_primary" id="spamtrollTestConnection"
+                data-test-url="' . $testUrl . '"
+                data-testing-text="' . htmlspecialchars($testingText) . '">
                 <i class="fa fa-plug"></i> ' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_test_connection') . '
             </button>
-            <span id="spamtrollTestResult" class="ipsType_light" style="margin-left: 10px;"></span>
-        </div>
-        <script>
-        function testSpamtrollConnection() {
-            var resultSpan = document.getElementById("spamtrollTestResult");
-            resultSpan.innerHTML = "<i class=\"fa fa-spinner fa-spin\"></i> ' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_testing') . '";
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "' . \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=settings&do=testConnection')->csrf() . '", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    try {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            resultSpan.innerHTML = "<span class=\"ipsType_success\"><i class=\"fa fa-check\"></i> " + response.message + "</span>";
-                        } else {
-                            resultSpan.innerHTML = "<span class=\"ipsType_warning\"><i class=\"fa fa-times\"></i> " + response.message + "</span>";
-                        }
-                    } catch(e) {
-                        resultSpan.innerHTML = "<span class=\"ipsType_warning\"><i class=\"fa fa-times\"></i> Error</span>";
-                    }
-                }
-            };
-            xhr.send("");
-        }
-        </script>';
+            <span id="spamtrollTestResult" class="ipsType_light spamtroll-test-result"></span>
+        </div>';
 
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_settings');
         \IPS\Output::i()->output = $form . $testButton;

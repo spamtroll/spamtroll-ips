@@ -3,7 +3,7 @@
 <div class="ipsPad">
     <table class="ipsTable ipsTable_zebra">
         <tr>
-            <th style="width: 30%;">{lang="spamtroll_log_id"}</th>
+            <th class="spamtroll-detail-label">{lang="spamtroll_log_id"}</th>
             <td>{$log['log_id']}</td>
         </tr>
         <tr>
@@ -41,7 +41,7 @@
         <tr>
             <th>{lang="spamtroll_log_spam_score"}</th>
             <td>
-                <div class="ipsProgressBar {{if $log['log_spam_score'] >= 0.7}}ipsProgressBar_negative{{elseif $log['log_spam_score'] >= 0.4}}ipsProgressBar_warning{{else}}ipsProgressBar_positive{{endif}}" style="max-width: 200px;">
+                <div class="ipsProgressBar {{if $log['log_spam_score'] >= 0.7}}ipsProgressBar_negative{{elseif $log['log_spam_score'] >= 0.4}}ipsProgressBar_warning{{else}}ipsProgressBar_positive{{endif}} spamtroll-progress-bar">
                     <div class="ipsProgressBar_progress" style="width: {expression="round($log['log_spam_score'] * 100)"}%;"></div>
                 </div>
                 <span class="ipsType_light">{expression="round($log['log_spam_score'] * 100)"}%</span>
@@ -59,7 +59,7 @@
         <tr>
             <th>{lang="spamtroll_log_content_preview"}</th>
             <td>
-                <div class="ipsType_code" style="max-height: 150px; overflow-y: auto; white-space: pre-wrap;">{{$log['log_content_preview']}}</div>
+                <div class="ipsType_code spamtroll-content-preview">{{$log['log_content_preview']}}</div>
             </td>
         </tr>
         {{endif}}

@@ -103,20 +103,20 @@ class _dashboard extends \IPS\Dispatcher\Controller
         // Stats cards
         $statsHtml = '
         <div class="ipsGrid ipsGrid_collapsePhone">
-            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #3498db;">' . (int) $stats['total'] . '</div>
+            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                <div class="spamtroll-stat-value spamtroll-stat-total">' . (int) $stats['total'] . '</div>
                 <div class="ipsType_light">' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_stat_total') . '</div>
             </div>
-            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #e74c3c;">' . (int) $stats['blocked'] . '</div>
+            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                <div class="spamtroll-stat-value spamtroll-stat-blocked">' . (int) $stats['blocked'] . '</div>
                 <div class="ipsType_light">' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_stat_blocked') . '</div>
             </div>
-            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #f39c12;">' . (int) $stats['suspicious'] . '</div>
+            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                <div class="spamtroll-stat-value spamtroll-stat-suspicious">' . (int) $stats['suspicious'] . '</div>
                 <div class="ipsType_light">' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_stat_suspicious') . '</div>
             </div>
-            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #27ae60;">' . (int) $stats['safe'] . '</div>
+            <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                <div class="spamtroll-stat-value spamtroll-stat-safe">' . (int) $stats['safe'] . '</div>
                 <div class="ipsType_light">' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_stat_safe') . '</div>
             </div>
         </div>';

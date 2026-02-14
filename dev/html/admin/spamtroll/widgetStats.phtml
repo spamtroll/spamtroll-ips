@@ -1,0 +1,27 @@
+<ips:template parameters="$stats" />
+
+<div class="ipsWidget ipsWidget_vertical">
+    <h3 class="ipsWidget_title">{lang="block_spamtrollStats"}</h3>
+    <div class="ipsWidget_inner">
+        <div class="ipsPad">
+            <div class="spamtroll-widget-total">
+                <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-total">{$stats['total']}</div>
+                <div class="ipsType_light">{lang="spamtroll_stat_total"}</div>
+            </div>
+            <ul class="ipsList_reset">
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_blocked"}</span>
+                    <span class="ipsBadge ipsBadge_negative">{$stats['blocked']}</span>
+                </li>
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_suspicious"}</span>
+                    <span class="ipsBadge ipsBadge_warning">{$stats['suspicious']}</span>
+                </li>
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_safe"}</span>
+                    <span class="ipsBadge ipsBadge_positive">{$stats['safe']}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

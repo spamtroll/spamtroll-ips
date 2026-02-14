@@ -37,20 +37,20 @@
             <h3 class="ipsWidget_title">{lang="spamtroll_dashboard_stats"}</h3>
             <div class="ipsWidget_inner">
                 <div class="ipsGrid ipsGrid_collapsePhone">
-                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                        <div class="ipsType_large ipsType_bold" style="font-size: 2em; color: #3498db;">{$stats['total']}</div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-total">{$stats['total']}</div>
                         <div class="ipsType_light">{lang="spamtroll_stat_total"}</div>
                     </div>
-                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                        <div class="ipsType_large ipsType_bold" style="font-size: 2em; color: #e74c3c;">{$stats['blocked']}</div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-blocked">{$stats['blocked']}</div>
                         <div class="ipsType_light">{lang="spamtroll_stat_blocked"}</div>
                     </div>
-                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                        <div class="ipsType_large ipsType_bold" style="font-size: 2em; color: #f39c12;">{$stats['suspicious']}</div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-suspicious">{$stats['suspicious']}</div>
                         <div class="ipsType_light">{lang="spamtroll_stat_suspicious"}</div>
                     </div>
-                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset" style="text-align: center;">
-                        <div class="ipsType_large ipsType_bold" style="font-size: 2em; color: #27ae60;">{$stats['safe']}</div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-safe">{$stats['safe']}</div>
                         <div class="ipsType_light">{lang="spamtroll_stat_safe"}</div>
                     </div>
                 </div>
@@ -64,7 +64,12 @@
 <div class="ipsBox">
     <h2 class="ipsBox_title">{lang="spamtroll_chart_title"}</h2>
     <div class="ipsBox_content ipsPad">
-        <canvas id="spamtrollChart" height="100"></canvas>
+        <canvas id="spamtrollChart" height="100"
+            data-labels='{$chartLabels}'
+            data-total='{$chartTotal}'
+            data-blocked='{$chartBlocked}'
+            data-label-total='{lang="spamtroll_chart_total" jsEscape="true"}'
+            data-label-blocked='{lang="spamtroll_chart_blocked" jsEscape="true"}'></canvas>
     </div>
 </div>
 
@@ -116,41 +121,3 @@
         {{endif}}
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof Chart !== 'undefined') {
-        var ctx = document.getElementById('spamtrollChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {$chartLabels},
-                datasets: [{
-                    label: '{lang="spamtroll_chart_total" jsEscape="true"}',
-                    data: {$chartTotal},
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }, {
-                    label: '{lang="spamtroll_chart_blocked" jsEscape="true"}',
-                    data: {$chartBlocked},
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
