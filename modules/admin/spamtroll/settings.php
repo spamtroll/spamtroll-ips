@@ -233,20 +233,8 @@ class _settings extends \IPS\Dispatcher\Controller
             );
         }
 
-        // Test connection button
-        $testUrl = \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=settings&do=testConnection')->csrf();
-        $testingText = \IPS\Member::loggedIn()->language()->addToStack('spamtroll_testing');
-        $testButton = '<div class="ipsPad">
-            <button type="button" class="ipsButton ipsButton_primary" id="spamtrollTestConnection"
-                data-test-url="' . $testUrl . '"
-                data-testing-text="' . htmlspecialchars($testingText) . '">
-                <i class="fa fa-plug"></i> ' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_test_connection') . '
-            </button>
-            <span id="spamtrollTestResult" class="ipsType_light spamtroll-test-result"></span>
-        </div>';
-
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_settings');
-        \IPS\Output::i()->output = $form . $testButton;
+        \IPS\Output::i()->output = \IPS\Theme::i()->getTemplate('spamtroll', 'spamtroll', 'admin')->settings($form);
     }
 
     /**
@@ -259,7 +247,14 @@ class _settings extends \IPS\Dispatcher\Controller
         \IPS\Session::i()->csrfCheck();
 
         try {
-            $client = \IPS\spamtroll\Application::apiClient();
+            $apiKey = \IPS\Request::i()->api_key ?: null;
+            $apiUrl = \IPS\Request::i()->api_url ?: null;
+
+            if ($apiKey || $apiUrl) {
+                $client = new \IPS\spamtroll\Api\Client($apiKey, $apiUrl);
+            } else {
+                $client = \IPS\spamtroll\Application::apiClient();
+            }
             $response = $client->testConnection();
 
             if ($response->success) {

@@ -98,9 +98,12 @@ class _Response
      */
     public function getSpamScore(): float
     {
-        $rawScore = (float) ($this->scanData['spam_score'] ?? 0.0);
+        $rawScore = $this->scanData['spam_score'] ?? 0.0;
+        if (!is_numeric($rawScore)) {
+            return 0.0;
+        }
         // Normalize: 15+ = 1.0, 0 = 0.0
-        return min(1.0, max(0.0, $rawScore / 15.0));
+        return min(1.0, max(0.0, (float) $rawScore / 15.0));
     }
 
     /**

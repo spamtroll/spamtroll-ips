@@ -37,6 +37,10 @@ abstract class spamtroll_hook_Post extends _HOOK_CLASS_
             // Get the member
             $member = $contentToCheck->author();
 
+            if ($member === null || !$member->member_id) {
+                return;
+            }
+
             // Check if member should bypass
             if (\IPS\spamtroll\Application::shouldBypass($member)) {
                 return;

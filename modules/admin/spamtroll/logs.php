@@ -73,6 +73,9 @@ class _logs extends \IPS\Dispatcher\Controller
             'spamtroll_filter_blocked' => "log_status='blocked'",
             'spamtroll_filter_suspicious' => "log_status='suspicious'",
             'spamtroll_filter_safe' => "log_status='safe'",
+            'spamtroll_filter_posts' => "log_content_type='post'",
+            'spamtroll_filter_messages' => "log_content_type='message'",
+            'spamtroll_filter_registrations' => "log_content_type='registration'",
         ];
 
         // Quick search
@@ -259,7 +262,7 @@ class _logs extends \IPS\Dispatcher\Controller
             if ($log['log_content_preview']) {
                 $html .= '<tr>
                         <th>' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_content_preview') . '</th>
-                        <td><div class="spamtroll-content-preview-php">' . htmlspecialchars($log['log_content_preview']) . '</div></td>
+                        <td><div class="spamtroll-content-preview">' . htmlspecialchars($log['log_content_preview']) . '</div></td>
                     </tr>';
             }
 

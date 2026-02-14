@@ -38,6 +38,10 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
                 $content .= ' ' . $this->email;
             }
 
+            if (empty(trim($content))) {
+                return $result;
+            }
+
             // Call API
             try {
                 $client = \IPS\spamtroll\Application::apiClient();

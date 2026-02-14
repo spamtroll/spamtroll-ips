@@ -137,47 +137,90 @@ class _Client
 
         $url = $this->baseUrl . $endpoint;
 
-        try {
-            $request = \IPS\Http\Url::external($url)->request($this->timeout);
-            $request = $request->setHeaders([
-                'X-API-Key' => $this->apiKey,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'User-Agent' => 'Spamtroll-IPS/1.0',
-            ]);
-
-            if ($method === 'POST' && $data !== null) {
-                $response = $request->post(json_encode($data));
-            } else {
-                $response = $request->get();
+        // Validate JSON encoding for POST data
+        $jsonBody = null;
+        if ($method === 'POST' && $data !== null) {
+            $jsonBody = json_encode($data);
+            if ($jsonBody === false) {
+                throw new Exception('Failed to encode request data as JSON', 0);
             }
-
-            $httpCode = $response->httpResponseCode;
-            $body = (string) $response;
-            $decoded = json_decode($body, true);
-
-            if ($httpCode >= 200 && $httpCode < 300) {
-                return new Response(true, $httpCode, $decoded ?: []);
-            }
-
-            $errorMessage = 'API error';
-            if (isset($decoded['error'])) {
-                $errorMessage = is_array($decoded['error']) ? json_encode($decoded['error']) : (string) $decoded['error'];
-            } elseif (isset($decoded['message'])) {
-                $errorMessage = is_array($decoded['message']) ? json_encode($decoded['message']) : (string) $decoded['message'];
-            }
-
-            return new Response(
-                false,
-                $httpCode,
-                $decoded ?: [],
-                $errorMessage
-            );
-        } catch (\IPS\Http\Request\Exception $e) {
-            throw Exception::connectionFailed($e->getMessage());
-        } catch (\Exception $e) {
-            throw new Exception('Request failed: ' . $e->getMessage(), 0, null, null, $e);
         }
+
+        $maxAttempts = 3;
+        $lastException = null;
+
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            if ($attempt > 0) {
+                usleep($attempt * 500000);
+            }
+
+            try {
+                $request = \IPS\Http\Url::external($url)->request($this->timeout);
+                $request = $request->setHeaders([
+                    'X-API-Key' => $this->apiKey,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'Spamtroll-IPS/1.0',
+                ]);
+
+                if ($method === 'POST' && $jsonBody !== null) {
+                    $response = $request->post($jsonBody);
+                } else {
+                    $response = $request->get();
+                }
+
+                $httpCode = $response->httpResponseCode;
+                $body = (string) $response;
+                $decoded = json_decode($body, true);
+
+                if ($httpCode >= 200 && $httpCode < 300) {
+                    return new Response(true, $httpCode, $decoded ?: []);
+                }
+
+                // 401 — invalid API key, no retry
+                if ($httpCode === 401) {
+                    throw Exception::invalidApiKey();
+                }
+
+                $errorMessage = 'API error';
+                if (isset($decoded['error'])) {
+                    $errorMessage = is_array($decoded['error']) ? json_encode($decoded['error']) : (string) $decoded['error'];
+                } elseif (isset($decoded['message'])) {
+                    $errorMessage = is_array($decoded['message']) ? json_encode($decoded['message']) : (string) $decoded['message'];
+                }
+
+                // 429 — rate limited, no retry
+                if ($httpCode === 429) {
+                    return new Response(false, $httpCode, $decoded ?: [], $errorMessage);
+                }
+
+                // 5xx — server error, retry
+                if ($httpCode >= 500) {
+                    $lastException = new Exception($errorMessage, $httpCode);
+                    continue;
+                }
+
+                // Other 4xx — client error, no retry
+                return new Response(false, $httpCode, $decoded ?: [], $errorMessage);
+
+            } catch (\IPS\Http\Request\Exception $e) {
+                $message = $e->getMessage();
+                if (stripos($message, 'timeout') !== false) {
+                    $lastException = Exception::timeout();
+                } else {
+                    $lastException = Exception::connectionFailed($message);
+                }
+                continue;
+            } catch (Exception $e) {
+                // Re-throw our own exceptions (invalidApiKey etc.) immediately
+                throw $e;
+            } catch (\Exception $e) {
+                $lastException = new Exception('Request failed: ' . $e->getMessage(), 0, null, null, $e);
+                continue;
+            }
+        }
+
+        throw $lastException;
     }
 
     /**

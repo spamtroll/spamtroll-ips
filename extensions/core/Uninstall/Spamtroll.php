@@ -48,18 +48,18 @@ class _Spamtroll
                 \IPS\Db::i()->dropTable( 'spamtroll_logs' );
             }
         }
-        catch ( \Exception $e ) {}
+        catch ( \Exception $e ) { \IPS\Log::log( $e, 'spamtroll' ); }
 
         try
         {
             \IPS\Db::i()->delete( 'core_tasks', [ 'app=?', 'spamtroll' ] );
         }
-        catch ( \Exception $e ) {}
+        catch ( \Exception $e ) { \IPS\Log::log( $e, 'spamtroll' ); }
 
         try
         {
             \IPS\Db::i()->delete( 'core_log', [ 'category=?', 'spamtroll' ] );
         }
-        catch ( \Exception $e ) {}
+        catch ( \Exception $e ) { \IPS\Log::log( $e, 'spamtroll' ); }
     }
 }

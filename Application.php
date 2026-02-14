@@ -89,8 +89,8 @@ class _Application extends \IPS\Application
      */
     public static function determineAction(float $score): string
     {
-        $spamThreshold = (float) \IPS\Settings::i()->spamtroll_spam_threshold;
-        $suspiciousThreshold = (float) \IPS\Settings::i()->spamtroll_suspicious_threshold;
+        $spamThreshold = max(0.0, min(1.0, (float) \IPS\Settings::i()->spamtroll_spam_threshold));
+        $suspiciousThreshold = max(0.0, min(1.0, (float) \IPS\Settings::i()->spamtroll_suspicious_threshold));
 
         if ($score >= $spamThreshold) {
             return \IPS\Settings::i()->spamtroll_action_blocked ?: 'block';
@@ -111,8 +111,8 @@ class _Application extends \IPS\Application
      */
     public static function determineStatus(float $score): string
     {
-        $spamThreshold = (float) \IPS\Settings::i()->spamtroll_spam_threshold;
-        $suspiciousThreshold = (float) \IPS\Settings::i()->spamtroll_suspicious_threshold;
+        $spamThreshold = max(0.0, min(1.0, (float) \IPS\Settings::i()->spamtroll_spam_threshold));
+        $suspiciousThreshold = max(0.0, min(1.0, (float) \IPS\Settings::i()->spamtroll_suspicious_threshold));
 
         if ($score >= $spamThreshold) {
             return 'blocked';
@@ -160,8 +160,8 @@ class _Application extends \IPS\Application
                 'log_ip_address' => $ipAddress,
                 'log_status' => $status,
                 'log_spam_score' => $spamScore,
-                'log_symbols' => $symbols ? json_encode($symbols) : null,
-                'log_threat_categories' => $threats ? json_encode($threats) : null,
+                'log_symbols' => $symbols ? (json_encode($symbols) ?: null) : null,
+                'log_threat_categories' => $threats ? (json_encode($threats) ?: null) : null,
                 'log_action_taken' => $actionTaken,
                 'log_content_preview' => $contentPreview ? mb_substr($contentPreview, 0, 500) : null,
                 'log_date' => time(),
