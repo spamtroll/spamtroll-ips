@@ -61,8 +61,15 @@ class _Response
         $this->data = $data;
         $this->error = $error;
 
-        // Extract nested data from API response format: {success: true, data: {...}}
-        $this->scanData = $data['data'] ?? $data;
+        // API response envelope: {success: bool, data: {...payload...}}
+        // or {success: false, error: {...}}. Unwrap `data` if the envelope
+        // explicitly marked the call successful; otherwise fall back to
+        // the whole payload so legacy/flat responses still work.
+        if (isset($data['success']) && $data['success'] === true && isset($data['data']) && is_array($data['data'])) {
+            $this->scanData = $data['data'];
+        } else {
+            $this->scanData = $data['data'] ?? $data;
+        }
     }
 
     /**
@@ -91,8 +98,21 @@ class _Response
     }
 
     /**
-     * Get spam score normalized to 0-1 range
-     * API uses 0-15+ scale, we normalize to 0-1
+     * Get spam score normalized to 0-1 range.
+     *
+     * The backend scores on an open-ended additive scale where SpamThreshold=15
+     * means "definitely spam". Previously this mapped everything ≥15 to 1.0,
+     * collapsing the whole spam range (score 15, 30, 100) into a single bucket
+     * and losing the signal the admin needs to pick sensitivity thresholds.
+     *
+     * New mapping:
+     *   - 0 raw  → 0.0
+     *   - 15 raw → 0.5  (just hit SpamThreshold)
+     *   - 30 raw → 1.0  (twice the threshold → fully spam)
+     *   - >30    → clamped to 1.0
+     *
+     * This keeps the 0-1 contract callers expect, but preserves distinction
+     * between borderline spam and high-confidence spam.
      *
      * @return float
      */
@@ -102,8 +122,12 @@ class _Response
         if (!is_numeric($rawScore)) {
             return 0.0;
         }
-        // Normalize: 15+ = 1.0, 0 = 0.0
-        return min(1.0, max(0.0, (float) $rawScore / 15.0));
+        $raw = (float) $rawScore;
+        if ($raw <= 0) {
+            return 0.0;
+        }
+        // Linear map 0..30 → 0..1, clamp above.
+        return min(1.0, $raw / 30.0);
     }
 
     /**

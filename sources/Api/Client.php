@@ -22,6 +22,18 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
 class _Client
 {
     /**
+     * Production API base URL — pinned. The ACP settings screen no
+     * longer exposes a `spamtroll_api_url` field; override via the
+     * constructor argument in tests or a custom hook.
+     */
+    const API_BASE_URL = 'https://api.spamtroll.io/api/v1';
+
+    /**
+     * Default API request timeout (seconds).
+     */
+    const DEFAULT_TIMEOUT = 5;
+
+    /**
      * @var string API key
      */
     protected $apiKey;
@@ -40,14 +52,14 @@ class _Client
      * Constructor
      *
      * @param string|null $apiKey  API key (loads from settings if null)
-     * @param string|null $baseUrl Base URL (loads from settings if null)
-     * @param int|null    $timeout Timeout (loads from settings if null)
+     * @param string|null $baseUrl Base URL (tests only; ACP no longer exposes this)
+     * @param int|null    $timeout Timeout (falls back to DEFAULT_TIMEOUT)
      */
     public function __construct(?string $apiKey = null, ?string $baseUrl = null, ?int $timeout = null)
     {
         $this->apiKey = $apiKey ?? \IPS\Settings::i()->spamtroll_api_key;
-        $this->baseUrl = rtrim($baseUrl ?? \IPS\Settings::i()->spamtroll_api_url, '/');
-        $this->timeout = $timeout ?? (int) (\IPS\Settings::i()->spamtroll_timeout ?: 5);
+        $this->baseUrl = rtrim($baseUrl ?? self::API_BASE_URL, '/');
+        $this->timeout = $timeout ?? self::DEFAULT_TIMEOUT;
     }
 
     /**

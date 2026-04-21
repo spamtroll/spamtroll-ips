@@ -46,8 +46,11 @@ class _settings extends \IPS\Dispatcher\Controller
     {
         $form = new \IPS\Helpers\Form;
 
-        // API Configuration Tab
-        $form->addTab('spamtroll_tab_api');
+        // Simplified single-tab form. Everything the non-technical admin
+        // needs: enable/disable, API key, sensitivity preset, what to
+        // scan, and which groups to skip. Everything else (API URL,
+        // timeout, numeric thresholds, action matrix, log retention) is
+        // pinned to sensible defaults in code.
         $form->addHeader('spamtroll_header_api_config');
 
         $form->add(new \IPS\Helpers\Form\YesNo(
@@ -72,124 +75,51 @@ class _settings extends \IPS\Dispatcher\Controller
             'spamtroll_api_key'
         ));
 
-        $form->add(new \IPS\Helpers\Form\Url(
-            'spamtroll_api_url',
-            \IPS\Settings::i()->spamtroll_api_url ?: 'https://api.spamtroll.io/api/v1',
-            false,
-            [],
-            null,
-            null,
-            null,
-            'spamtroll_api_url'
-        ));
-
-        $form->add(new \IPS\Helpers\Form\Number(
-            'spamtroll_timeout',
-            \IPS\Settings::i()->spamtroll_timeout ?: 5,
-            false,
-            ['min' => 1, 'max' => 30],
-            null,
-            null,
-            \IPS\Member::loggedIn()->language()->addToStack('spamtroll_seconds'),
-            'spamtroll_timeout'
-        ));
-
-        // Detection Settings Tab
-        $form->addTab('spamtroll_tab_detection');
         $form->addHeader('spamtroll_header_thresholds');
 
-        $form->add(new \IPS\Helpers\Form\Number(
-            'spamtroll_spam_threshold',
-            \IPS\Settings::i()->spamtroll_spam_threshold ?: 0.7,
+        // Sensitivity preset replaces the two 0.0-1.0 threshold inputs
+        // (spam_threshold, suspicious_threshold). Mapping lives in
+        // Application::sensitivityThresholds(). Default: balanced.
+        $form->add(new \IPS\Helpers\Form\Select(
+            'spamtroll_sensitivity',
+            \IPS\Settings::i()->spamtroll_sensitivity ?: 'balanced',
             false,
-            ['min' => 0, 'max' => 1, 'decimals' => 2],
+            [
+                'options' => [
+                    'lenient'  => 'spamtroll_sensitivity_lenient',
+                    'balanced' => 'spamtroll_sensitivity_balanced',
+                    'strict'   => 'spamtroll_sensitivity_strict',
+                ],
+            ],
             null,
             null,
             null,
-            'spamtroll_spam_threshold'
-        ));
-
-        $form->add(new \IPS\Helpers\Form\Number(
-            'spamtroll_suspicious_threshold',
-            \IPS\Settings::i()->spamtroll_suspicious_threshold ?: 0.4,
-            false,
-            ['min' => 0, 'max' => 1, 'decimals' => 2],
-            null,
-            null,
-            null,
-            'spamtroll_suspicious_threshold'
+            'spamtroll_sensitivity'
         ));
 
         $form->addHeader('spamtroll_header_content_types');
 
-        $form->add(new \IPS\Helpers\Form\YesNo(
-            'spamtroll_check_posts',
-            \IPS\Settings::i()->spamtroll_check_posts ?? true,
-            false,
-            [],
-            null,
-            null,
-            null,
-            'spamtroll_check_posts'
-        ));
-
-        $form->add(new \IPS\Helpers\Form\YesNo(
-            'spamtroll_check_messages',
-            \IPS\Settings::i()->spamtroll_check_messages ?? true,
-            false,
-            [],
-            null,
-            null,
-            null,
-            'spamtroll_check_messages'
-        ));
-
-        $form->add(new \IPS\Helpers\Form\YesNo(
-            'spamtroll_check_registrations',
-            \IPS\Settings::i()->spamtroll_check_registrations ?? true,
-            false,
-            [],
-            null,
-            null,
-            null,
-            'spamtroll_check_registrations'
-        ));
-
-        // Actions Tab
-        $form->addTab('spamtroll_tab_actions');
-        $form->addHeader('spamtroll_header_actions');
-
-        $actionOptions = [
-            'block' => 'spamtroll_action_block',
-            'moderate' => 'spamtroll_action_moderate',
-            'warn' => 'spamtroll_action_warn',
-            'allow' => 'spamtroll_action_allow',
-        ];
-
+        // Single scope dropdown replaces three independent YesNo toggles
+        // (posts / messages / registrations). Most admins want "all" or
+        // "forum only" — not every combination.
         $form->add(new \IPS\Helpers\Form\Select(
-            'spamtroll_action_blocked',
-            \IPS\Settings::i()->spamtroll_action_blocked ?: 'block',
+            'spamtroll_scan_scope',
+            \IPS\Settings::i()->spamtroll_scan_scope ?: 'all',
             false,
-            ['options' => $actionOptions],
+            [
+                'options' => [
+                    'all'           => 'spamtroll_scope_all',           // posts + PMs + registrations
+                    'posts_and_pms' => 'spamtroll_scope_posts_and_pms', // posts + PMs
+                    'posts_only'    => 'spamtroll_scope_posts_only',    // posts only
+                    'off'           => 'spamtroll_scope_off',           // nothing (but still keep plugin installed)
+                ],
+            ],
             null,
             null,
             null,
-            'spamtroll_action_blocked'
+            'spamtroll_scan_scope'
         ));
 
-        $form->add(new \IPS\Helpers\Form\Select(
-            'spamtroll_action_suspicious',
-            \IPS\Settings::i()->spamtroll_action_suspicious ?: 'moderate',
-            false,
-            ['options' => $actionOptions],
-            null,
-            null,
-            null,
-            'spamtroll_action_suspicious'
-        ));
-
-        // Bypass Settings Tab
-        $form->addTab('spamtroll_tab_bypass');
         $form->addHeader('spamtroll_header_bypass');
 
         $form->add(new \IPS\Helpers\Form\Select(
@@ -203,27 +133,43 @@ class _settings extends \IPS\Dispatcher\Controller
             'spamtroll_bypass_groups'
         ));
 
-        // Maintenance Tab
-        $form->addTab('spamtroll_tab_maintenance');
-        $form->addHeader('spamtroll_header_logs');
-
-        $form->add(new \IPS\Helpers\Form\Number(
-            'spamtroll_log_retention_days',
-            \IPS\Settings::i()->spamtroll_log_retention_days ?: 30,
-            false,
-            ['min' => 1, 'max' => 365],
-            null,
-            null,
-            \IPS\Member::loggedIn()->language()->addToStack('spamtroll_days'),
-            'spamtroll_log_retention_days'
-        ));
-
         // Process form submission
         if ($values = $form->values(true)) {
             // Convert bypass groups array to comma-separated string
             if (isset($values['spamtroll_bypass_groups']) && \is_array($values['spamtroll_bypass_groups'])) {
                 $values['spamtroll_bypass_groups'] = implode(',', $values['spamtroll_bypass_groups']);
             }
+
+            // Derive legacy settings from the new simplified fields so
+            // Post.php / Message.php / Member.php hooks keep working
+            // without having to be rewritten to read the new keys.
+            switch ($values['spamtroll_sensitivity'] ?? 'balanced') {
+                case 'strict':
+                    $values['spamtroll_spam_threshold'] = 0.5;
+                    $values['spamtroll_suspicious_threshold'] = 0.3;
+                    break;
+                case 'lenient':
+                    $values['spamtroll_spam_threshold'] = 0.85;
+                    $values['spamtroll_suspicious_threshold'] = 0.6;
+                    break;
+                case 'balanced':
+                default:
+                    $values['spamtroll_spam_threshold'] = 0.7;
+                    $values['spamtroll_suspicious_threshold'] = 0.4;
+                    break;
+            }
+
+            $scope = $values['spamtroll_scan_scope'] ?? 'all';
+            $values['spamtroll_check_posts']         = $scope !== 'off';
+            $values['spamtroll_check_messages']      = in_array($scope, ['all', 'posts_and_pms'], true);
+            $values['spamtroll_check_registrations'] = ($scope === 'all');
+
+            // Pin moderate/block actions — the 4x4 action matrix is
+            // collapsed to a single sensible policy.
+            $values['spamtroll_action_blocked']      = 'block';
+            $values['spamtroll_action_suspicious']   = 'moderate';
+            $values['spamtroll_timeout']             = 5;
+            $values['spamtroll_log_retention_days']  = 30;
 
             $form->saveAsSettings($values);
 
