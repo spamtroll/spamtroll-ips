@@ -151,7 +151,7 @@ class _Install
         /* Insert default settings */
         $defaults = array(
             'spamtroll_api_key'              => '',
-            'spamtroll_api_url'              => 'http://spamtroll-api.local/api/v1',
+            'spamtroll_api_url'              => 'https://api.spamtroll.io/api/v1',
             'spamtroll_enabled'              => '0',
             'spamtroll_spam_threshold'       => '0.7',
             'spamtroll_suspicious_threshold' => '0.4',

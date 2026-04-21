@@ -74,7 +74,7 @@ class _settings extends \IPS\Dispatcher\Controller
 
         $form->add(new \IPS\Helpers\Form\Url(
             'spamtroll_api_url',
-            \IPS\Settings::i()->spamtroll_api_url ?: 'http://spamtroll-api.local/api/v1',
+            \IPS\Settings::i()->spamtroll_api_url ?: 'https://api.spamtroll.io/api/v1',
             false,
             [],
             null,

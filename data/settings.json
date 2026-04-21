@@ -5,7 +5,7 @@
     },
     {
         "key": "spamtroll_api_url",
-        "default": "http://spamtroll-api.local/api/v1"
+        "default": "https://api.spamtroll.io/api/v1"
     },
     {
         "key": "spamtroll_enabled",
