@@ -43,6 +43,12 @@ if ( ! is_dir( $appPath ) )
     exit( 1 );
 }
 
+if ( ! file_exists( "$appPath/vendor/autoload.php" ) )
+{
+    fwrite( STDERR, "Composer dependencies missing. Run:\n    cd $appPath && composer install --no-dev\nbefore installing.\n" );
+    exit( 1 );
+}
+
 /* 1. core_applications */
 $appJson = json_decode( file_get_contents( "$appPath/data/application.json" ), true );
 try

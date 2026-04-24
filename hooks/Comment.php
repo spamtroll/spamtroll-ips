@@ -65,13 +65,13 @@ abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
 
             try {
                 $client = \IPS\spamtroll\Application::apiClient();
-                $response = $client->checkSpam(
+                $response = $client->checkSpam(new \Spamtroll\Sdk\Request\CheckSpamRequest(
                     $text,
-                    $contentType,
+                    $contentType === 'message' ? \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_MESSAGE : \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_FORUM,
                     $ip,
                     $postingMember->name ?: null,
                     $postingMember->email ?: null
-                );
+                ));
 
                 if (!$response->success) {
                     \IPS\Log::log('Spamtroll API error: ' . ($response->error ?? '(none)'), 'spamtroll');
@@ -105,7 +105,7 @@ abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
                         }
                     }
                 }
-            } catch (\IPS\spamtroll\Api\Exception $e) {
+            } catch (\Spamtroll\Sdk\Exception\SpamtrollException $e) {
                 \IPS\Log::log('Spamtroll API exception: ' . $e->getMessage(), 'spamtroll');
             } catch (\Throwable $t) {
                 \IPS\Log::log('Spamtroll hook error: ' . $t->getMessage(), 'spamtroll');

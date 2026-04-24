@@ -11,13 +11,20 @@
 
 namespace IPS\spamtroll;
 
+/* Load the Spamtroll SDK (installed via Composer into applications/spamtroll/vendor/).
+ * This runs the first time IPS's autoloader pulls in \IPS\spamtroll\Application,
+ * which happens before any hook or admin controller can reach the API client. */
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 /**
  * Spamtroll Anti-Spam Application Class
  */
 class _Application extends \IPS\Application
 {
     /**
-     * @var \IPS\spamtroll\Api\Client|null Singleton instance
+     * @var \Spamtroll\Sdk\Client|null Singleton instance
      */
     protected static $apiClient = null;
 
@@ -34,12 +41,18 @@ class _Application extends \IPS\Application
     /**
      * Get API Client singleton
      *
-     * @return \IPS\spamtroll\Api\Client
+     * @return \Spamtroll\Sdk\Client
      */
-    public static function apiClient(): \IPS\spamtroll\Api\Client
+    public static function apiClient(): \Spamtroll\Sdk\Client
     {
         if (static::$apiClient === null) {
-            static::$apiClient = new \IPS\spamtroll\Api\Client();
+            static::$apiClient = new \Spamtroll\Sdk\Client(
+                (string) \IPS\Settings::i()->spamtroll_api_key,
+                new \Spamtroll\Sdk\ClientConfig(
+                    userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION
+                ),
+                new \IPS\spamtroll\Api\IpsHttpClient()
+            );
         }
 
         return static::$apiClient;

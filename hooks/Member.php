@@ -45,13 +45,13 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
             // Call API
             try {
                 $client = \IPS\spamtroll\Application::apiClient();
-                $response = $client->checkSpam(
+                $response = $client->checkSpam(new \Spamtroll\Sdk\Request\CheckSpamRequest(
                     $content,
-                    'registration',
+                    \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_REGISTRATION,
                     $ipAddress,
                     $this->name,
                     $this->email
-                );
+                ));
 
                 if (!$response->success) {
                     \IPS\Log::log('Spamtroll API error: ' . $response->error, 'spamtroll');
@@ -80,7 +80,7 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
                 // Execute action based on spam score
                 return $this->executeRegistrationSpamAction($action, $spamScore, $result);
 
-            } catch (\IPS\spamtroll\Api\Exception $e) {
+            } catch (\Spamtroll\Sdk\Exception\SpamtrollException $e) {
                 \IPS\Log::log('Spamtroll API exception: ' . $e->getMessage(), 'spamtroll');
                 return $result;
             }
