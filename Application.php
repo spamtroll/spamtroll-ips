@@ -150,7 +150,8 @@ class _Application extends \IPS\Application
         ?array $symbols,
         ?array $threats,
         string $actionTaken,
-        ?string $contentPreview = null
+        ?string $contentPreview = null,
+        ?string $submissionId = null
     ): void {
         try {
             \IPS\Db::i()->insert('spamtroll_logs', [
@@ -164,6 +165,7 @@ class _Application extends \IPS\Application
                 'log_threat_categories' => $threats ? (json_encode($threats) ?: null) : null,
                 'log_action_taken' => $actionTaken,
                 'log_content_preview' => $contentPreview ? mb_substr($contentPreview, 0, 500) : null,
+                'log_submission_id' => $submissionId,
                 'log_date' => time(),
             ]);
         } catch (\Exception $e) {

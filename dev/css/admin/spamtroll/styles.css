@@ -1,0 +1,160 @@
+/**
+ * Spamtroll Admin Styles
+ *
+ * @package     IPS Community Suite
+ * @subpackage  Spamtroll Anti-Spam
+ */
+
+/* Dashboard wrapper — overrides ACP defaults (ipsWidget / ipsBox) that
+ * ship with white backgrounds and look out of place on dark ACP themes.
+ * Scoped to .spamtroll-dashboard so we don't leak into the rest of the ACP.
+ *
+ * !important is needed here: IPS core CSS has rules like
+ *   .ipsBox:not(.ipsBox_transparent):not(.ipsModerated) { background: var(--c0) }
+ * whose specificity (0,0,3,0) beats our descendant selector (0,0,2,0).
+ * Rather than racing the selector arms, we assert our background choice.
+ */
+.spamtroll-dashboard .ipsWidget,
+.spamtroll-dashboard .ipsBox {
+    background: transparent !important;
+    border: 1px solid rgba(128, 128, 128, 0.18) !important;
+    box-shadow: none !important;
+}
+
+.spamtroll-dashboard .ipsWidget_title,
+.spamtroll-dashboard .ipsBox_title {
+    background: rgba(0, 0, 0, 0.06) !important;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+    color: inherit;
+}
+
+.spamtroll-dashboard .ipsWidget_inner,
+.spamtroll-dashboard .ipsBox_content {
+    background: transparent !important;
+}
+
+.spamtroll-dashboard .ipsAreaBackground_reset,
+.spamtroll-dashboard .spamtroll-stat-card {
+    background: transparent !important;
+}
+
+/* Empty leading ipsBox rendered when isConfigured && isEnabled is true —
+ * collapse it so there's no ghost block at the top of the dashboard. */
+.spamtroll-dashboard > .ipsBox:empty,
+.spamtroll-dashboard > .ipsBox:not(:has(*)) {
+    display: none;
+}
+
+/* Tables inside our dashboard inherit the same transparent background */
+.spamtroll-table {
+    background: transparent;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.spamtroll-table thead th {
+    background: rgba(0, 0, 0, 0.04);
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.spamtroll-table tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.spamtroll-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.spamtroll-table .ipsType_right,
+.spamtroll-table th.ipsType_right {
+    text-align: right;
+}
+
+/* Dashboard - Stat cards */
+.spamtroll-stat-card {
+    text-align: center;
+}
+
+.spamtroll-stat-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.spamtroll-stat-total {
+    color: #3498db;
+}
+
+.spamtroll-stat-blocked {
+    color: #e74c3c;
+}
+
+.spamtroll-stat-suspicious {
+    color: #f39c12;
+}
+
+.spamtroll-stat-safe {
+    color: #27ae60;
+}
+
+/* Settings - Test connection */
+.spamtroll-test-result {
+    margin-left: 10px;
+}
+
+/* Log details */
+.spamtroll-detail-label {
+    width: 30%;
+}
+
+/* Scan UUID column in the logs list — shows truncated UUID + copy button */
+.spamtroll-uuid {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.spamtroll-uuid code {
+    font-size: 0.85em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(128, 128, 128, 0.12);
+}
+
+.spamtroll-copy-btn {
+    padding: 2px 6px !important;
+    line-height: 1 !important;
+    min-width: 0 !important;
+}
+
+.spamtroll-content-preview {
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    background: #f5f5f5;
+    padding: 10px;
+}
+
+.spamtroll-progress-bar {
+    max-width: 200px;
+}
+
+/* Widget - Stat summary */
+.spamtroll-widget-total {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.spamtroll-widget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

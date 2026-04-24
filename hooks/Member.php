@@ -15,10 +15,10 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
      *
      * @return bool|null
      */
-    public function spamService()
+    public function spamService($type = 'register', $emailAddress = null, &$spamCode = null, &$disposable = false, &$geoBlock = false)
     {
         try {
-            $result = parent::spamService();
+            $result = parent::spamService($type, $emailAddress, $spamCode, $disposable, $geoBlock);
 
             // Check if spam checking is enabled for registrations
             if (!\IPS\spamtroll\Application::isEnabled()) {
@@ -73,7 +73,8 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
                     $response->getSymbols(),
                     $response->getThreatCategories(),
                     $action,
-                    'Username: ' . $this->name . ', Email: ' . ($this->email ?: 'N/A')
+                    'Username: ' . $this->name . ', Email: ' . ($this->email ?: 'N/A'),
+                    $response->getSubmissionId()
                 );
 
                 // Execute action based on spam score

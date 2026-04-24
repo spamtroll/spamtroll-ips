@@ -72,6 +72,26 @@ $lang = array(
     'spamtroll_log_retention_days' => 'Log Retention',
     'spamtroll_log_retention_days_desc' => 'Number of days to keep spam logs.',
 
+    // Simplified settings: sensitivity preset + scan scope
+    'spamtroll_sensitivity'          => 'Sensitivity',
+    'spamtroll_sensitivity_desc'     => 'How aggressively to flag content. "Balanced" is recommended for most forums.',
+    'spamtroll_sensitivity_lenient'  => 'Lenient (fewer false positives)',
+    'spamtroll_sensitivity_balanced' => 'Balanced (recommended)',
+    'spamtroll_sensitivity_strict'   => 'Strict (catches more spam)',
+
+    'spamtroll_scan_scope'           => 'What to scan',
+    'spamtroll_scan_scope_desc'      => 'Which content types Spamtroll should check.',
+    'spamtroll_scope_all'            => 'Posts, messages, and new registrations',
+    'spamtroll_scope_posts_and_pms'  => 'Posts and private messages',
+    'spamtroll_scope_posts_only'     => 'Forum posts only',
+    'spamtroll_scope_off'            => 'Off (keep installed but do not scan)',
+
+    // Settings form headers
+    'spamtroll_header_api_config'      => 'API Configuration',
+    'spamtroll_header_thresholds'      => 'Detection',
+    'spamtroll_header_content_types'   => 'What to Scan',
+    'spamtroll_header_bypass'          => 'Bypass',
+
     // Dashboard
     'spamtroll_dashboard_title' => 'Spamtroll Dashboard',
     'spamtroll_dashboard_stats' => 'Statistics (Last 7 Days)',
@@ -106,6 +126,8 @@ $lang = array(
     'spamtroll_log_action_taken' => 'Action',
     'spamtroll_log_ip_address' => 'IP Address',
     'spamtroll_log_date' => 'Date',
+    'spamtroll_log_submission_id' => 'Scan UUID',
+    'spamtroll_copied' => 'Copied',
     'spamtroll_log_content_preview' => 'Content Preview',
     'spamtroll_log_symbols' => 'Detection Symbols',
     'spamtroll_log_threat_categories' => 'Threat Categories',

@@ -134,6 +134,18 @@
                 "unsigned": false,
                 "auto_increment": false
             },
+            "log_submission_id": {
+                "name": "log_submission_id",
+                "type": "VARCHAR",
+                "length": 36,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Spamtroll API submission UUID",
+                "unsigned": false,
+                "auto_increment": false
+            },
             "log_date": {
                 "name": "log_date",
                 "type": "INT",

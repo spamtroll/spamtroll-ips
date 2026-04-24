@@ -1,20 +1,23 @@
 <ips:template parameters="$stats, $recentLogs, $apiStatus, $isConfigured, $isEnabled, $chartLabels, $chartTotal, $chartBlocked" />
 
+<div class="spamtroll-dashboard">
+{{if !$isConfigured}}
 <div class="ipsBox">
-    {{if !$isConfigured}}
     <div class="ipsMessage ipsMessage_warning">
         <i class="fa fa-exclamation-triangle"></i>
         {lang="spamtroll_not_configured_message"}
         <a href="{url="app=spamtroll&module=spamtroll&controller=settings"}" class="ipsButton ipsButton_verySmall ipsButton_light">{lang="spamtroll_go_to_settings"}</a>
     </div>
-    {{elseif !$isEnabled}}
+</div>
+{{elseif !$isEnabled}}
+<div class="ipsBox">
     <div class="ipsMessage ipsMessage_info">
         <i class="fa fa-info-circle"></i>
         {lang="spamtroll_disabled_message"}
         <a href="{url="app=spamtroll&module=spamtroll&controller=settings"}" class="ipsButton ipsButton_verySmall ipsButton_light">{lang="spamtroll_go_to_settings"}</a>
     </div>
-    {{endif}}
 </div>
+{{endif}}
 
 <div class="ipsGrid ipsGrid_collapsePhone">
     <div class="ipsGrid_span4">
@@ -63,13 +66,37 @@
 
 <div class="ipsBox">
     <h2 class="ipsBox_title">{lang="spamtroll_chart_title"}</h2>
-    <div class="ipsBox_content ipsPad">
-        <canvas id="spamtrollChart" height="100"
-            data-labels='{$chartLabels}'
-            data-total='{$chartTotal}'
-            data-blocked='{$chartBlocked}'
-            data-label-total='{lang="spamtroll_chart_total" jsEscape="true"}'
-            data-label-blocked='{lang="spamtroll_chart_blocked" jsEscape="true"}'></canvas>
+    <div class="ipsBox_content">
+        {{if count($stats['daily'])}}
+        <table class="spamtroll-table">
+            <thead>
+                <tr>
+                    <th>{lang="spamtroll_log_date"}</th>
+                    <th class="ipsType_right">{lang="spamtroll_chart_total"}</th>
+                    <th class="ipsType_right">{lang="spamtroll_chart_blocked"}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{foreach $stats['daily'] as $day}}
+                <tr>
+                    <td>{$day['date']}</td>
+                    <td class="ipsType_right">{$day['total']}</td>
+                    <td class="ipsType_right">
+                        {{if $day['blocked'] > 0}}
+                        <span class="ipsType_warning">{$day['blocked']}</span>
+                        {{else}}
+                        0
+                        {{endif}}
+                    </td>
+                </tr>
+                {{endforeach}}
+            </tbody>
+        </table>
+        {{else}}
+        <div class="ipsPad ipsType_center ipsType_light">
+            {lang="spamtroll_no_data"}
+        </div>
+        {{endif}}
     </div>
 </div>
 
@@ -79,7 +106,7 @@
     <h2 class="ipsBox_title">{lang="spamtroll_dashboard_recent"}</h2>
     <div class="ipsBox_content">
         {{if count($recentLogs)}}
-        <table class="ipsTable ipsTable_responsive ipsTable_zebra">
+        <table class="spamtroll-table">
             <thead>
                 <tr>
                     <th>{lang="spamtroll_log_date"}</th>
@@ -120,4 +147,5 @@
         </div>
         {{endif}}
     </div>
+</div>
 </div>

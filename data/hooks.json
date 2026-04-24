@@ -1,11 +1,7 @@
 {
-    "Post": {
+    "Comment": {
         "type": "C",
-        "class": "\\IPS\\forums\\Topic\\Post"
-    },
-    "Message": {
-        "type": "C",
-        "class": "\\IPS\\core\\Messenger\\Message"
+        "class": "\\IPS\\Content\\Comment"
     },
     "Member": {
         "type": "C",

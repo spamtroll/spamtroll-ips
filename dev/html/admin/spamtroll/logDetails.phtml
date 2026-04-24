@@ -6,6 +6,20 @@
             <th class="spamtroll-detail-label">{lang="spamtroll_log_id"}</th>
             <td>{$log['log_id']}</td>
         </tr>
+        {{if !empty($log['log_submission_id'])}}
+        <tr>
+            <th>{lang="spamtroll_log_submission_id"}</th>
+            <td>
+                <span class="spamtroll-uuid">
+                    <code>{$log['log_submission_id']}</code>
+                    <button type="button" class="ipsButton ipsButton_verySmall ipsButton_light spamtroll-copy-btn"
+                        data-clipboard="{$log['log_submission_id']}" title="Copy UUID">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                </span>
+            </td>
+        </tr>
+        {{endif}}
         <tr>
             <th>{lang="spamtroll_log_date"}</th>
             <td>{datetime="$log['log_date']"}</td>
@@ -59,7 +73,7 @@
         <tr>
             <th>{lang="spamtroll_log_content_preview"}</th>
             <td>
-                <div class="ipsType_code spamtroll-content-preview">{{$log['log_content_preview']}}</div>
+                <div class="ipsType_code spamtroll-content-preview">{$log['log_content_preview']}</div>
             </td>
         </tr>
         {{endif}}

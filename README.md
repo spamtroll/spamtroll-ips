@@ -23,157 +23,61 @@ Official Spamtroll integration for IPS Community Suite 4.5+ and 5.x. Automatical
 
 ## Installation
 
-### Method 1: Developer Mode (Recommended for Development)
+> **⚠️ This is an IPS _application_, not a _plugin_.**
+>
+> In IPS Community Suite:
+> - **Plugins** are single-file `.xml` uploads via **System → Plugins → Install**. They add small tweaks.
+> - **Applications** (this one) are full modules with hooks, admin pages, database tables, tasks, and widgets. They go under `applications/<key>/` on disk.
+>
+> If you try to upload this repository as a plugin, IPS will reject it with **"plugin is invalid"**. Follow the steps below instead.
 
-#### Step 1: Copy application files
+Two install paths are supported, depending on whether the target forum has Developer Mode enabled.
+
+### Method A — CLI install (Developer Mode, `IN_DEV=1`)
+
+This is the fastest path for development forums and for self-hosted production forums where you have SSH access. A bundled PHP script performs every step the ACP Developer Center would perform (register the app, create the logs table, register hooks/tasks/widgets, import language strings and templates, compile templates, clear caches).
+
+**Step 1.** Copy the application folder into the IPS installation:
 
 ```bash
-cp -r /path/to/spamtroll-ips /path/to/ips/applications/spamtroll
+rsync -a --exclude='.git' ~/git/spamtroll-ips/ /path/to/ips/applications/spamtroll/
+chown -R <ips-user>:<ips-group> /path/to/ips/applications/spamtroll
 ```
 
-Example for a local installation:
-
-```bash
-cp -r ~/git/spamtroll-ips ~/git/dogomania/forum/applications/spamtroll
-```
-
-#### Step 2: Enable Developer Mode (if not already enabled)
-
-Edit the `conf_global.php` file in the IPS root directory:
+**Step 2.** Confirm Developer Mode is enabled in `conf_global.php`:
 
 ```php
 define('IN_DEV', 1);
 ```
 
-#### Step 3: Install the application via CLI
-
-Run the following PHP script in the IPS directory:
+**Step 3.** Run the installer from the IPS root directory:
 
 ```bash
 cd /path/to/ips/forum
-php -r "
-require 'init.php';
-
-// Load application data
-\$appJson = json_decode(file_get_contents('applications/spamtroll/data/application.json'), true);
-
-// Check if already installed
-try {
-    \$exists = \\IPS\\Db::i()->select('app_id', 'core_applications', array('app_directory=?', 'spamtroll'))->first();
-    echo \"Application already installed (ID: \$exists)\n\";
-    exit;
-} catch (UnderflowException \$e) {
-    // Continue with installation
-}
-
-// Add application to database
-\$maxPos = \\IPS\\Db::i()->select('MAX(app_position)', 'core_applications')->first();
-
-\\IPS\\Db::i()->insert('core_applications', array(
-    'app_author' => \$appJson['app_author'],
-    'app_directory' => \$appJson['app_directory'],
-    'app_protected' => 0,
-    'app_enabled' => 1,
-    'app_position' => \$maxPos + 1,
-    'app_version' => '1.0.0',
-    'app_long_version' => 10000,
-    'app_update_check' => \$appJson['app_update_check'] ?? '',
-    'app_website' => \$appJson['app_website'] ?? '',
-    'app_hide_tab' => 0,
-));
-echo \"Application added to database\n\";
-
-// Create logs table
-try {
-    \\IPS\\Db::i()->createTable(array(
-        'name' => 'spamtroll_logs',
-        'columns' => array(
-            array('name' => 'log_id', 'type' => 'BIGINT', 'length' => 20, 'unsigned' => true, 'auto_increment' => true),
-            array('name' => 'log_member_id', 'type' => 'INT', 'length' => 11, 'unsigned' => true, 'allow_null' => true),
-            array('name' => 'log_content_type', 'type' => 'VARCHAR', 'length' => 50, 'default' => ''),
-            array('name' => 'log_content_id', 'type' => 'BIGINT', 'length' => 20, 'unsigned' => true, 'allow_null' => true),
-            array('name' => 'log_ip_address', 'type' => 'VARCHAR', 'length' => 46, 'allow_null' => true),
-            array('name' => 'log_status', 'type' => 'VARCHAR', 'length' => 20, 'default' => 'safe'),
-            array('name' => 'log_spam_score', 'type' => 'DECIMAL', 'length' => '5,4', 'default' => '0.0000'),
-            array('name' => 'log_symbols', 'type' => 'TEXT', 'allow_null' => true),
-            array('name' => 'log_threat_categories', 'type' => 'TEXT', 'allow_null' => true),
-            array('name' => 'log_action_taken', 'type' => 'VARCHAR', 'length' => 20, 'default' => 'allow'),
-            array('name' => 'log_content_preview', 'type' => 'TEXT', 'allow_null' => true),
-            array('name' => 'log_date', 'type' => 'INT', 'length' => 11, 'unsigned' => true, 'default' => 0),
-        ),
-        'indexes' => array(
-            array('type' => 'primary', 'columns' => array('log_id')),
-            array('type' => 'key', 'name' => 'log_member_id', 'columns' => array('log_member_id')),
-            array('type' => 'key', 'name' => 'log_date', 'columns' => array('log_date')),
-            array('type' => 'key', 'name' => 'log_status', 'columns' => array('log_status')),
-        ),
-    ));
-    echo \"Table spamtroll_logs created\n\";
-} catch (Exception \$e) {
-    echo \"Table already exists or error: \" . \$e->getMessage() . \"\n\";
-}
-
-// Add settings
-\$settings = json_decode(file_get_contents('applications/spamtroll/data/settings.json'), true);
-foreach (\$settings as \$setting) {
-    try {
-        \\IPS\\Db::i()->insert('core_sys_conf_settings', array(
-            'conf_key' => \$setting['key'],
-            'conf_value' => \$setting['default'],
-            'conf_default' => \$setting['default'],
-            'conf_app' => 'spamtroll',
-        ));
-    } catch (Exception \$e) {
-        // May already exist
-    }
-}
-echo \"Settings added\n\";
-
-// Add modules
-\$modules = json_decode(file_get_contents('applications/spamtroll/data/modules.json'), true);
-foreach (\$modules as \$area => \$areaModules) {
-    foreach (\$areaModules as \$key => \$module) {
-        try {
-            \\IPS\\Db::i()->insert('core_modules', array(
-                'sys_module_key' => \$key,
-                'sys_module_application' => 'spamtroll',
-                'sys_module_area' => \$area,
-                'sys_module_protected' => \$module['protected'] ?? 0,
-                'sys_module_visible' => 1,
-                'sys_module_position' => 1,
-                'sys_module_default_controller' => \$module['default_controller'] ?? '',
-            ));
-        } catch (Exception \$e) {
-            // May already exist
-        }
-    }
-}
-echo \"Modules added\n\";
-
-// Clear cache
-\\IPS\\Data\\Store::i()->clearAll();
-echo \"Cache cleared\n\";
-
-echo \"\n=== INSTALLATION COMPLETE ===\n\";
-"
+php applications/spamtroll/setup/cli-install.php
 ```
 
-#### Step 4: Verify installation
+The script is idempotent — re-running it on an installed forum only reports `[=]` for existing items.
+
+**Step 4.** Verify:
 
 ```bash
-php -r "
-require 'init.php';
-\$app = \\IPS\\Application::load('spamtroll');
-echo 'Spamtroll v' . \$app->version . ' installed successfully!\n';
-"
+php -r "require 'init.php'; \$a = \\IPS\\Application::load('spamtroll'); echo 'Spamtroll v' . \$a->version . ' enabled=' . (int)\$a->enabled . PHP_EOL;"
 ```
 
-### Method 2: Installation via Admin CP
+**Step 5.** Log into the ACP → **Community → Spamtroll → Settings**, paste your API key, enable the app.
 
-1. Log in to Admin CP
-2. Go to **System** > **Applications & Modules**
-3. Click **Install** or use the **Developer Center** if Developer Mode is enabled
-4. Select the `spamtroll` folder from the applications directory
+### Method B — Build a `.tar` package and upload via ACP
+
+For production forums without Developer Mode, or for distribution, build a proper application package:
+
+1. On a development IPS install with `IN_DEV=1`, copy the application folder into `applications/spamtroll/`.
+2. Log into the ACP → **System → Applications → Developer Center** → select Spamtroll → **Download**. IPS generates a `.tar` with everything pre-compiled.
+3. On the target forum, ACP → **System → Applications → Install** → upload the `.tar`.
+
+IPS automatically registers the app, imports language strings, and compiles templates during the install — no manual steps needed.
+
+> **Why CLI install needs an extra import step.** When you drop a new application folder onto a forum with `IN_DEV=1`, IPS does NOT automatically import templates from `dev/html/`, language strings from `dev/lang.php`, or CSS/JS from `dev/`. Those imports normally happen when the ACP Developer Center builds the `.tar`, or when the ACP installs a `.tar`. `setup/cli-install.php` fills that gap for the CLI install path. This is the root cause of the infamous `template_store_missing` error when people manually copy an application folder and only register it in `core_applications`.
 
 ## Configuration
 
@@ -337,36 +241,51 @@ The logs should show entries with:
 2. Verify the database table exists (`spamtroll_logs`)
 3. Check PHP error logs for any database errors
 
+### Developer Mode looks enabled but `\IPS\IN_DEV` is false
+
+`IPS\IN_DEV` is populated from the global `IN_DEV` constant, but only at the exact moment `init.php` runs (around line 613 in IPS 4.7). IPS loads `constants.php` before that point, but `conf_global.php` only later, on the first `\IPS\Db::i()` call. If `define('IN_DEV', 1);` lives in `conf_global.php`, it's seen as `defined('IN_DEV') === true` at runtime but `\IPS\IN_DEV === false`, and the framework behaves as if Dev Mode were off.
+
+Move `define('IN_DEV', 1);` out of `conf_global.php` and into `constants.php`. Restart any long-lived PHP processes (opcache) afterwards. To confirm, run `php -r "require 'init.php'; \\IPS\\Db::i(); echo var_export(\\IPS\\IN_DEV, true);"` — it should print `true`, not `false`.
+
+### "plugin is invalid" when uploading the repo
+
+You uploaded the repository (or a zip of it) via **System → Plugins → Install**. This is an _application_, not a _plugin_ — see the note at the top of the Installation section and use Method A or B instead.
+
+### `template_store_missing` / `ErrorException: template_store_missing`
+
+Triggered when IPS tries to render a template for a group that has no compiled entry in the datastore. The two common causes:
+
+1. **The application was installed by only copying files + inserting a row into `core_applications`.** Templates in `dev/html/` were never imported into `core_theme_templates`. Run `php applications/spamtroll/setup/cli-install.php` from the IPS root — it imports the templates and compiles them.
+2. **One template file has invalid syntax**, which poisons the entire compiled group (one PHP file holds every template in a group, so one parse error breaks all of them). Look at the raw compiled template in `core_store` with key `template_1_<hash>_<group>`, run `php -l` on it, and fix the offending `.phtml`. Common mistake: writing `{{$foo}}` (raw expression, no echo) when you want echo — the correct form is `{$foo}`.
+
+After fixing a template, delete the compile lock and recompile:
+
+```bash
+php -r "require 'init.php'; \\IPS\\Db::i()->delete('core_store', array('store_key LIKE ?', 'template_compiling_%')); \\IPS\\Data\\Store::i()->clearAll(); foreach (glob(\\IPS\\ROOT_PATH.'/datastore/*.php') as \$f) @unlink(\$f); \\IPS\\Theme::load(1)->compileTemplates('spamtroll', 'admin', 'spamtroll');"
+```
+
+### Admin menu shows hash strings (e.g. `89950d2aa01ae2ad795b91681fe7529b`) instead of titles
+
+Language strings for the application were not imported into `core_sys_lang_words`. Re-run `php applications/spamtroll/setup/cli-install.php` — the language import step is idempotent.
+
 ## Uninstallation
 
 ### Via CLI
 
 ```bash
 cd /path/to/ips/forum
-php -r "
-require 'init.php';
-
-// Remove data
-\\IPS\\Db::i()->dropTable('spamtroll_logs', true);
-\\IPS\\Db::i()->delete('core_sys_conf_settings', array('conf_app=?', 'spamtroll'));
-\\IPS\\Db::i()->delete('core_modules', array('sys_module_application=?', 'spamtroll'));
-\\IPS\\Db::i()->delete('core_applications', array('app_directory=?', 'spamtroll'));
-\\IPS\\Data\\Store::i()->clearAll();
-
-echo 'Spamtroll uninstalled\n';
-"
+php applications/spamtroll/setup/cli-uninstall.php
+rm -rf applications/spamtroll
 ```
 
-Then remove the application folder:
-
-```bash
-rm -rf /path/to/ips/applications/spamtroll
-```
+`cli-uninstall.php` drops `spamtroll_logs` and removes every row in `core_applications`, `core_modules`, `core_hooks`, `core_tasks`, `core_widgets`, `core_sys_conf_settings`, `core_sys_lang_words`, and `core_theme_templates` where `app = 'spamtroll'`, then clears caches.
 
 ### Via Admin CP
 
 1. Go to **System** > **Applications & Modules**
 2. Find Spamtroll and click **Uninstall**
+
+IPS runs `extensions/core/Uninstall/Spamtroll.php` automatically to clean up the logs table and related tasks.
 
 ## Support
 

@@ -185,6 +185,16 @@ class _Response
     }
 
     /**
+     * Get submission UUID (scan identifier returned by /scan/check)
+     *
+     * @return string|null
+     */
+    public function getSubmissionId(): ?string
+    {
+        return $this->scanData['submission_id'] ?? null;
+    }
+
+    /**
      * Get status message
      *
      * @return string|null

@@ -109,6 +109,13 @@ class _Install
                         'default'    => null,
                     ),
                     array(
+                        'name'       => 'log_submission_id',
+                        'type'       => 'VARCHAR',
+                        'length'     => 36,
+                        'allow_null' => true,
+                        'default'    => null,
+                    ),
+                    array(
                         'name'       => 'log_date',
                         'type'       => 'INT',
                         'length'     => 11,
@@ -146,6 +153,21 @@ class _Install
                 ),
                 'collation' => 'utf8mb4_unicode_ci',
             ) );
+        }
+        else
+        {
+            /* Migration: ensure log_submission_id column exists on installs
+             * created before that column was added to schema.json. */
+            if ( ! \IPS\Db::i()->checkForColumn( 'spamtroll_logs', 'log_submission_id' ) )
+            {
+                \IPS\Db::i()->addColumn( 'spamtroll_logs', array(
+                    'name'       => 'log_submission_id',
+                    'type'       => 'VARCHAR',
+                    'length'     => 36,
+                    'allow_null' => true,
+                    'default'    => null,
+                ) );
+            }
         }
 
         /* Insert default settings */

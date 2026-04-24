@@ -34,6 +34,9 @@ class _logs extends \IPS\Dispatcher\Controller
     public function execute()
     {
         \IPS\Dispatcher::i()->checkAcpPermission('spamtroll_logs');
+        $cssV = (string) filemtime(\IPS\ROOT_PATH . '/applications/spamtroll/dev/css/admin/spamtroll/styles.css');
+        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
+        \IPS\Output::i()->jsFiles = array_merge(\IPS\Output::i()->jsFiles, \IPS\Output::i()->js('spamtroll.js', 'spamtroll', 'admin'));
         parent::execute();
     }
 
@@ -47,18 +50,19 @@ class _logs extends \IPS\Dispatcher\Controller
         // Create table
         $table = new \IPS\Helpers\Table\Db('spamtroll_logs', \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=logs'));
 
-        $table->langPrefix = 'spamtroll_log_';
+        $table->langPrefix = 'spamtroll_';
 
         // Columns
         $table->include = [
             'log_id',
+            'log_date',
             'log_member_id',
             'log_content_type',
             'log_status',
             'log_spam_score',
             'log_action_taken',
             'log_ip_address',
-            'log_date',
+            'log_submission_id',
         ];
 
         $table->mainColumn = 'log_id';
@@ -122,6 +126,20 @@ class _logs extends \IPS\Dispatcher\Controller
             'log_date' => function ($val) {
                 return \IPS\DateTime::ts($val)->html();
             },
+            'log_submission_id' => function ($val) {
+                if (!$val) {
+                    return '<span class="ipsType_light">—</span>';
+                }
+                $escaped = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+                $short = substr($val, 0, 8);
+                return '<span class="spamtroll-uuid">'
+                     . '<code title="' . $escaped . '">' . $short . '…</code>'
+                     . '<button type="button" class="ipsButton ipsButton_verySmall ipsButton_light spamtroll-copy-btn" '
+                     . 'data-clipboard="' . $escaped . '" title="Copy UUID">'
+                     . '<i class="fa fa-copy"></i>'
+                     . '</button>'
+                     . '</span>';
+            },
         ];
 
         // Row buttons
@@ -155,8 +173,40 @@ class _logs extends \IPS\Dispatcher\Controller
             </a>
         </div>';
 
+        // Inline clipboard handler for the UUID copy button — delegates so it
+        // still works after the table re-renders via AJAX filtering.
+        $copiedLabel = htmlspecialchars(\IPS\Member::loggedIn()->language()->get('spamtroll_copied'), ENT_QUOTES, 'UTF-8');
+        $copyScript = <<<HTML
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.spamtroll-copy-btn');
+    if (!btn) return;
+    e.preventDefault();
+    const value = btn.getAttribute('data-clipboard') || '';
+    const done = () => {
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fa fa-check"></i> {$copiedLabel}';
+        setTimeout(() => { btn.innerHTML = original; }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = value; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (_) {}
+            ta.remove(); done();
+        });
+    } else {
+        const ta = document.createElement('textarea');
+        ta.value = value; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        ta.remove(); done();
+    }
+});
+</script>
+HTML;
+
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_logs');
-        \IPS\Output::i()->output = $buttons . $table;
+        \IPS\Output::i()->output = $buttons . $table . $copyScript;
     }
 
     /**
