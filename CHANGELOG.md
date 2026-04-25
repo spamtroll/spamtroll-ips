@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- PHPStan level 9 + custom IPS framework stubs (`stubs/IPS.stub.php`)
+  + thin baseline (`phpstan-baseline.neon`) for residual IPS magic.
+  Application code is fully clean — every new error in the live
+  paths surfaces as a real diagnostic, not noise.
+- php-cs-fixer config (`.php-cs-fixer.php`) — PSR-12 +
+  `@PSR12:risky` + `@PHP80Migration:risky` with the PSR-1
+  `class_definition` rule disabled (IPS requires the `_ClassName`
+  prefix). `hooks/`, `dev/`, and `stubs/` are excluded.
+- Pest 2 unit suite (`tests/Unit/ApplicationTest.php`) covering
+  `Application::determineStatus()`, `determineAction()`, and
+  `shouldBypass()` — the only standalone-testable surface, since IPS
+  itself can't be bootstrapped in CI. 13 tests / 19 assertions.
+- peck spell-check with IPS-aware `peck.json` dictionary (acpmenu,
+  acpsearch, furl, phtml, datastore, csrf, cli-install, …).
+- `.github/workflows/qa.yml` — test matrix (PHP 8.2/8.3/8.4) + qa
+  job (PHPStan + cs-fixer dry-run + peck on PHP 8.3 with aspell).
+  Repo previously had no CI.
+- Composer scripts: `test`, `test:coverage`, `lint`, `lint:fix`,
+  `stan`, `peck`, `qa` (composite).
+- Documentation under `docs/CONTRIBUTING.md` (local setup, quality
+  gate, release flow) and `docs/ARCHITECTURE.md` (request flow, why
+  hooks are excluded from PHPStan, why `_ClassName` exists, score
+  normalization delegation).
+
+### Changed
+
+- `Application.php`, `widgets/spamtrollStats.php`, and the three
+  controllers under `modules/admin/spamtroll/` got native type hints
+  on properties and methods so `\IPS\Widget` and
+  `\IPS\Dispatcher\Controller` overrides match the parent
+  signatures.
+- `installOther()` typed `void` to satisfy covariance with the
+  stubbed `\IPS\Application::installOther()`.
+- File headers across all non-hook PHP files reformatted by
+  cs-fixer: `declare(strict_types=1)` added, tabs replaced with
+  4-space indent, `array()` → `[]`, `strpos === false` →
+  `str_contains`, trailing commas in multiline argument lists.
+
 ## [1.0.2] - 2026-04-25
 
 ### Added

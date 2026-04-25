@@ -1,0 +1,45 @@
+{
+    "preset": "base",
+    "ignore": {
+        "words": [
+            "php",
+            "ips",
+            "acp",
+            "acpmenu",
+            "acpsearch",
+            "acpsession",
+            "furl",
+            "phtml",
+            "spamtroll",
+            "submission",
+            "denominator",
+            "throwable",
+            "retryable",
+            "exponential",
+            "backoff",
+            "ipshttpclient",
+            "iphttp",
+            "datastore",
+            "csrf",
+            "cli",
+            "cleantalk",
+            "checkspam",
+            "checkspamrequest",
+            "preprocessor",
+            "namespaced",
+            "covariant",
+            "rewrites",
+            "psr",
+            "phpstan",
+            "phpdoc",
+            "ext",
+            "curl"
+        ],
+        "paths": [
+            "vendor",
+            "dev",
+            "stubs",
+            ".phpstan-cache"
+        ]
+    }
+}

@@ -1,11 +1,17 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll Anti-Spam Application Class
+ *
  * @author      Spamtroll
  * @copyright   (c) 2024 Spamtroll
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
+ *
  * @since       01 Jan 2024
+ *
  * @version     1.0.0
  */
 
@@ -49,9 +55,9 @@ class _Application extends \IPS\Application
             static::$apiClient = new \Spamtroll\Sdk\Client(
                 (string) \IPS\Settings::i()->spamtroll_api_key,
                 new \Spamtroll\Sdk\ClientConfig(
-                    userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION
+                    userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION,
                 ),
-                new \IPS\spamtroll\Api\IpsHttpClient()
+                new \IPS\spamtroll\Api\IpsHttpClient(),
             );
         }
 
@@ -73,6 +79,7 @@ class _Application extends \IPS\Application
      * Check if member should bypass spam checking
      *
      * @param \IPS\Member $member Member to check
+     *
      * @return bool
      */
     public static function shouldBypass(\IPS\Member $member): bool
@@ -105,6 +112,7 @@ class _Application extends \IPS\Application
      * Determine action based on spam score
      *
      * @param float $score Spam score
+     *
      * @return string Action: block, moderate, warn, allow
      */
     public static function determineAction(float $score): string
@@ -127,6 +135,7 @@ class _Application extends \IPS\Application
      * Determine status based on spam score
      *
      * @param float $score Spam score
+     *
      * @return string Status: blocked, suspicious, safe
      */
     public static function determineStatus(float $score): string
@@ -148,17 +157,16 @@ class _Application extends \IPS\Application
     /**
      * Log spam check result
      *
-     * @param int|null     $memberId     Member ID
-     * @param string       $contentType  Content type (post, message, registration)
-     * @param int|null     $contentId    Content ID
-     * @param string|null  $ipAddress    IP address
-     * @param string       $status       Status (blocked, suspicious, safe)
-     * @param float        $spamScore    Spam score
-     * @param array|null   $symbols      Detection symbols
-     * @param array|null   $threats      Threat categories
-     * @param string       $actionTaken  Action taken
-     * @param string|null  $contentPreview Content preview
-     * @return void
+     * @param int|null $memberId Member ID
+     * @param string $contentType Content type (post, message, registration)
+     * @param int|null $contentId Content ID
+     * @param string|null $ipAddress IP address
+     * @param string $status Status (blocked, suspicious, safe)
+     * @param float $spamScore Spam score
+     * @param array|null $symbols Detection symbols
+     * @param array|null $threats Threat categories
+     * @param string $actionTaken Action taken
+     * @param string|null $contentPreview Content preview
      */
     public static function log(
         ?int $memberId,
@@ -171,7 +179,7 @@ class _Application extends \IPS\Application
         ?array $threats,
         string $actionTaken,
         ?string $contentPreview = null,
-        ?string $submissionId = null
+        ?string $submissionId = null,
     ): void {
         try {
             \IPS\Db::i()->insert('spamtroll_logs', [
@@ -197,6 +205,7 @@ class _Application extends \IPS\Application
      * Get statistics for dashboard
      *
      * @param int $days Number of days to get stats for
+     *
      * @return array
      */
     public static function getStatistics(int $days = 7): array
@@ -236,6 +245,7 @@ class _Application extends \IPS\Application
      * Get recent logs
      *
      * @param int $limit Number of logs to retrieve
+     *
      * @return array
      */
     public static function getRecentLogs(int $limit = 20): array
@@ -253,10 +263,8 @@ class _Application extends \IPS\Application
 
     /**
      * Install routine
-     *
-     * @return void
      */
-    public function installOther()
+    public function installOther(): void
     {
         // Nothing to do on install
     }

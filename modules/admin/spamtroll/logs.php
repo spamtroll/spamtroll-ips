@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll Logs Controller
+ *
  * @author      Spamtroll
  * @copyright   (c) 2024 Spamtroll
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
+ *
  * @since       01 Jan 2024
  */
 
@@ -12,7 +17,7 @@ namespace IPS\spamtroll\modules\admin\spamtroll;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -24,28 +29,24 @@ class _logs extends \IPS\Dispatcher\Controller
     /**
      * @var bool Has been CSRF-protected
      */
-    public static $csrfProtected = true;
+    public static bool $csrfProtected = true;
 
     /**
      * Execute
-     *
-     * @return void
      */
-    public function execute()
+    public function execute(): void
     {
         \IPS\Dispatcher::i()->checkAcpPermission('spamtroll_logs');
         $cssV = (string) filemtime(\IPS\ROOT_PATH . '/applications/spamtroll/dev/css/admin/spamtroll/styles.css');
-        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
+        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn ($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
         \IPS\Output::i()->jsFiles = array_merge(\IPS\Output::i()->jsFiles, \IPS\Output::i()->js('spamtroll.js', 'spamtroll', 'admin'));
         parent::execute();
     }
 
     /**
      * Logs list
-     *
-     * @return void
      */
-    protected function manage()
+    protected function manage(): void
     {
         // Create table
         $table = new \IPS\Helpers\Table\Db('spamtroll_logs', \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=logs'));
@@ -73,7 +74,7 @@ class _logs extends \IPS\Dispatcher\Controller
 
         // Filters
         $table->filters = [
-            'spamtroll_filter_all' => NULL,
+            'spamtroll_filter_all' => null,
             'spamtroll_filter_blocked' => "log_status='blocked'",
             'spamtroll_filter_suspicious' => "log_status='suspicious'",
             'spamtroll_filter_safe' => "log_status='safe'",
@@ -98,9 +99,7 @@ class _logs extends \IPS\Dispatcher\Controller
                     return \IPS\Member::loggedIn()->language()->addToStack('spamtroll_deleted_member');
                 }
             },
-            'log_content_type' => function ($val) {
-                return \IPS\Member::loggedIn()->language()->addToStack('spamtroll_content_type_' . $val);
-            },
+            'log_content_type' => fn ($val) => \IPS\Member::loggedIn()->language()->addToStack('spamtroll_content_type_' . $val),
             'log_status' => function ($val) {
                 $class = 'ipsBadge';
                 switch ($val) {
@@ -114,18 +113,14 @@ class _logs extends \IPS\Dispatcher\Controller
                         $class .= ' ipsBadge_positive';
                         break;
                 }
-                return "<span class='{$class}'>" . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_status_' . $val) . "</span>";
+                return "<span class='{$class}'>" . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_status_' . $val) . '</span>';
             },
             'log_spam_score' => function ($val) {
                 $percent = round($val * 100);
                 return "{$percent}%";
             },
-            'log_action_taken' => function ($val) {
-                return \IPS\Member::loggedIn()->language()->addToStack('spamtroll_action_' . $val);
-            },
-            'log_date' => function ($val) {
-                return \IPS\DateTime::ts($val)->html();
-            },
+            'log_action_taken' => fn ($val) => \IPS\Member::loggedIn()->language()->addToStack('spamtroll_action_' . $val),
+            'log_date' => fn ($val) => \IPS\DateTime::ts($val)->html(),
             'log_submission_id' => function ($val) {
                 if (!$val) {
                     return '<span class="ipsType_light">—</span>';
@@ -143,8 +138,7 @@ class _logs extends \IPS\Dispatcher\Controller
         ];
 
         // Row buttons
-        $table->rowButtons = function ($row) {
-            return [
+        $table->rowButtons = fn ($row) => [
                 'view' => [
                     'icon' => 'search',
                     'title' => 'spamtroll_view_details',
@@ -158,7 +152,6 @@ class _logs extends \IPS\Dispatcher\Controller
                     'data' => ['confirm' => '', 'confirmMessage' => \IPS\Member::loggedIn()->language()->addToStack('spamtroll_delete_log_confirm')],
                 ],
             ];
-        };
 
         // Action buttons
         $clearUrl = \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=logs&do=clearAll')->csrf();
@@ -177,33 +170,33 @@ class _logs extends \IPS\Dispatcher\Controller
         // still works after the table re-renders via AJAX filtering.
         $copiedLabel = htmlspecialchars(\IPS\Member::loggedIn()->language()->get('spamtroll_copied'), ENT_QUOTES, 'UTF-8');
         $copyScript = <<<HTML
-<script>
-document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.spamtroll-copy-btn');
-    if (!btn) return;
-    e.preventDefault();
-    const value = btn.getAttribute('data-clipboard') || '';
-    const done = () => {
-        const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fa fa-check"></i> {$copiedLabel}';
-        setTimeout(() => { btn.innerHTML = original; }, 1200);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(value).then(done).catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = value; document.body.appendChild(ta); ta.select();
-            try { document.execCommand('copy'); } catch (_) {}
-            ta.remove(); done();
-        });
-    } else {
-        const ta = document.createElement('textarea');
-        ta.value = value; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); } catch (_) {}
-        ta.remove(); done();
-    }
-});
-</script>
-HTML;
+            <script>
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('.spamtroll-copy-btn');
+                if (!btn) return;
+                e.preventDefault();
+                const value = btn.getAttribute('data-clipboard') || '';
+                const done = () => {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa fa-check"></i> {$copiedLabel}';
+                    setTimeout(() => { btn.innerHTML = original; }, 1200);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(value).then(done).catch(() => {
+                        const ta = document.createElement('textarea');
+                        ta.value = value; document.body.appendChild(ta); ta.select();
+                        try { document.execCommand('copy'); } catch (_) {}
+                        ta.remove(); done();
+                    });
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = value; document.body.appendChild(ta); ta.select();
+                    try { document.execCommand('copy'); } catch (_) {}
+                    ta.remove(); done();
+                }
+            });
+            </script>
+            HTML;
 
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_logs');
         \IPS\Output::i()->output = $buttons . $table . $copyScript;
@@ -211,10 +204,8 @@ HTML;
 
     /**
      * View log details
-     *
-     * @return void
      */
-    protected function view()
+    protected function view(): void
     {
         $id = \IPS\Request::i()->id;
 
@@ -326,10 +317,8 @@ HTML;
 
     /**
      * Delete log entry
-     *
-     * @return void
      */
-    protected function delete()
+    protected function delete(): void
     {
         \IPS\Session::i()->csrfCheck();
 
@@ -339,16 +328,14 @@ HTML;
 
         \IPS\Output::i()->redirect(
             \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=logs'),
-            'deleted'
+            'deleted',
         );
     }
 
     /**
      * Clear all logs
-     *
-     * @return void
      */
-    protected function clearAll()
+    protected function clearAll(): void
     {
         \IPS\Session::i()->csrfCheck();
 
@@ -356,16 +343,14 @@ HTML;
 
         \IPS\Output::i()->redirect(
             \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=logs'),
-            'spamtroll_logs_cleared'
+            'spamtroll_logs_cleared',
         );
     }
 
     /**
      * Export logs
-     *
-     * @return void
      */
-    protected function export()
+    protected function export(): void
     {
         \IPS\Session::i()->csrfCheck();
 

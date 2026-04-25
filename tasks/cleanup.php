@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll Cleanup Task
+ *
  * @author      Spamtroll
  * @copyright   (c) 2024 Spamtroll
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
+ *
  * @since       01 Jan 2024
  */
 
@@ -12,7 +17,7 @@ namespace IPS\spamtroll\tasks;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -50,7 +55,7 @@ class _cleanup extends \IPS\Task
 
             return null;
         } catch (\Exception $e) {
-            return "Spamtroll cleanup error: " . $e->getMessage();
+            return 'Spamtroll cleanup error: ' . $e->getMessage();
         }
     }
 
@@ -60,10 +65,8 @@ class _cleanup extends \IPS\Task
      * If your task takes longer than 15 minutes to run, this method
      * will be called before execute(). Use it to clean up anything which
      * may not have been done.
-     *
-     * @return void
      */
-    public function cleanup()
+    public function cleanup(): void
     {
         // Nothing to clean up
     }

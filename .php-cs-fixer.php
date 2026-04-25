@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+$finder = (new PhpCsFixer\Finder())
+    ->in([__DIR__])
+    ->name('*.php')
+    ->ignoreDotFiles(true)
+    ->ignoreVCS(true)
+    ->exclude([
+        'vendor',
+        // IPS magic preprocessor — `//<?php` first line, not real PHP.
+        'hooks',
+        // dev/lang*.php are pure data tables (return $lang = […];).
+        'dev',
+        // Stub file mirrors the IPS framework's surface; no point
+        // styling something we won't ship.
+        'stubs',
+    ]);
+
+return (new PhpCsFixer\Config())
+    ->setRiskyAllowed(true)
+    ->setRules([
+        '@PSR12' => true,
+        '@PSR12:risky' => true,
+        '@PHP80Migration' => true,
+        '@PHP80Migration:risky' => true,
+        // PSR-1's StudlyCaps rule fires on IPS's `_ClassName` prefix
+        // convention. The framework requires it for autoload, so we
+        // disable the check here.
+        'class_definition' => false,
+        'array_syntax' => ['syntax' => 'short'],
+        'binary_operator_spaces' => ['default' => 'single_space'],
+        'no_unused_imports' => true,
+        'ordered_imports' => ['sort_algorithm' => 'alpha'],
+        'single_quote' => true,
+        'no_extra_blank_lines' => ['tokens' => ['extra', 'use', 'use_trait', 'curly_brace_block']],
+        'phpdoc_align' => ['align' => 'left'],
+        'phpdoc_trim' => true,
+        'phpdoc_no_empty_return' => true,
+        'phpdoc_separation' => true,
+        'trailing_comma_in_multiline' => ['elements' => ['arrays', 'arguments', 'parameters']],
+    ])
+    ->setFinder($finder)
+    ->setIndent('    ')
+    ->setLineEnding("\n")
+    ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache');

@@ -1,6 +1,9 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll Anti-Spam Upgrade Step — 1.0.2
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
  *
@@ -18,17 +21,17 @@ namespace IPS\spamtroll\setup\upg_10002;
 
 class _Upgrade
 {
-    public function step1( $data )
+    public function step1($data)
     {
         try {
-            \IPS\Db::i()->delete( 'core_sys_conf_settings', array( 'conf_key=?', 'spamtroll_check_messages' ) );
-        } catch ( \Exception $e ) {
+            \IPS\Db::i()->delete('core_sys_conf_settings', [ 'conf_key=?', 'spamtroll_check_messages' ]);
+        } catch (\Exception $e) {
             // delete is best-effort; absence is fine
         }
 
         // Cache invalidation so the dropped setting and the new one
         // both show up correctly on the next page load.
-        unset( \IPS\Data\Store::i()->settings );
+        unset(\IPS\Data\Store::i()->settings);
 
         return true;
     }

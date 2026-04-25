@@ -1,6 +1,9 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll SDK HTTP adapter for IPS
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
  */
@@ -9,7 +12,7 @@ namespace IPS\spamtroll\Api;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -49,7 +52,7 @@ class _IpsHttpClient implements HttpClientInterface
         return new HttpResponse(
             (int) $ipsResponse->httpResponseCode,
             (string) $ipsResponse,
-            []
+            [],
         );
     }
 }

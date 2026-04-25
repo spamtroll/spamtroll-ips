@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll Settings Controller
+ *
  * @author      Spamtroll
  * @copyright   (c) 2024 Spamtroll
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
+ *
  * @since       01 Jan 2024
  */
 
@@ -12,7 +17,7 @@ namespace IPS\spamtroll\modules\admin\spamtroll;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -24,30 +29,26 @@ class _settings extends \IPS\Dispatcher\Controller
     /**
      * @var bool Has been CSRF-protected
      */
-    public static $csrfProtected = true;
+    public static bool $csrfProtected = true;
 
     /**
      * Execute
-     *
-     * @return void
      */
-    public function execute()
+    public function execute(): void
     {
         \IPS\Dispatcher::i()->checkAcpPermission('spamtroll_settings');
         $cssV = (string) filemtime(\IPS\ROOT_PATH . '/applications/spamtroll/dev/css/admin/spamtroll/styles.css');
-        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
+        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn ($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
         \IPS\Output::i()->jsFiles = array_merge(\IPS\Output::i()->jsFiles, \IPS\Output::i()->js('spamtroll.js', 'spamtroll', 'admin'));
         parent::execute();
     }
 
     /**
      * Settings form
-     *
-     * @return void
      */
-    protected function manage()
+    protected function manage(): void
     {
-        $form = new \IPS\Helpers\Form;
+        $form = new \IPS\Helpers\Form();
 
         // Simplified single-tab form. Everything the non-technical admin
         // needs: enable/disable, API key, sensitivity preset, what to
@@ -64,7 +65,7 @@ class _settings extends \IPS\Dispatcher\Controller
             null,
             null,
             null,
-            'spamtroll_enabled'
+            'spamtroll_enabled',
         ));
 
         $form->add(new \IPS\Helpers\Form\Text(
@@ -75,7 +76,7 @@ class _settings extends \IPS\Dispatcher\Controller
             null,
             null,
             null,
-            'spamtroll_api_key'
+            'spamtroll_api_key',
         ));
 
         $form->addHeader('spamtroll_header_thresholds');
@@ -89,15 +90,15 @@ class _settings extends \IPS\Dispatcher\Controller
             false,
             [
                 'options' => [
-                    'lenient'  => 'spamtroll_sensitivity_lenient',
+                    'lenient' => 'spamtroll_sensitivity_lenient',
                     'balanced' => 'spamtroll_sensitivity_balanced',
-                    'strict'   => 'spamtroll_sensitivity_strict',
+                    'strict' => 'spamtroll_sensitivity_strict',
                 ],
             ],
             null,
             null,
             null,
-            'spamtroll_sensitivity'
+            'spamtroll_sensitivity',
         ));
 
         $form->addHeader('spamtroll_header_content_types');
@@ -112,15 +113,15 @@ class _settings extends \IPS\Dispatcher\Controller
             false,
             [
                 'options' => [
-                    'all'        => 'spamtroll_scope_all',        // posts + registrations
+                    'all' => 'spamtroll_scope_all',        // posts + registrations
                     'posts_only' => 'spamtroll_scope_posts_only', // posts only
-                    'off'        => 'spamtroll_scope_off',        // nothing (but still keep plugin installed)
+                    'off' => 'spamtroll_scope_off',        // nothing (but still keep plugin installed)
                 ],
             ],
             null,
             null,
             null,
-            'spamtroll_scan_scope'
+            'spamtroll_scan_scope',
         ));
 
         $form->addHeader('spamtroll_header_bypass');
@@ -133,7 +134,7 @@ class _settings extends \IPS\Dispatcher\Controller
             null,
             null,
             null,
-            'spamtroll_bypass_groups'
+            'spamtroll_bypass_groups',
         ));
 
         // Trust threshold: members with more than N forum posts skip
@@ -147,7 +148,7 @@ class _settings extends \IPS\Dispatcher\Controller
             null,
             null,
             \IPS\Member::loggedIn()->language()->addToStack('spamtroll_posts_unit'),
-            'spamtroll_bypass_min_posts'
+            'spamtroll_bypass_min_posts',
         ));
 
         // Process form submission
@@ -177,7 +178,7 @@ class _settings extends \IPS\Dispatcher\Controller
             }
 
             $scope = $values['spamtroll_scan_scope'] ?? 'all';
-            $values['spamtroll_check_posts']         = $scope !== 'off';
+            $values['spamtroll_check_posts'] = $scope !== 'off';
             $values['spamtroll_check_registrations'] = ($scope === 'all');
 
             // Number form returns numeric; keep as int for cleaner storage
@@ -187,16 +188,16 @@ class _settings extends \IPS\Dispatcher\Controller
 
             // Pin moderate/block actions — the 4x4 action matrix is
             // collapsed to a single sensible policy.
-            $values['spamtroll_action_blocked']      = 'block';
-            $values['spamtroll_action_suspicious']   = 'moderate';
-            $values['spamtroll_timeout']             = 5;
-            $values['spamtroll_log_retention_days']  = 30;
+            $values['spamtroll_action_blocked'] = 'block';
+            $values['spamtroll_action_suspicious'] = 'moderate';
+            $values['spamtroll_timeout'] = 5;
+            $values['spamtroll_log_retention_days'] = 30;
 
             $form->saveAsSettings($values);
 
             \IPS\Output::i()->redirect(
                 \IPS\Http\Url::internal('app=spamtroll&module=spamtroll&controller=settings'),
-                'saved'
+                'saved',
             );
         }
 
@@ -206,10 +207,8 @@ class _settings extends \IPS\Dispatcher\Controller
 
     /**
      * Test API connection
-     *
-     * @return void
      */
-    protected function testConnection()
+    protected function testConnection(): void
     {
         \IPS\Session::i()->csrfCheck();
 
@@ -220,9 +219,9 @@ class _settings extends \IPS\Dispatcher\Controller
                 $client = new \Spamtroll\Sdk\Client(
                     (string) $apiKey,
                     new \Spamtroll\Sdk\ClientConfig(
-                        userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION
+                        userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION,
                     ),
-                    new \IPS\spamtroll\Api\IpsHttpClient()
+                    new \IPS\spamtroll\Api\IpsHttpClient(),
                 );
             } else {
                 $client = \IPS\spamtroll\Application::apiClient();

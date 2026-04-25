@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @brief       Spamtroll Dashboard Controller
+ *
  * @author      Spamtroll
  * @copyright   (c) 2024 Spamtroll
+ *
  * @package     IPS Community Suite
  * @subpackage  Spamtroll Anti-Spam
+ *
  * @since       01 Jan 2024
  */
 
@@ -12,7 +17,7 @@ namespace IPS\spamtroll\modules\admin\spamtroll;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -24,28 +29,24 @@ class _dashboard extends \IPS\Dispatcher\Controller
     /**
      * @var bool Has been CSRF-protected
      */
-    public static $csrfProtected = true;
+    public static bool $csrfProtected = true;
 
     /**
      * Execute
-     *
-     * @return void
      */
-    public function execute()
+    public function execute(): void
     {
         \IPS\Dispatcher::i()->checkAcpPermission('spamtroll_dashboard');
         $cssV = (string) filemtime(\IPS\ROOT_PATH . '/applications/spamtroll/dev/css/admin/spamtroll/styles.css');
-        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
+        \IPS\Output::i()->cssFiles = array_merge(\IPS\Output::i()->cssFiles, array_map(fn ($u) => ((string) $u) . '?v=' . $cssV, \IPS\Theme::i()->css('spamtroll/styles.css', 'spamtroll', 'admin')));
         \IPS\Output::i()->jsFiles = array_merge(\IPS\Output::i()->jsFiles, \IPS\Output::i()->js('spamtroll.js', 'spamtroll', 'admin'));
         parent::execute();
     }
 
     /**
      * Dashboard view
-     *
-     * @return void
      */
-    protected function manage()
+    protected function manage(): void
     {
         // Get statistics
         $stats = \IPS\spamtroll\Application::getStatistics(7);
@@ -64,14 +65,20 @@ class _dashboard extends \IPS\Dispatcher\Controller
         $chartLabels = $chartTotal = $chartBlocked = [];
         foreach ($stats['daily'] as $day) {
             $chartLabels[] = $day['date'];
-            $chartTotal[]  = $day['total'];
+            $chartTotal[] = $day['total'];
             $chartBlocked[] = $day['blocked'];
         }
 
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_dashboard');
         \IPS\Output::i()->output = \IPS\Theme::i()->getTemplate('spamtroll', 'spamtroll', 'admin')->dashboard(
-            $stats, $recentLogs, $apiStatus, $isConfigured, $isEnabled,
-            json_encode($chartLabels), json_encode($chartTotal), json_encode($chartBlocked)
+            $stats,
+            $recentLogs,
+            $apiStatus,
+            $isConfigured,
+            $isEnabled,
+            json_encode($chartLabels),
+            json_encode($chartTotal),
+            json_encode($chartBlocked),
         );
     }
 

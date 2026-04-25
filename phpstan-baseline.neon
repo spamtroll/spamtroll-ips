@@ -1,0 +1,516 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 6
+			path: Application.php
+
+		-
+			message: "#^Instantiated class IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient not found\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\_Application\\:\\:getRecentLogs\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\_Application\\:\\:getStatistics\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\_Application\\:\\:log\\(\\) has parameter \\$symbols with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\_Application\\:\\:log\\(\\) has parameter \\$threats with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, mixed given\\.$#"
+			count: 2
+			path: Application.php
+
+		-
+			message: "#^Parameter \\#2 \\$timestamp of function date expects int\\|null, int\\|false given\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Parameter \\#3 \\$http of class Spamtroll\\\\Sdk\\\\Client constructor expects Spamtroll\\\\Sdk\\\\Http\\\\HttpClientInterface\\|null, IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient given\\.$#"
+			count: 1
+			path: Application.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\extensions\\\\core\\\\MemberSync\\\\_Spamtroll\\:\\:onMerge\\(\\) has parameter \\$mergedMembers with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: extensions/core/MemberSync/Spamtroll.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Db\\:\\:dropTable\\(\\)\\.$#"
+			count: 1
+			path: extensions/core/Uninstall/Spamtroll.php
+
+		-
+			message: "#^Call to static method apiClient\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/dashboard.php
+
+		-
+			message: "#^Call to static method getRecentLogs\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/dashboard.php
+
+		-
+			message: "#^Call to static method getStatistics\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/dashboard.php
+
+		-
+			message: "#^Cannot call method dashboard\\(\\) on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/dashboard.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\modules\\\\admin\\\\spamtroll\\\\_dashboard\\:\\:checkApiStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/dashboard.php
+
+		-
+			message: "#^Access to an undefined property IPS\\\\Helpers\\\\Table\\\\Db\\:\\:\\$mainColumn\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Access to an undefined property IPS\\\\Helpers\\\\Table\\\\Db\\:\\:\\$quickSearch\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Access to an undefined property IPS\\\\Request\\:\\:\\$id\\.$#"
+			count: 2
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 2
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Member\\:\\:link\\(\\)\\.$#"
+			count: 2
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Output\\:\\:sendHeader\\(\\)\\.$#"
+			count: 2
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Output\\:\\:sendOutput\\(\\)\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Call to an undefined static method IPS\\\\DateTime\\:\\:ts\\(\\)\\.$#"
+			count: 2
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_action_taken' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_content_preview' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_content_type' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_date' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_id' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_ip_address' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_member_id' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_spam_score' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_status' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_symbols' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot access offset 'log_threat…' on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Parameter \\#1 \\$id of static method IPS\\\\Member\\:\\:load\\(\\) expects int, mixed given\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, mixed given\\.$#"
+			count: 4
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function htmlspecialchars expects string, mixed given\\.$#"
+			count: 5
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Parameter \\#2 \\$timestamp of function date expects int\\|null, mixed given\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Property IPS\\\\Helpers\\\\Table\\\\Db\\:\\:\\$filters \\(array\\<string, string\\>\\) does not accept array\\<string, string\\|null\\>\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Property IPS\\\\Helpers\\\\Table\\\\Db\\:\\:\\$include \\(array\\<string, string\\>\\) does not accept array\\<int, string\\>\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Property IPS\\\\Helpers\\\\Table\\\\Db\\:\\:\\$rowButtons \\(array\\<int, mixed\\>\\) does not accept Closure\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Call to static method apiClient\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/settings.php
+
+		-
+			message: "#^Cannot call method settings\\(\\) on mixed\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/settings.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/settings.php
+
+		-
+			message: "#^Instantiated class IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient not found\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/settings.php
+
+		-
+			message: "#^Parameter \\#3 \\$http of class Spamtroll\\\\Sdk\\\\Client constructor expects Spamtroll\\\\Sdk\\\\Http\\\\HttpClientInterface\\|null, IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient given\\.$#"
+			count: 1
+			path: modules/admin/spamtroll/settings.php
+
+		-
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 5
+			path: setup/cli-install.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Data\\\\Store\\:\\:clearAll\\(\\)\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Call to an undefined static method IPS\\\\Theme\\:\\:addCss\\(\\)\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Call to an undefined static method IPS\\\\Theme\\:\\:addTemplate\\(\\)\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Call to static method writeDataFile\\(\\) on an unknown class IPS\\\\Plugin\\\\Hook\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'allow_reuse' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'app_author' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'app_directory' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'app_update_check' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'app_website' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'class' on mixed\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'default_area' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'default_controller' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'protected' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'restrict' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'type' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'word_custom' on mixed\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'word_default' on mixed\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot access offset 'word_id' on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot call method compileCss\\(\\) on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot call method compileTemplates\\(\\) on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot call method getExtension\\(\\) on mixed\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot call method getPathname\\(\\) on mixed\\.$#"
+			count: 4
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 4
+			path: setup/cli-install.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function array_keys expects array, mixed given\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Parameter \\#1 \\$id of static method IPS\\\\Theme\\:\\:load\\(\\) expects int, array\\<string, mixed\\> given\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
+			count: 5
+			path: setup/cli-install.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_match expects string, string\\|false given\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Parameter \\#3 \\$subject of function preg_replace expects array\\|string, string\\|false given\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$area \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$existingId \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$filename \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$key \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$o\\['filename'\\] \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$taskKey \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Part \\$widgetKey \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 2
+			path: setup/cli-install.php
+
+		-
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: setup/cli-uninstall.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Data\\\\Store\\:\\:clearAll\\(\\)\\.$#"
+			count: 1
+			path: setup/cli-uninstall.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Db\\:\\:dropTable\\(\\)\\.$#"
+			count: 1
+			path: setup/cli-uninstall.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Db\\:\\:addColumn\\(\\)\\.$#"
+			count: 1
+			path: setup/install.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\Db\\:\\:checkForColumn\\(\\)\\.$#"
+			count: 1
+			path: setup/install.php
+
+		-
+			message: "#^Caught class IPS\\\\Db\\\\Exception not found\\.$#"
+			count: 1
+			path: setup/install.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\install\\\\_Install\\:\\:step1\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: setup/install.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\install\\\\_Install\\:\\:step1\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: setup/install.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\install\\\\_Install\\:\\:step1\\(\\) should return array\\|null but returns true\\.$#"
+			count: 1
+			path: setup/install.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10001\\\\_Upgrade\\:\\:step1\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: setup/upgrade/10001/upgrade.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10001\\\\_Upgrade\\:\\:step1\\(\\) has parameter \\$data with no type specified\\.$#"
+			count: 1
+			path: setup/upgrade/10001/upgrade.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10001\\\\_Upgrade\\:\\:step1CustomTitle\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: setup/upgrade/10001/upgrade.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10002\\\\_Upgrade\\:\\:step1\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: setup/upgrade/10002/upgrade.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10002\\\\_Upgrade\\:\\:step1\\(\\) has parameter \\$data with no type specified\\.$#"
+			count: 1
+			path: setup/upgrade/10002/upgrade.php
+
+		-
+			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10002\\\\_Upgrade\\:\\:step1CustomTitle\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: setup/upgrade/10002/upgrade.php
+
+		-
+			message: "#^Call to an undefined method IPS\\\\spamtroll\\\\widgets\\\\_spamtrollStats\\:\\:output\\(\\)\\.$#"
+			count: 1
+			path: widgets/spamtrollStats.php
+
+		-
+			message: "#^Call to static method getStatistics\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
+			count: 1
+			path: widgets/spamtrollStats.php

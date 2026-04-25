@@ -1,0 +1,31 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 9
+    paths:
+        - Application.php
+        - sources
+        - modules
+        - widgets
+        - tasks
+        - extensions
+        - setup
+    excludePaths:
+        # IPS hook files start with `//<?php` (a literal HTML comment),
+        # which means the file isn't valid PHP until the IPS hook
+        # preprocessor rewrites it. PHPStan would either choke on the
+        # parse error or treat the whole body as inline HTML. We rely
+        # on manual review for the two hook files instead.
+        - hooks/*
+        # Language tables are not code; the `<?php` opens, the array
+        # is assigned, end-of-file. Nothing to analyse.
+        - dev/lang.php
+        - dev/lang_pl.php
+        - dev/lang_de.php
+    bootstrapFiles:
+        - vendor/autoload.php
+        - stubs/IPS.stub.php
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: true
+    tmpDir: .phpstan-cache
