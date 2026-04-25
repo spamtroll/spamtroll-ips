@@ -91,6 +91,13 @@ class _Application extends \IPS\Application
             }
         }
 
+        // Established-member trust threshold: a member with more than N
+        // forum posts is skipped. 0 disables the check (default).
+        $minPosts = (int) \IPS\Settings::i()->spamtroll_bypass_min_posts;
+        if ($minPosts > 0 && (int) $member->member_posts > $minPosts) {
+            return true;
+        }
+
         return false;
     }
 

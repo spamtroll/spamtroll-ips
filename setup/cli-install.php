@@ -201,16 +201,44 @@ if ( file_exists( "$appPath/data/widgets.json" ) )
     }
 }
 
-/* 7. language strings (dev/lang.php + dev/jslang.php for every installed language) */
-$lang   = array();
+/* 7. language strings — pick a translation file per language pack.
+ *
+ * Each pack in core_sys_lang has a `lang_short` ISO-ish code ("en",
+ * "pl_PL", "de", …). We take the first two letters and try
+ * dev/lang_<code>.php; if missing, fall back to dev/lang.php (the
+ * canonical EN copy). dev/jslang.php is shared across all locales.
+ *
+ * Inserts new (lang_id, word_key) rows; updates word_default for
+ * existing rows so re-running the installer after editing a string
+ * file actually rolls the change out — and so freshly-added locales
+ * (PL/DE in 1.0.2) overwrite the EN strings that 1.0.0/1.0.1 had
+ * pushed into every pack indiscriminately. word_custom is only
+ * touched when the admin hasn't customised it (i.e. it still equals
+ * the previous default).
+ */
 $jslang = array();
-if ( file_exists( "$appPath/dev/lang.php" ) )   { include "$appPath/dev/lang.php"; }
 if ( file_exists( "$appPath/dev/jslang.php" ) ) { include "$appPath/dev/jslang.php"; }
 
-$installedLangs = iterator_to_array( \IPS\Db::i()->select( 'lang_id', 'core_sys_lang' ) );
-$langImported = 0;
-foreach ( $installedLangs as $langId )
+$langCache = array();
+$loadLang = function ( $code ) use ( &$langCache, $appPath ) {
+    $code = strtolower( $code );
+    if ( isset( $langCache[ $code ] ) ) { return $langCache[ $code ]; }
+    $file = "$appPath/dev/lang_" . $code . ".php";
+    $fallback = "$appPath/dev/lang.php";
+    $lang = array();
+    if ( file_exists( $file ) )       { include $file; }
+    elseif ( file_exists( $fallback ) ) { include $fallback; }
+    return $langCache[ $code ] = $lang;
+};
+
+$installedLangs = iterator_to_array( \IPS\Db::i()->select( 'lang_id, lang_short', 'core_sys_lang' ) );
+$langInserted = 0; $langUpdated = 0;
+foreach ( $installedLangs as $row )
 {
+    $langId = (int) $row['lang_id'];
+    $code = substr( strtolower( (string) ( $row['lang_short'] ?? 'en' ) ), 0, 2 );
+    $lang = $loadLang( $code );
+
     foreach ( array( array( $lang, 0 ), array( $jslang, 1 ) ) as $pair )
     {
         list( $map, $isJs ) = $pair;
@@ -218,9 +246,25 @@ foreach ( $installedLangs as $langId )
         {
             try
             {
-                \IPS\Db::i()->select( 'word_id', 'core_sys_lang_words',
+                $existing = \IPS\Db::i()->select( 'word_id, word_default, word_custom', 'core_sys_lang_words',
                     array( 'word_app=? AND word_key=? AND lang_id=? AND word_js=?', $appDir, $key, $langId, $isJs )
                 )->first();
+
+                if ( $existing['word_default'] === $val
+                     && ( $existing['word_custom'] === null || $existing['word_custom'] === $val ) )
+                {
+                    continue; // already up to date
+                }
+
+                $update = array( 'word_default' => $val );
+                // Only refresh word_custom if admin hasn't overridden it.
+                if ( $existing['word_custom'] === null
+                     || $existing['word_custom'] === $existing['word_default'] )
+                {
+                    $update['word_custom'] = $val;
+                }
+                \IPS\Db::i()->update( 'core_sys_lang_words', $update, array( 'word_id=?', $existing['word_id'] ) );
+                $langUpdated++;
             }
             catch ( UnderflowException $e )
             {
@@ -233,12 +277,12 @@ foreach ( $installedLangs as $langId )
                     'word_js'      => $isJs,
                     'word_export'  => 1,
                 ) );
-                $langImported++;
+                $langInserted++;
             }
         }
     }
 }
-echo "[+] language strings imported: $langImported (across " . count( $installedLangs ) . " language(s))\n";
+echo "[+] language strings: inserted=$langInserted, updated=$langUpdated (across " . count( $installedLangs ) . " language(s))\n";
 
 /* 8. templates (dev/html/<location>/<group>/<name>.phtml → core_theme_templates).
  *     Update-or-insert so that re-running the installer after editing .phtml

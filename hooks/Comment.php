@@ -6,13 +6,16 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
 }
 
 /**
- * Hook on \IPS\Content\Comment::create — intercepts every post reply,
- * every PM message, and (via Item::processAfterCreate → Comment::create)
- * the first post of each new topic.
+ * Hook on \IPS\Content\Comment::create — intercepts every post reply
+ * and (via Item::processAfterCreate → Comment::create) the first post
+ * of each new topic.
  *
- * Replaces the old per-class hooks on \IPS\forums\Topic\Post and
- * \IPS\core\Messenger\Message, which only intercepted Item-level
- * processAfterCreate and therefore missed ordinary replies.
+ * Skips private messages: the Messenger Conversation path also flows
+ * through Comment::create, but as of 1.0.2 we explicitly bail out for
+ * those item classes. Replaces the old per-class hooks on
+ * \IPS\forums\Topic\Post and \IPS\core\Messenger\Message, which only
+ * intercepted Item-level processAfterCreate and therefore missed
+ * ordinary replies.
  */
 abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
 {
@@ -38,16 +41,16 @@ abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
                 return $result;
             }
 
-            /* Messages (PMs) live under \IPS\core\Messenger\Message; forum
-             * posts under \IPS\forums\Topic\Post or similar. We key behaviour
-             * on the item class so one hook handles both. */
+            /* Skip private messages outright. Messenger Conversations also
+             * route through Comment::create, but we don't scan them anymore. */
             $itemClass = is_object($item) ? get_class($item) : '';
-            $isMessage = ($itemClass === 'IPS\\core\\Messenger\\Conversation')
-                      || (strpos($itemClass, 'Messenger') !== false);
-            $contentType = $isMessage ? 'message' : 'post';
+            if ($itemClass === 'IPS\\core\\Messenger\\Conversation'
+                || strpos($itemClass, 'Messenger') !== false
+            ) {
+                return $result;
+            }
 
-            $settingKey = $isMessage ? 'spamtroll_check_messages' : 'spamtroll_check_posts';
-            if (!\IPS\Settings::i()->$settingKey) {
+            if (!\IPS\Settings::i()->spamtroll_check_posts) {
                 return $result;
             }
 
@@ -67,7 +70,7 @@ abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
                 $client = \IPS\spamtroll\Application::apiClient();
                 $response = $client->checkSpam(new \Spamtroll\Sdk\Request\CheckSpamRequest(
                     $text,
-                    $contentType === 'message' ? \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_MESSAGE : \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_FORUM,
+                    \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_FORUM,
                     $ip,
                     $postingMember->name ?: null,
                     $postingMember->email ?: null
@@ -84,7 +87,7 @@ abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
 
                 \IPS\spamtroll\Application::log(
                     $postingMember->member_id ?: null,
-                    $contentType,
+                    'post',
                     is_object($result) && isset($result->pid) ? $result->pid
                         : (is_object($result) && isset($result->id) ? $result->id : null),
                     $ip,

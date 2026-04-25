@@ -24,10 +24,6 @@
         "default": "1"
     },
     {
-        "key": "spamtroll_check_messages",
-        "default": "1"
-    },
-    {
         "key": "spamtroll_check_registrations",
         "default": "1"
     },
@@ -42,6 +38,10 @@
     {
         "key": "spamtroll_bypass_groups",
         "default": ""
+    },
+    {
+        "key": "spamtroll_bypass_min_posts",
+        "default": "0"
     },
     {
         "key": "spamtroll_log_retention_days",

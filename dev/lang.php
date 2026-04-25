@@ -26,10 +26,10 @@ $lang = array(
 
     // Settings Headers
     'spamtroll_header_api_config' => 'API Configuration',
-    'spamtroll_header_thresholds' => 'Spam Thresholds',
-    'spamtroll_header_content_types' => 'Content Types to Check',
+    'spamtroll_header_thresholds' => 'Detection',
+    'spamtroll_header_content_types' => 'What to Scan',
     'spamtroll_header_actions' => 'Spam Actions',
-    'spamtroll_header_bypass' => 'Bypass Settings',
+    'spamtroll_header_bypass' => 'Bypass',
     'spamtroll_header_logs' => 'Log Settings',
 
     // Settings Fields
@@ -43,6 +43,7 @@ $lang = array(
     'spamtroll_timeout_desc' => 'Timeout for API requests.',
     'spamtroll_seconds' => 'seconds',
     'spamtroll_days' => 'days',
+    'spamtroll_posts_unit' => 'posts',
 
     'spamtroll_spam_threshold' => 'Spam Threshold',
     'spamtroll_spam_threshold_desc' => 'Score above this value will be treated as spam (0.0 - 1.0).',
@@ -51,8 +52,6 @@ $lang = array(
 
     'spamtroll_check_posts' => 'Check Forum Posts',
     'spamtroll_check_posts_desc' => 'Enable spam checking for forum posts.',
-    'spamtroll_check_messages' => 'Check Private Messages',
-    'spamtroll_check_messages_desc' => 'Enable spam checking for private messages.',
     'spamtroll_check_registrations' => 'Check Registrations',
     'spamtroll_check_registrations_desc' => 'Enable spam checking during member registration.',
 
@@ -69,6 +68,9 @@ $lang = array(
     'spamtroll_bypass_groups' => 'Bypass Groups',
     'spamtroll_bypass_groups_desc' => 'Members in these groups will not be checked for spam. Administrators are always bypassed.',
 
+    'spamtroll_bypass_min_posts' => 'Bypass users with more than X posts',
+    'spamtroll_bypass_min_posts_desc' => 'Members who have written more than this many forum posts will not be scanned. Set to 0 to disable this threshold.',
+
     'spamtroll_log_retention_days' => 'Log Retention',
     'spamtroll_log_retention_days_desc' => 'Number of days to keep spam logs.',
 
@@ -80,17 +82,10 @@ $lang = array(
     'spamtroll_sensitivity_strict'   => 'Strict (catches more spam)',
 
     'spamtroll_scan_scope'           => 'What to scan',
-    'spamtroll_scan_scope_desc'      => 'Which content types Spamtroll should check.',
-    'spamtroll_scope_all'            => 'Posts, messages, and new registrations',
-    'spamtroll_scope_posts_and_pms'  => 'Posts and private messages',
+    'spamtroll_scan_scope_desc'      => 'Which content types Spamtroll should check. Private messages are never scanned.',
+    'spamtroll_scope_all'            => 'Posts and new registrations',
     'spamtroll_scope_posts_only'     => 'Forum posts only',
     'spamtroll_scope_off'            => 'Off (keep installed but do not scan)',
-
-    // Settings form headers
-    'spamtroll_header_api_config'      => 'API Configuration',
-    'spamtroll_header_thresholds'      => 'Detection',
-    'spamtroll_header_content_types'   => 'What to Scan',
-    'spamtroll_header_bypass'          => 'Bypass',
 
     // Dashboard
     'spamtroll_dashboard_title' => 'Spamtroll Dashboard',
@@ -138,7 +133,6 @@ $lang = array(
     'spamtroll_filter_suspicious' => 'Suspicious Only',
     'spamtroll_filter_safe' => 'Safe Only',
     'spamtroll_filter_posts' => 'Posts Only',
-    'spamtroll_filter_messages' => 'Messages Only',
     'spamtroll_filter_registrations' => 'Registrations Only',
 
     'spamtroll_status_blocked' => 'Blocked',

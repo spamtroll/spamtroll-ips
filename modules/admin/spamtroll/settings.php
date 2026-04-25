@@ -102,19 +102,19 @@ class _settings extends \IPS\Dispatcher\Controller
 
         $form->addHeader('spamtroll_header_content_types');
 
-        // Single scope dropdown replaces three independent YesNo toggles
-        // (posts / messages / registrations). Most admins want "all" or
-        // "forum only" — not every combination.
+        // Single scope dropdown replaces independent YesNo toggles. Posts
+        // and registrations only — private messages were removed in 1.0.2
+        // by request: scanning private mail surprised forum admins and
+        // didn't carry its weight against the API quota.
         $form->add(new \IPS\Helpers\Form\Select(
             'spamtroll_scan_scope',
             \IPS\Settings::i()->spamtroll_scan_scope ?: 'all',
             false,
             [
                 'options' => [
-                    'all'           => 'spamtroll_scope_all',           // posts + PMs + registrations
-                    'posts_and_pms' => 'spamtroll_scope_posts_and_pms', // posts + PMs
-                    'posts_only'    => 'spamtroll_scope_posts_only',    // posts only
-                    'off'           => 'spamtroll_scope_off',           // nothing (but still keep plugin installed)
+                    'all'        => 'spamtroll_scope_all',        // posts + registrations
+                    'posts_only' => 'spamtroll_scope_posts_only', // posts only
+                    'off'        => 'spamtroll_scope_off',        // nothing (but still keep plugin installed)
                 ],
             ],
             null,
@@ -134,6 +134,20 @@ class _settings extends \IPS\Dispatcher\Controller
             null,
             null,
             'spamtroll_bypass_groups'
+        ));
+
+        // Trust threshold: members with more than N forum posts skip
+        // scanning entirely. Catches the "established member, never spams"
+        // case without admins having to put them in a bypass group.
+        $form->add(new \IPS\Helpers\Form\Number(
+            'spamtroll_bypass_min_posts',
+            (int) \IPS\Settings::i()->spamtroll_bypass_min_posts,
+            false,
+            ['min' => 0, 'max' => 100000],
+            null,
+            null,
+            \IPS\Member::loggedIn()->language()->addToStack('spamtroll_posts_unit'),
+            'spamtroll_bypass_min_posts'
         ));
 
         // Process form submission
@@ -164,8 +178,12 @@ class _settings extends \IPS\Dispatcher\Controller
 
             $scope = $values['spamtroll_scan_scope'] ?? 'all';
             $values['spamtroll_check_posts']         = $scope !== 'off';
-            $values['spamtroll_check_messages']      = in_array($scope, ['all', 'posts_and_pms'], true);
             $values['spamtroll_check_registrations'] = ($scope === 'all');
+
+            // Number form returns numeric; keep as int for cleaner storage
+            // and so empty input lands as 0 instead of "" that would later
+            // stringly-truthy itself into a bypass-everyone bug.
+            $values['spamtroll_bypass_min_posts'] = max(0, (int) ($values['spamtroll_bypass_min_posts'] ?? 0));
 
             // Pin moderate/block actions — the 4x4 action matrix is
             // collapsed to a single sensible policy.

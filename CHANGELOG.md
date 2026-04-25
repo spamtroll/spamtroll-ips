@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-04-25
+
+### Added
+- **Bypass threshold by post count.** New setting `spamtroll_bypass_min_posts`
+  (ACP → Spamtroll → Settings → Bypass): members with more than N forum
+  posts skip scanning entirely. Default `0` keeps the previous behaviour
+  (no post-count threshold). Catches the "established member, never
+  spams" case without admins manually maintaining a bypass group.
+- **Polish and German translations** — full `dev/lang_pl.php` and
+  `dev/lang_de.php`. The CLI installer now picks the right strings per
+  language pack based on `core_sys_lang.lang_short`, so PL packs that
+  previously inherited the EN default get refreshed on the next run.
+  Other locales fall back to EN.
+
+### Changed
+- **Private messages are no longer scanned.** The "Posts and private
+  messages" option was removed from the scan-scope dropdown; the
+  Comment hook now bails out for any `\IPS\core\Messenger\*` item
+  before reaching the API. The legacy `spamtroll_check_messages`
+  setting is dropped from `data/settings.json` and from the database
+  by the 1.0.2 upgrade handler.
+- `setup/cli-install.php` now updates `core_sys_lang_words` rows
+  whose `word_default` has changed (previously it only inserted
+  missing rows). Custom strings that admins have overridden via ACP
+  are preserved — only `word_default` plus `word_custom`-when-equal-
+  to-default are refreshed.
+
+## [1.0.1] - 2026-04-24
+
 ### Changed
 - API client extracted to the shared `spamtroll/php-sdk` Composer package.
   `\IPS\spamtroll\Api\Client`, `\IPS\spamtroll\Api\Response`, and
