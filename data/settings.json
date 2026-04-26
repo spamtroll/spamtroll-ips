@@ -50,5 +50,9 @@
     {
         "key": "spamtroll_timeout",
         "default": "5"
+    },
+    {
+        "key": "spamtroll_quota_skipped_log",
+        "default": ""
     }
 ]

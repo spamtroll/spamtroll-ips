@@ -69,6 +69,29 @@ class _dashboard extends \IPS\Dispatcher\Controller
             $chartBlocked[] = $day['blocked'];
         }
 
+        // Quota-skipped panel — surfaces "X messages were not scanned
+        // because daily quota was exhausted" with an upgrade CTA.
+        // Empty unless something hit the limit in the last 7 days.
+        $quotaSkipped = \IPS\spamtroll\Application::getQuotaSkippedStats(7);
+        if ($quotaSkipped['total'] > 0) {
+            $usage = $quotaSkipped['last_usage'];
+            $current = isset($usage['current']) && is_numeric($usage['current']) ? (int) $usage['current'] : 0;
+            $limit = isset($usage['limit']) && is_numeric($usage['limit']) ? (int) $usage['limit'] : 0;
+            $plan = isset($usage['plan']) && is_string($usage['plan']) ? $usage['plan'] : 'free';
+            \IPS\Output::i()->sidebar['actions']['quota'] = [
+                'title' => sprintf(
+                    '%d messages skipped (last 7d) — %d/%d on %s. Upgrade →',
+                    $quotaSkipped['total'],
+                    $current,
+                    $limit,
+                    $plan,
+                ),
+                'icon' => 'exclamation-triangle',
+                'link' => \IPS\Http\Url::external('https://spamtroll.io/dashboard/billing'),
+                'target' => '_blank',
+            ];
+        }
+
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_dashboard');
         \IPS\Output::i()->output = \IPS\Theme::i()->getTemplate('spamtroll', 'spamtroll', 'admin')->dashboard(
             $stats,

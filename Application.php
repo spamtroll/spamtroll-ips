@@ -202,6 +202,78 @@ class _Application extends \IPS\Application
     }
 
     /**
+     * Record a quota-exhausted scan (HTTP 402 response from the API)
+     * in the application config so the AdminCP dashboard can render
+     * "X messages were skipped because you hit your daily quota —
+     * upgrade your plan". JSON-encoded payload is intentionally
+     * compact: a per-day counter pruned to 30 days plus the most
+     * recent usage block from the API. No DB schema changes needed.
+     */
+    public static function recordQuotaSkipped(\Spamtroll\Sdk\Response\CheckSpamResponse $response): void
+    {
+        $today = gmdate('Y-m-d');
+        $stored = json_decode((string) \IPS\Settings::i()->spamtroll_quota_skipped_log, true);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $byDay = isset($stored['days']) && is_array($stored['days']) ? $stored['days'] : [];
+        $byDay[$today] = (isset($byDay[$today]) ? (int) $byDay[$today] : 0) + 1;
+
+        $cutoff = gmdate('Y-m-d', strtotime('-30 days'));
+        foreach (array_keys($byDay) as $day) {
+            if (!is_string($day) || $day < $cutoff) {
+                unset($byDay[$day]);
+            }
+        }
+
+        $usage = method_exists($response, 'getQuotaUsage') ? $response->getQuotaUsage() : [];
+
+        \IPS\Settings::i()->changeValues([
+            'spamtroll_quota_skipped_log' => json_encode([
+                'days' => $byDay,
+                'last_at' => time(),
+                'last_usage' => is_array($usage) ? $usage : [],
+            ]),
+        ]);
+    }
+
+    /**
+     * Snapshot of the quota-skipped log for the AdminCP panel. Always
+     * returns the canonical shape so the template can render without
+     * extra null-checks.
+     *
+     * @return array{total: int, today: int, days: array<string,int>, last_usage: array<string,mixed>, last_at: int}
+     */
+    public static function getQuotaSkippedStats(int $days = 7): array
+    {
+        $stored = json_decode((string) \IPS\Settings::i()->spamtroll_quota_skipped_log, true);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $byDay = isset($stored['days']) && is_array($stored['days']) ? $stored['days'] : [];
+        $cutoff = gmdate('Y-m-d', strtotime('-' . max(1, $days) . ' days'));
+
+        $window = [];
+        $total = 0;
+        foreach ($byDay as $day => $count) {
+            if (!is_string($day) || !is_int($count) || $day < $cutoff) {
+                continue;
+            }
+            $window[$day] = $count;
+            $total += $count;
+        }
+
+        $today = gmdate('Y-m-d');
+        return [
+            'total' => $total,
+            'today' => isset($byDay[$today]) && is_int($byDay[$today]) ? $byDay[$today] : 0,
+            'days' => $window,
+            'last_usage' => isset($stored['last_usage']) && is_array($stored['last_usage']) ? $stored['last_usage'] : [],
+            'last_at' => isset($stored['last_at']) && is_int($stored['last_at']) ? $stored['last_at'] : 0,
+        ];
+    }
+
+    /**
      * Get statistics for dashboard
      *
      * @param int $days Number of days to get stats for

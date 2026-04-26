@@ -76,6 +76,15 @@ abstract class spamtroll_hook_Comment extends _HOOK_CLASS_
                     $postingMember->email ?: null
                 ));
 
+                // Quota exhausted — log locally so the AdminCP panel can
+                // surface "X messages skipped, upgrade your plan", then
+                // fail open. The post is allowed because the user ran
+                // out of paid scans, not because we think it's spam.
+                if ($response->httpCode === 402) {
+                    \IPS\spamtroll\Application::recordQuotaSkipped($response);
+                    return $result;
+                }
+
                 if (!$response->success) {
                     \IPS\Log::log('Spamtroll API error: ' . ($response->error ?? '(none)'), 'spamtroll');
                     return $result;

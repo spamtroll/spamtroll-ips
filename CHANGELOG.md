@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Quota-aware fail-open** on HTTP 402 / `QUOTA_EXCEEDED`. When the API rejects a scan because the user's daily quota is exhausted, the post (Comment hook) or registration (Member hook) is allowed through unscanned — the rejection was a billing condition, not a spam verdict. Detected by `$response->httpCode === 402` so this works with both SDK 0.9.2 and the unreleased 0.9.3 helpers.
+- `Application::recordQuotaSkipped(CheckSpamResponse)` and `getQuotaSkippedStats($days = 7)` keep a rolling 30-day per-day count plus the most recent `usage` block (current / limit / plan / reset_at) in `\IPS\Settings::i()->spamtroll_quota_skipped_log` (JSON-encoded; pruned on every write — no DB schema change).
+- AdminCP dashboard sidebar surfaces a quota-skipped action ("X messages skipped — Upgrade →") that deep-links to the Spamtroll billing page when at least one quota-skipped event was recorded in the last 7 days.
+- New ACP setting key `spamtroll_quota_skipped_log` (registered in `data/settings.json`).
 - PHPStan level 9 + custom IPS framework stubs (`stubs/IPS.stub.php`)
   + thin baseline (`phpstan-baseline.neon`) for residual IPS magic.
   Application code is fully clean — every new error in the live

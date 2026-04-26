@@ -53,6 +53,11 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
                     $this->email
                 ));
 
+                if ($response->httpCode === 402) {
+                    \IPS\spamtroll\Application::recordQuotaSkipped($response);
+                    return $result;
+                }
+
                 if (!$response->success) {
                     \IPS\Log::log('Spamtroll API error: ' . $response->error, 'spamtroll');
                     return $result;
