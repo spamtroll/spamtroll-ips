@@ -139,27 +139,4 @@ abstract class spamtroll_hook_Member extends _HOOK_CLASS_
                 return $parentResult;
         }
     }
-
-    /**
-     * Additional spam check during save
-     *
-     * @return void
-     */
-    public function save()
-    {
-        try {
-            // Only check on new registrations
-            if ($this->member_id === null && \IPS\spamtroll\Application::isEnabled()) {
-                // The spamService() method will be called by IPS during registration
-            }
-
-            parent::save();
-        } catch (\RuntimeException $e) {
-            if (method_exists(get_parent_class(), __FUNCTION__)) {
-                return \call_user_func_array('parent::' . __FUNCTION__, \func_get_args());
-            } else {
-                throw $e;
-            }
-        }
-    }
 }

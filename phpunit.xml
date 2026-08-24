@@ -15,7 +15,8 @@
     </testsuites>
     <source>
         <include>
-            <directory>Application.php</directory>
+            <file>Application.php</file>
+            <directory>sources</directory>
         </include>
     </source>
 </phpunit>

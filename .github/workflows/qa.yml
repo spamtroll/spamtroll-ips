@@ -59,3 +59,23 @@ jobs:
 
       - name: Peck (spell check)
         run: composer peck
+
+  manifests:
+    name: Manifests (build.xml + data/*.json)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # data/build.xml is generated from the JSON manifests. Nothing in the
+      # Suite reads it (docs/SUITE-FACTS.md, U1), but a stale copy misleads
+      # every human who does and hides real changes in review. Regenerating
+      # it and diffing is the cheapest way to keep it honest.
+      - name: build.xml is up to date
+        run: |
+          bash dev/build-xml.sh
+          git diff --exit-code data/build.xml
+
+      # Cross-checks the manifests against the files and settings they name.
+      # Each check corresponds to a defect that has shipped at least once.
+      - name: Manifests are consistent
+        run: bash dev/check-manifests.sh

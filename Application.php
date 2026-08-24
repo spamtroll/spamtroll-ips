@@ -219,7 +219,7 @@ class _Application extends \IPS\Application
         $byDay = isset($stored['days']) && is_array($stored['days']) ? $stored['days'] : [];
         $byDay[$today] = (isset($byDay[$today]) ? (int) $byDay[$today] : 0) + 1;
 
-        $cutoff = gmdate('Y-m-d', strtotime('-30 days'));
+        $cutoff = gmdate('Y-m-d', time() - (30 * 86400));
         foreach (array_keys($byDay) as $day) {
             if (!is_string($day) || $day < $cutoff) {
                 unset($byDay[$day]);
@@ -251,7 +251,7 @@ class _Application extends \IPS\Application
             $stored = [];
         }
         $byDay = isset($stored['days']) && is_array($stored['days']) ? $stored['days'] : [];
-        $cutoff = gmdate('Y-m-d', strtotime('-' . max(1, $days) . ' days'));
+        $cutoff = gmdate('Y-m-d', time() - (max(1, $days) * 86400));
 
         $window = [];
         $total = 0;

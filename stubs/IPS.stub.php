@@ -67,24 +67,51 @@ namespace IPS {
         public $spamtroll_timeout = 5;
         public string $spamtroll_sensitivity = 'balanced';
         public string $spamtroll_scan_scope = 'all';
+        public string $spamtroll_quota_skipped_log = '';
+        public bool $spamtroll_override_thresholds = false;
+        public bool $spamtroll_anonymize_ip = false;
+        /* Core settings the application reads but does not own. */
+        public bool $spam_service_enabled = true;
+        public string $reg_auth_type = 'none';
 
-        private static ?self $instance = null;
+        protected static ?self $instance = null;
 
         public static function i(): self
         {
-            if (self::$instance === null) {
-                self::$instance = new self();
+            if (static::$instance === null) {
+                static::$instance = new static();
             }
-            return self::$instance;
+            return static::$instance;
+        }
+
+        /**
+         * Replace the singleton. Test-only seam: the live framework has no
+         * such method, so nothing shipped may call it.
+         */
+        public static function setInstance(?self $instance): void
+        {
+            static::$instance = $instance;
+        }
+
+        /**
+         * @param array<string, mixed> $newValues
+         */
+        public function changeValues(array $newValues): void
+        {
+            foreach ($newValues as $key => $value) {
+                $this->{$key} = $value;
+            }
         }
     }
 
-    class Member
+    class _Member
     {
         public int $member_id = 0;
         public int $member_posts = 0;
         public string $name = '';
         public string $email = '';
+        public int $mod_posts = 0;
+        public int $temp_ban = 0;
         public int $language = 1;
         public int $acp_language = 1;
         /** @var array<int, int> */
@@ -109,7 +136,24 @@ namespace IPS {
         {
             return new Lang();
         }
+
+        public function save(): void {}
+
+        /**
+         * @return int|null
+         */
+        public function spamService(
+            string $type = 'register',
+            ?string $emailAddress = null,
+            mixed &$spamCode = null,
+            mixed &$disposable = false,
+            mixed &$geoBlock = false,
+        ) {
+            return null;
+        }
     }
+
+    class Member extends _Member {}
 
     class Lang
     {
@@ -229,6 +273,8 @@ namespace IPS {
     {
         public string $title = '';
         public string $output = '';
+        /** @var array<string, array<string, mixed>> */
+        public array $sidebar = ['actions' => []];
         /** @var array<int, string> */
         public array $cssFiles = [];
         /** @var array<int, string> */
@@ -429,7 +475,10 @@ namespace IPS\Http {
             return new self();
         }
 
-        public function request(?int $timeout = null): Request
+        /**
+         * @param bool|int $followRedirects
+         */
+        public function request(?int $timeout = null, ?string $httpVersion = null, $followRedirects = 5): Request
         {
             return new Request();
         }
@@ -469,12 +518,66 @@ namespace IPS\Http {
     class Response
     {
         public int $httpResponseCode = 200;
+        /** @var array<string, string>|null */
+        public $httpHeaders = null;
 
         public function __toString(): string
         {
             return '';
         }
     }
+}
+
+namespace IPS\Content {
+    abstract class _Comment
+    {
+        public int $id = 0;
+
+        /**
+         * @param mixed $item
+         * @param mixed $comment
+         * @param mixed $first
+         * @param mixed $guestName
+         * @param mixed $incrementPostCount
+         * @param mixed $member
+         * @param mixed $ipAddress
+         * @param mixed $hiddenStatus
+         * @param mixed $anonymous
+         *
+         * @return static
+         */
+        public static function create($item, $comment, $first = false, $guestName = null, $incrementPostCount = null, $member = null, ?\IPS\DateTime $time = null, $ipAddress = null, $hiddenStatus = null, $anonymous = null)
+        {
+            /* @phpstan-ignore-next-line new.static */
+            return new static();
+        }
+
+        /**
+         * @param \IPS\Member|null|false $member
+         */
+        public function hide($member, ?string $reason = null): void {}
+
+        public function item(): Item
+        {
+            return new Item();
+        }
+    }
+
+    abstract class Comment extends _Comment {}
+
+    class Item
+    {
+        public int $id = 0;
+
+        /**
+         * @param \IPS\Member|null|false $member
+         */
+        public function hide($member, ?string $reason = null): void {}
+    }
+}
+
+namespace IPS\core\Messenger {
+    class Conversation extends \IPS\Content\Item {}
 }
 
 namespace IPS\Http\Request {
