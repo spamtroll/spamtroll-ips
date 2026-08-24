@@ -110,6 +110,8 @@ $lang = array(
     'spamtroll_not_configured_message' => 'Spamtroll nie jest skonfigurowany. Wpisz klucz API w ustawieniach.',
     'spamtroll_disabled_message' => 'Spamtroll jest aktualnie wyłączony. Włącz go w ustawieniach, aby zacząć chronić swoją społeczność.',
     'spamtroll_go_to_settings' => 'Przejdź do ustawień',
+    'spamtroll_spam_defense_off_message' => 'Skanowanie rejestracji jest tutaj włączone, ale ochrona antyspamowa samego Suite jest wyłączona — a Suite pyta usługę antyspamową o rejestrację tylko wtedy, gdy to ustawienie jest włączone. Żadna rejestracja nie jest skanowana.',
+    'spamtroll_go_to_spam_settings' => 'Otwórz ustawienia ochrony antyspamowej',
 
     // Logs
     'spamtroll_logs_title' => 'Dziennik spamu',

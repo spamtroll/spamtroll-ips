@@ -87,6 +87,27 @@ class _Application extends \IPS\Application
     }
 
     /**
+     * Whether the registration hook can actually run.
+     *
+     * The Suite only calls `\IPS\Member::spamService()` when its own spam
+     * defence is switched on (docs/SUITE-FACTS.md, U4b). With
+     * `spam_service_enabled` off, this application's registration hook is
+     * installed, enabled, and never reached — and until now the AdminCP
+     * reported registration scanning as working.
+     *
+     * Returns true when registration scanning is switched off here too, since
+     * then there is nothing to warn about.
+     */
+    public static function registrationScanningIsReachable(): bool
+    {
+        if (!\IPS\Settings::i()->spamtroll_check_registrations) {
+            return true;
+        }
+
+        return (bool) \IPS\Settings::i()->spam_service_enabled;
+    }
+
+    /**
      * Check if member should bypass spam checking
      *
      * @param \IPS\Member $member Member to check

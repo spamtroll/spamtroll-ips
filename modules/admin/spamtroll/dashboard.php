@@ -102,6 +102,7 @@ class _dashboard extends \IPS\Dispatcher\Controller
             json_encode($chartLabels),
             json_encode($chartTotal),
             json_encode($chartBlocked),
+            \IPS\spamtroll\Application::registrationScanningIsReachable(),
         );
     }
 

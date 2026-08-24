@@ -82,7 +82,9 @@ if [ "$extensionCount" -eq 0 ]; then
   bad "data/extensions.json declares no extension classes at all"
 fi
 
-while IFS=$'\t' read -r group extension name fqcn; do
+# Unit separator rather than a tab: jq's @tsv escapes backslashes, and every
+# one of these values is a namespaced class name.
+while IFS=$'\x1f' read -r group extension name fqcn; do
   if [ -z "$fqcn" ] || [ "$fqcn" = "null" ]; then
     bad "extensions.json: $group/$extension/$name has no class"
     continue
@@ -99,7 +101,8 @@ while IFS=$'\t' read -r group extension name fqcn; do
     continue
   fi
   ok "extensions.json: $fqcn"
-done < <(jq -r 'to_entries[] as $g | $g.value | to_entries[] as $e | $e.value | to_entries[] | [$g.key, $e.key, .key, .value] | @tsv' data/extensions.json)
+done < <(jq -r 'to_entries[] as $g | $g.value | to_entries[] as $e | $e.value | to_entries[]
+  | "\($g.key)\u001f\($e.key)\u001f\(.key)\u001f\(.value)"' data/extensions.json)
 
 # ------------------------------------------------------------- 4. versions
 # The highest key in versions.json is the application's long version. The

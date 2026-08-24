@@ -1,6 +1,1 @@
-{
-    "core": {
-        "MemberSync": {},
-        "Uninstall": {}
-    }
-}
+{"core":{"MemberSync":{"Spamtroll":"IPS\\spamtroll\\extensions\\core\\MemberSync\\Spamtroll"},"Uninstall":{"Spamtroll":"IPS\\spamtroll\\extensions\\core\\Uninstall\\Spamtroll"}}}

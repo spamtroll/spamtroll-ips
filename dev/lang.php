@@ -110,6 +110,8 @@ $lang = array(
     'spamtroll_not_configured_message' => 'Spamtroll is not configured. Please enter your API key in the settings.',
     'spamtroll_disabled_message' => 'Spamtroll is currently disabled. Enable it in the settings to start protecting your community.',
     'spamtroll_go_to_settings' => 'Go to Settings',
+    'spamtroll_spam_defense_off_message' => "Registration scanning is switched on here, but the Suite's own spam defence is off — and the Suite only asks a spam service about a registration when that setting is enabled. No registration is being scanned.",
+    'spamtroll_go_to_spam_settings' => 'Open Spam Prevention settings',
 
     // Logs
     'spamtroll_logs_title' => 'Spam Logs',
