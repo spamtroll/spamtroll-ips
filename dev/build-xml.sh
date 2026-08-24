@@ -56,24 +56,28 @@ out="$DATA_DIR/build.xml"
     ' "$DATA_DIR/settings.json" | sed 's|^| |'
   fi
 
-  # Tasks: from tasks.json (if non-empty)
+  # Tasks: from tasks.json, a map of key -> frequency.
+  #
+  # This used to iterate `.[]`, which yields the *values* — so `.key` was
+  # looked up on a frequency string and jq failed. The failure was then
+  # swallowed by `2>/dev/null … || true`, defeating the `set -euo pipefail`
+  # above, and data/build.xml simply had no <task> element at all.
   if [ -f "$DATA_DIR/tasks.json" ]; then
     jq -r '
-      if length == 0 then empty
-      else .[] | "<task key=\"\(.key)\"><![CDATA[" +
-        ({key: .key, frequency: (.frequency // "P1D")} | tojson) +
-        "]]></task>"
-      end
-    ' "$DATA_DIR/tasks.json" 2>/dev/null | sed 's|^| |' || true
+      to_entries[] |
+      "<task key=\"\(.key)\"><![CDATA[" +
+        ({key: .key, frequency: .value} | tojson) +
+      "]]></task>"
+    ' "$DATA_DIR/tasks.json" | sed 's|^| |'
   fi
 
-  # Widgets: from widgets.json (if non-empty)
+  # Widgets: from widgets.json, a map of key -> definition. Same defect as
+  # tasks — the generated element read key="null".
   if [ -f "$DATA_DIR/widgets.json" ]; then
     jq -r '
-      if length == 0 then empty
-      else .[] | "<widget key=\"\(.key)\"><![CDATA[" + (. | tojson) + "]]></widget>"
-      end
-    ' "$DATA_DIR/widgets.json" 2>/dev/null | sed 's|^| |' || true
+      to_entries[] |
+      "<widget key=\"\(.key)\"><![CDATA[" + (.value | tojson) + "]]></widget>"
+    ' "$DATA_DIR/widgets.json" | sed 's|^| |'
   fi
 
   printf '</build>\n'

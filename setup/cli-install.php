@@ -49,6 +49,14 @@ if (! file_exists("$appPath/vendor/autoload.php")) {
 
 /* 1. core_applications */
 $appJson = json_decode(file_get_contents("$appPath/data/application.json"), true);
+
+/* The version comes from data/versions.json, not from a literal here. It used
+ * to be hardcoded as 1.0.0/10000, so a fresh CLI install reported a version
+ * two releases behind the upgrade steps it had just skipped, and the Suite
+ * would then try to run them. */
+$versions = json_decode(file_get_contents("$appPath/data/versions.json"), true);
+$appLongVersion = max(array_map('intval', array_keys($versions)));
+$appVersion = $versions[(string) $appLongVersion];
 try {
     $existingId = \IPS\Db::i()->select('app_id', 'core_applications', [ 'app_directory=?', $appDir ])->first();
     echo "[=] app in core_applications (id=$existingId)\n";
@@ -60,8 +68,8 @@ try {
         'app_protected' => 0,
         'app_enabled' => 1,
         'app_position' => $maxPos + 1,
-        'app_version' => '1.0.0',
-        'app_long_version' => 10000,
+        'app_version' => $appVersion,
+        'app_long_version' => $appLongVersion,
         'app_update_check' => $appJson['app_update_check'] ?? '',
         'app_website' => $appJson['app_website'] ?? '',
         'app_hide_tab' => 0,

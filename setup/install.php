@@ -200,16 +200,21 @@ class _Install
             'spamtroll_api_key' => '',
             'spamtroll_api_url' => 'https://api.spamtroll.io/api/v1',
             'spamtroll_enabled' => '0',
+            'spamtroll_sensitivity' => 'balanced',
+            'spamtroll_scan_scope' => 'all',
+            'spamtroll_override_thresholds' => '0',
             'spamtroll_spam_threshold' => '0.7',
             'spamtroll_suspicious_threshold' => '0.4',
             'spamtroll_check_posts' => '1',
-            'spamtroll_check_messages' => '1',
             'spamtroll_check_registrations' => '1',
             'spamtroll_action_blocked' => 'block',
             'spamtroll_action_suspicious' => 'moderate',
             'spamtroll_bypass_groups' => '',
+            'spamtroll_bypass_min_posts' => '0',
+            'spamtroll_anonymize_ip' => '0',
             'spamtroll_log_retention_days' => '30',
             'spamtroll_timeout' => '5',
+            'spamtroll_quota_skipped_log' => '',
         ];
 
         foreach ($defaults as $key => $value) {

@@ -7,6 +7,149 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Registration no longer breaks when the package ships without `vendor/`.**
+  `hooks/Member.php` caught `SpamtrollException` inside and `\RuntimeException`
+  outside, so the `\Error` a missing SDK produces escaped `spamService()`
+  entirely and nobody could register. `hooks/Comment.php` caught `\Throwable`
+  and was unaffected — one defect, two hooks, opposite outcomes. Both hooks are
+  now adapters over `\IPS\spamtroll\Scanner\Gateway`, whose every public
+  method catches `\Throwable` and answers with the permissive result.
+- **A post is no longer created twice.** Both hooks wrapped the framework's
+  passthrough boilerplate — `catch (\RuntimeException)` then call the parent
+  again — around bodies that did more than forward, so any `\RuntimeException`
+  from inside produced a duplicate post row (and, on the registration path, a
+  duplicated spam-service query and post counter). `parent::` is now called
+  once, outside any `try`, and the boilerplate is gone.
+- **The extensions load at all.** `data/extensions.json` shipped as
+  `{"core":{"MemberSync":{},"Uninstall":{}}}` — the right keys around nothing —
+  so `MemberSync::onDelete()` never ran (deleting a member removed none of
+  their scan logs) and `Uninstall::postUninstall()` never ran (uninstalling
+  left `spamtroll_logs` and its `core_tasks` rows behind).
+- **`moderate` and `warn` verdicts on registration do something.** The hook
+  returned IPS spam-service codes 2 and 3 and assumed something downstream
+  would act on them. The Suite performs those side effects *inside*
+  `spamService()`, in a branch a hook that returns a code never reaches, and
+  its caller tests `== 4` and nothing else — so only `block` worked, while
+  `moderate` and `warn` let the registration through untouched.
+  `Scanner\RegistrationAction` now performs the effect (`mod_posts = -1`,
+  `reg_auth_type = 'admin'`) and returns a code that does not undo it.
+- **Hiding a spam first post now hides its topic.** `Content::hide()` sets the
+  column on the comment and never touches the item, so the topic — with its
+  title, which is usually where the spam is — stayed visible to guests and to
+  search engines.
+- **A failed `hide()` is logged instead of swallowed.** `hide()` throws when the
+  content class maps neither a `hidden` nor an `approved` column; so does a
+  class with no `hide()` at all. Both used to end in silence.
+- **A hide is credited to nobody rather than to the spammer.** `hide(NULL)`
+  attributes the action to the currently logged-in member, which during a post
+  is the person being hidden. Now `hide(FALSE)`.
+- **`spamtroll_sensitivity` and `spamtroll_scan_scope` are saved.** Both have
+  been rendered by the AdminCP form since 1.0.2 without ever being installed as
+  settings, and `Settings::changeValues()` discards an unknown `conf_key`
+  without a word. Choosing "Strict" and pressing Save did nothing; the page came
+  back showing "Balanced".
+- **`spamtroll_api_url` is read.** Written by the installer since 1.0.0 and used
+  by nothing, so a forum pointed at a staging backend talked to production. The
+  field is back on the settings form.
+- **A rate-limited scan logs something readable.** The SDK's error extractor
+  checks `isset($decoded['error'])` before `['message']`, so the limiter's
+  `{"error":true,"message":"…"}` stringified to `"1"` — `Spamtroll API error: 1`
+  is what the log showed for every 429 and every routing mistake.
+  `Scanner\ApiError` reads all four body shapes itself.
+- **A third-party class with "Messenger" in its namespace is scanned.** The
+  private-message skip matched on the class name with `strpos`, so an
+  application could disable spam checking for its own content by accident.
+- Deleting an account now removes its registration scan. Those rows are written
+  before the account exists, so they carry no member id and the delete-by-member
+  never matched them; the account went and the scan — with the IP address it was
+  made from — stayed.
+- Cross-site scripting in the AdminCP: the connection-test result concatenated
+  the API's message into `innerHTML`.
+- The connection-test button fired two requests per click — the whole handler
+  was duplicated inline in `settings.phtml` on top of the `.js` file.
+- `data/build.xml` regenerated. `dev/build-xml.sh` iterated `.[]` over
+  `tasks.json` and `widgets.json`, which are maps, so `<task>` was missing
+  entirely and `<widget>` read `key="null"` — and `2>/dev/null … || true`
+  swallowed the jq failure that would have said so.
+- Version drift: `setup/cli-install.php` hardcoded 1.0.0/10000, so a fresh CLI
+  install reported a version two releases behind the upgrade steps it had just
+  skipped. It now reads `data/versions.json`.
+
+### Added
+
+- `\IPS\spamtroll\Scanner\Gateway` — the only entry point for hooks, and the
+  only place fail-open is implemented. Everything behind it (`Scanner`,
+  `Policy`, `ApiError`, `Breaker`, `Decision`, `ClientFactory`,
+  `RegistrationAction`, `Log\Recorder`, `Log\QuotaLog`) is testable without
+  the Suite.
+- **Circuit breaker.** Three consecutive transport failures buy 60 seconds of
+  silence; a 429 is honoured for its `Retry-After` (clamped to 300s); an
+  `X-RateLimit-Remaining` at or below 5 takes a 10 second pause before the
+  server has to say no. Fails open in every direction — a datastore that is
+  down cannot stop a post.
+- **Latency budget.** The interactive path makes one attempt with no backoff;
+  the AdminCP and cron keep three. Everything used to inherit the SDK defaults
+  — 5s × 3 with 500ms between — so an unreachable API meant roughly 16 seconds
+  of a member watching a spinner, and three units of their daily quota spent on
+  a scan that produced no verdict.
+- Response headers reach the plugin. The SDK drops them, so the HTTP adapter
+  keeps the last set behind `Scanner\ResponseHeaderSource`.
+- The AdminCP dashboard says when registration scanning cannot run: the Suite
+  calls `spamService()` only when its own `spam_service_enabled` is set, so with
+  IPS spam defence off the hook is installed, enabled and never reached.
+- `spamtroll_anonymize_ip` — masks the last octet of an IPv4 and everything past
+  the first 64 bits of an IPv6 before the scan row is written. Off by default.
+- `spamtroll_override_thresholds` — see **Changed**.
+- `log_email_hash` column (SHA-256 of the lower-cased address, indexed) with
+  migration `setup/upgrade/10003/`.
+- `tasks/cleanup.php` prunes `core_log` rows in the `spamtroll` category on the
+  same retention as the scan log. `core_log` has no retention of its own.
+- `docs/SUITE-FACTS.md` — every behaviour of IPS Community Suite 4.7.22 this
+  application depends on, with the file and line it was read from, and an
+  explicit list of what still needs a running Suite to answer.
+- Tests: the fail-open matrix (18 rows through the real SDK over a fake
+  network), a hook harness that compiles `hooks/*.php` exactly as the Suite
+  does, signature assertions against the recorded 4.7.22 signatures, and
+  `dev/prove-regression.sh`, which points the hook suite at the pre-fix files
+  and fails if they pass.
+- CI: `dev/check-manifests.sh` cross-checks `data/*.json` against the code it
+  names, and a job regenerates `data/build.xml` and diffs it.
+- `hooks/` is analysed by PHPStan at level 9 for the first time —
+  `dev/preprocess-hooks.php` applies the Suite's own transformation.
+
+### Changed
+
+- **The verdict comes from the backend.** `Scanner\Policy::actionFor(status,
+  preset)` replaces this application's own thresholds, which classified a
+  *normalised* score against numbers of its own: "Balanced" blocked at a raw
+  21.0 while the backend blocked at 15.0, everything in between went through,
+  and the per-platform overrides in the Spamtroll panel had no effect. The
+  preset now decides what the forum does with each verdict rather than moving a
+  threshold.
+
+  **Existing forums keep the old behaviour.** The 1.0.3 upgrade sets
+  `spamtroll_override_thresholds` to 1, so nothing changes on a forum that was
+  already tuned. Fresh installs get the backend verdict. To switch an existing
+  forum over, set `spamtroll_override_thresholds` to 0 in
+  `core_sys_conf_settings` — the old threshold path then stops being consulted.
+- The AdminCP no longer echoes exception messages back to the browser. An
+  exception from the HTTP layer can carry the request URL, and the request
+  carries the API key; the detail goes to `\IPS\Log` instead.
+- The copy-to-clipboard handler moved out of `modules/admin/spamtroll/logs.php`
+  into `dev/js/admin/spamtroll.js`. Inline script in the AdminCP is something
+  the Content-Security-Policy is entitled to refuse.
+
+### Removed
+
+- `hooks/Member.php::save()` — its only statement was `parent::save()` inside
+  the passthrough boilerplate, and its `mixed` return was not covariant with the
+  parent's.
+- `dev/html/admin/spamtroll/logs.phtml` and `logDetails.phtml` — never
+  referenced; the log controller builds its HTML directly.
+
+
 ### Added
 
 - **Quota-aware fail-open** on HTTP 402 / `QUOTA_EXCEEDED`. When the API rejects a scan because the user's daily quota is exhausted, the post (Comment hook) or registration (Member hook) is allowed through unscanned — the rejection was a billing condition, not a spam verdict. Detected by `$response->httpCode === 402` so this works with both SDK 0.9.2 and the unreleased 0.9.3 helpers.

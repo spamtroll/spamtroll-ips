@@ -79,11 +79,28 @@ class _settings extends \IPS\Dispatcher\Controller
             'spamtroll_api_key',
         ));
 
+        // Written by the installer since 1.0.0 and read by nothing until
+        // 1.0.3, so a forum pointed at a staging backend talked to
+        // production. Now that ClientFactory reads it, it needs a way in —
+        // and the connection-test script has always looked for this field.
+        $form->add(new \IPS\Helpers\Form\Text(
+            'spamtroll_api_url',
+            \IPS\Settings::i()->spamtroll_api_url ?: \Spamtroll\Sdk\ClientConfig::DEFAULT_BASE_URL,
+            false,
+            ['size' => 50, 'placeholder' => \Spamtroll\Sdk\ClientConfig::DEFAULT_BASE_URL],
+            null,
+            null,
+            null,
+            'spamtroll_api_url',
+        ));
+
         $form->addHeader('spamtroll_header_thresholds');
 
-        // Sensitivity preset replaces the two 0.0-1.0 threshold inputs
-        // (spam_threshold, suspicious_threshold). Mapping lives in
-        // Application::sensitivityThresholds(). Default: balanced.
+        // The preset decides what the forum does with each verdict the
+        // backend returns — see \IPS\spamtroll\Scanner\Policy. It no longer
+        // moves a numeric threshold: this application was classifying a
+        // normalised score against thresholds of its own, so "Balanced"
+        // blocked at a raw 21.0 while the backend blocked at 15.0.
         $form->add(new \IPS\Helpers\Form\Select(
             'spamtroll_sensitivity',
             \IPS\Settings::i()->spamtroll_sensitivity ?: 'balanced',
@@ -158,9 +175,10 @@ class _settings extends \IPS\Dispatcher\Controller
                 $values['spamtroll_bypass_groups'] = implode(',', $values['spamtroll_bypass_groups']);
             }
 
-            // Derive legacy settings from the new simplified fields so
-            // Post.php / Message.php / Member.php hooks keep working
-            // without having to be rewritten to read the new keys.
+            // The numeric thresholds are only consulted when
+            // spamtroll_override_thresholds is on. Keep them in step with the
+            // preset anyway, so a forum that switches the override on gets
+            // something coherent rather than whatever it last had.
             switch ($values['spamtroll_sensitivity'] ?? 'balanced') {
                 case 'strict':
                     $values['spamtroll_spam_threshold'] = 0.5;
@@ -177,6 +195,10 @@ class _settings extends \IPS\Dispatcher\Controller
                     break;
             }
 
+            $apiUrl = $values['spamtroll_api_url'] ?? '';
+            $values['spamtroll_api_url'] = (\is_scalar($apiUrl) ? trim((string) $apiUrl) : '')
+                ?: \Spamtroll\Sdk\ClientConfig::DEFAULT_BASE_URL;
+
             $scope = $values['spamtroll_scan_scope'] ?? 'all';
             $values['spamtroll_check_posts'] = $scope !== 'off';
             $values['spamtroll_check_registrations'] = ($scope === 'all');
@@ -192,6 +214,9 @@ class _settings extends \IPS\Dispatcher\Controller
             $values['spamtroll_action_suspicious'] = 'moderate';
             $values['spamtroll_timeout'] = 5;
             $values['spamtroll_log_retention_days'] = 30;
+
+            // Not on the form, and not to be reset by saving it either.
+            unset($values['spamtroll_override_thresholds'], $values['spamtroll_anonymize_ip']);
 
             $form->saveAsSettings($values);
 

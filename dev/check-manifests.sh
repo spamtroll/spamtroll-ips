@@ -105,18 +105,16 @@ done < <(jq -r 'to_entries[] as $g | $g.value | to_entries[] as $e | $e.value | 
   | "\($g.key)\u001f\($e.key)\u001f\(.key)\u001f\(.value)"' data/extensions.json)
 
 # ------------------------------------------------------------- 4. versions
-# The highest key in versions.json is the application's long version. The
-# CLI installer used to hardcode its own, so a fresh install reported 1.0.0
-# while the upgrade steps for 1.0.1 and 1.0.2 had already run.
+# The highest key in versions.json is the application's long version. The CLI
+# installer used to carry its own literal, so a fresh install reported 1.0.0
+# while the upgrade steps for 1.0.1 and 1.0.2 had already been skipped.
 longVersion=$(jq -r 'keys | map(tonumber) | max' data/versions.json)
 humanVersion=$(jq -r --arg k "$longVersion" '.[$k]' data/versions.json)
-installLong=$(grep -oE "'app_long_version' => [0-9]+" setup/cli-install.php | grep -oE '[0-9]+')
-installHuman=$(grep -oE "'app_version' => '[^']+'" setup/cli-install.php | sed "s/.*'\\(.*\\)'/\\1/")
 
-if [ "$longVersion" = "$installLong" ] && [ "$humanVersion" = "$installHuman" ]; then
-  ok "versions.json ($humanVersion / $longVersion) matches setup/cli-install.php"
+if grep -qE "'app_(long_)?version' => '?[0-9]" setup/cli-install.php; then
+  bad "setup/cli-install.php hardcodes a version instead of reading data/versions.json"
 else
-  bad "version drift: versions.json says $humanVersion/$longVersion, cli-install.php says $installHuman/$installLong"
+  ok "setup/cli-install.php takes its version from data/versions.json"
 fi
 
 appVersionTag=$(grep -oE '@version +[0-9]+\.[0-9]+\.[0-9]+' Application.php | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
@@ -125,6 +123,25 @@ if [ "$appVersionTag" != "$humanVersion" ]; then
 else
   ok "Application.php @version matches versions.json"
 fi
+
+constVersion=$(grep -oE "const VERSION = '[^']+'" Application.php | sed "s/.*'\(.*\)'/\1/")
+constLong=$(grep -oE 'const VERSION_LONG = [0-9]+' Application.php | grep -oE '[0-9]+')
+if [ "$constVersion" = "$humanVersion" ] && [ "$constLong" = "$longVersion" ]; then
+  ok "Application::VERSION ($constVersion / $constLong) matches versions.json"
+else
+  bad "version drift: Application::VERSION is $constVersion/$constLong, versions.json says $humanVersion/$longVersion"
+fi
+
+# Every version above the first needs an upgrade step, or the Suite has
+# nothing to run when it walks an install forward.
+for v in $(jq -r 'keys[]' data/versions.json); do
+  if [ "$v" = "10000" ]; then
+    continue
+  fi
+  if [ ! -f "setup/upgrade/${v}/upgrade.php" ]; then
+    bad "versions.json declares $v but setup/upgrade/${v}/upgrade.php does not exist"
+  fi
+done
 
 # ----------------------------------------------------------------- 5. tasks
 # Tasks come from data/tasks.json (SUITE-FACTS U9), one file per key.

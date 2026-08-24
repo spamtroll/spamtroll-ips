@@ -51,11 +51,6 @@ parameters:
 			path: extensions/core/MemberSync/Spamtroll.php
 
 		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:dropTable\\(\\)\\.$#"
-			count: 1
-			path: extensions/core/Uninstall/Spamtroll.php
-
-		-
 			message: "#^Cannot call method dashboard\\(\\) on mixed\\.$#"
 			count: 1
 			path: modules/admin/spamtroll/dashboard.php
@@ -82,11 +77,6 @@ parameters:
 
 		-
 			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
-			count: 2
-			path: modules/admin/spamtroll/logs.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Member\\:\\:link\\(\\)\\.$#"
 			count: 2
 			path: modules/admin/spamtroll/logs.php
 
@@ -311,6 +301,11 @@ parameters:
 			path: setup/cli-install.php
 
 		-
+			message: "#^Cannot access offset numeric\\-string on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
 			message: "#^Cannot call method compileCss\\(\\) on mixed\\.$#"
 			count: 1
 			path: setup/cli-install.php
@@ -342,7 +337,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$array of function array_keys expects array, mixed given\\.$#"
-			count: 1
+			count: 2
 			path: setup/cli-install.php
 
 		-
@@ -352,7 +347,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
-			count: 5
+			count: 6
 			path: setup/cli-install.php
 
 		-
@@ -411,19 +406,9 @@ parameters:
 			path: setup/cli-uninstall.php
 
 		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:dropTable\\(\\)\\.$#"
+			message: "#^Method IPS\\\\Db\\:\\:dropTable\\(\\) invoked with 2 parameters, 1 required\\.$#"
 			count: 1
 			path: setup/cli-uninstall.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:addColumn\\(\\)\\.$#"
-			count: 2
-			path: setup/install.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:checkForColumn\\(\\)\\.$#"
-			count: 2
-			path: setup/install.php
 
 		-
 			message: "#^Caught class IPS\\\\Db\\\\Exception not found\\.$#"

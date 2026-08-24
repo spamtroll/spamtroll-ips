@@ -73,3 +73,49 @@ it('keeps the application version in step with data/versions.json', function ():
     expect(Application::VERSION_LONG)->toBe($long);
     expect(Application::VERSION)->toBe($versions[(string) $long]);
 });
+
+it('installs every setting the AdminCP form reads or writes', function (): void {
+    /* Form::saveAsSettings() goes straight to Settings::changeValues(), which
+     * drops a key that is not in core_sys_conf_settings without a word
+     * (docs/SUITE-FACTS.md, U10). spamtroll_sensitivity and
+     * spamtroll_scan_scope were rendered, chosen, saved and discarded for
+     * two releases. */
+    $declared = array_column(manifest('settings'), 'key');
+    $controller = (string) file_get_contents(\dirname(__DIR__, 2) . '/modules/admin/spamtroll/settings.php');
+
+    preg_match_all(
+        "/Settings::i\\(\\)->(spamtroll_[a-z_]+)|\\\$values\\['(spamtroll_[a-z_]+)'\\]/",
+        $controller,
+        $matches,
+    );
+    $used = array_values(array_unique(array_filter(array_merge($matches[1], $matches[2]))));
+
+    expect($used)->not->toBeEmpty();
+    foreach ($used as $key) {
+        expect($declared)->toContain($key);
+    }
+});
+
+it('declares the same settings in the manifest and in the installer', function (): void {
+    $declared = array_column(manifest('settings'), 'key');
+    sort($declared);
+
+    $installer = (string) file_get_contents(\dirname(__DIR__, 2) . '/setup/install.php');
+    preg_match('/\$defaults = \[(.*?)\n        \];/s', $installer, $block);
+    preg_match_all("/'(spamtroll_[a-z_]+)'/", $block[1] ?? '', $matches);
+    $installed = $matches[1];
+    sort($installed);
+
+    expect($installed)->toBe($declared);
+});
+
+it('ships an upgrade step for every version past the first', function (): void {
+    /* json_decode turns numeric object keys into ints. */
+    foreach (array_map('intval', array_keys(manifest('versions'))) as $long) {
+        if ($long === 10000) {
+            continue;
+        }
+
+        expect(\dirname(__DIR__, 2) . '/setup/upgrade/' . $long . '/upgrade.php')->toBeFile();
+    }
+});
