@@ -1,6 +1,15 @@
-<ips:template parameters="$stats, $recentLogs, $apiStatus, $isConfigured, $isEnabled, $chartLabels, $chartTotal, $chartBlocked" />
+<ips:template parameters="$stats, $recentLogs, $apiStatus, $isConfigured, $isEnabled, $chartLabels, $chartTotal, $chartBlocked, $registrationScanningReachable" />
 
 <div class="spamtroll-dashboard">
+{{if !$registrationScanningReachable}}
+<div class="ipsBox">
+    <div class="ipsMessage ipsMessage_error">
+        <i class="fa fa-exclamation-triangle"></i>
+        {lang="spamtroll_spam_defense_off_message"}
+        <a href="{url="app=core&module=settings&controller=spam"}" class="ipsButton ipsButton_verySmall ipsButton_light">{lang="spamtroll_go_to_spam_settings"}</a>
+    </div>
+</div>
+{{endif}}
 {{if !$isConfigured}}
 <div class="ipsBox">
     <div class="ipsMessage ipsMessage_warning">

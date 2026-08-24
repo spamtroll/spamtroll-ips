@@ -67,24 +67,51 @@ namespace IPS {
         public $spamtroll_timeout = 5;
         public string $spamtroll_sensitivity = 'balanced';
         public string $spamtroll_scan_scope = 'all';
+        public string $spamtroll_quota_skipped_log = '';
+        public bool $spamtroll_override_thresholds = false;
+        public bool $spamtroll_anonymize_ip = false;
+        /* Core settings the application reads but does not own. */
+        public bool $spam_service_enabled = true;
+        public string $reg_auth_type = 'none';
 
-        private static ?self $instance = null;
+        protected static ?self $instance = null;
 
         public static function i(): self
         {
-            if (self::$instance === null) {
-                self::$instance = new self();
+            if (static::$instance === null) {
+                static::$instance = new static();
             }
-            return self::$instance;
+            return static::$instance;
+        }
+
+        /**
+         * Replace the singleton. Test-only seam: the live framework has no
+         * such method, so nothing shipped may call it.
+         */
+        public static function setInstance(?self $instance): void
+        {
+            static::$instance = $instance;
+        }
+
+        /**
+         * @param array<string, mixed> $newValues
+         */
+        public function changeValues(array $newValues): void
+        {
+            foreach ($newValues as $key => $value) {
+                $this->{$key} = $value;
+            }
         }
     }
 
-    class Member
+    class _Member
     {
         public int $member_id = 0;
         public int $member_posts = 0;
         public string $name = '';
         public string $email = '';
+        public int $mod_posts = 0;
+        public int $temp_ban = 0;
         public int $language = 1;
         public int $acp_language = 1;
         /** @var array<int, int> */
@@ -95,21 +122,55 @@ namespace IPS {
             return false;
         }
 
-        public static function loggedIn(?Member $member = null): self
+        public static function loggedIn(?Member $member = null): Member
         {
-            return new self();
+            return new Member();
         }
 
-        public static function load(int $id): self
+        public static function load(int $id): Member
         {
-            return new self();
+            return new Member();
         }
 
         public function language(): Lang
         {
             return new Lang();
         }
+
+        public function link(?string $warningRef = null, bool $showProfileLink = true): string
+        {
+            return '';
+        }
+
+        /**
+         * Untyped, like the Suite's own (`system/Member/Member.php:450`).
+         *
+         * @return mixed
+         */
+        public function save()
+        {
+            return null;
+        }
+
+        /**
+         * Untyped on purpose: this is the Suite's own signature, character
+         * for character (docs/SUITE-FACTS.md, U4a).
+         *
+         * @param mixed $type
+         * @param mixed $emailAddress
+         * @param mixed $spamCode
+         * @param mixed $disposable
+         * @param mixed $geoBlock
+         *
+         * @return int|null
+         */
+        public function spamService($type = 'register', $emailAddress = null, &$spamCode = null, &$disposable = false, &$geoBlock = false)
+        {
+            return null;
+        }
     }
+
+    class Member extends _Member {}
 
     class Lang
     {
@@ -141,7 +202,18 @@ namespace IPS {
 
     class Log
     {
-        public static function log(\Throwable|string $what, string $category = ''): void {}
+        /**
+         * Test-only capture buffer. The live framework writes to core_log;
+         * the suite reads this instead of reaching for a database.
+         *
+         * @var array<int, array{what: \Throwable|string, category: string}>
+         */
+        public static array $entries = [];
+
+        public static function log(\Throwable|string $what, string $category = ''): void
+        {
+            static::$entries[] = ['what' => $what, 'category' => $category];
+        }
     }
 
     class Db
@@ -190,6 +262,24 @@ namespace IPS {
             return true;
         }
 
+        public function checkForColumn(string $table, string $column): bool
+        {
+            return true;
+        }
+
+        /**
+         * @param array<string, mixed> $definition
+         */
+        public function addColumn(string $table, array $definition): bool
+        {
+            return true;
+        }
+
+        public function dropTable(string $table): bool
+        {
+            return true;
+        }
+
         /**
          * @param array<string, mixed> $columns
          */
@@ -229,6 +319,8 @@ namespace IPS {
     {
         public string $title = '';
         public string $output = '';
+        /** @var array<string, array<string, mixed>> */
+        public array $sidebar = ['actions' => []];
         /** @var array<int, string> */
         public array $cssFiles = [];
         /** @var array<int, string> */
@@ -429,7 +521,10 @@ namespace IPS\Http {
             return new self();
         }
 
-        public function request(?int $timeout = null): Request
+        /**
+         * @param bool|int $followRedirects
+         */
+        public function request(?int $timeout = null, ?string $httpVersion = null, $followRedirects = 5): Request
         {
             return new Request();
         }
@@ -469,12 +564,66 @@ namespace IPS\Http {
     class Response
     {
         public int $httpResponseCode = 200;
+        /** @var array<string, string>|null */
+        public $httpHeaders = null;
 
         public function __toString(): string
         {
             return '';
         }
     }
+}
+
+namespace IPS\Content {
+    abstract class _Comment
+    {
+        public int $id = 0;
+
+        /**
+         * @param mixed $item
+         * @param mixed $comment
+         * @param mixed $first
+         * @param mixed $guestName
+         * @param mixed $incrementPostCount
+         * @param mixed $member
+         * @param mixed $ipAddress
+         * @param mixed $hiddenStatus
+         * @param mixed $anonymous
+         *
+         * @return static
+         */
+        public static function create($item, $comment, $first = false, $guestName = null, $incrementPostCount = null, $member = null, ?\IPS\DateTime $time = null, $ipAddress = null, $hiddenStatus = null, $anonymous = null)
+        {
+            /* @phpstan-ignore-next-line new.static */
+            return new static();
+        }
+
+        /**
+         * @param \IPS\Member|null|false $member
+         */
+        public function hide($member, ?string $reason = null): void {}
+
+        public function item(): Item
+        {
+            return new Item();
+        }
+    }
+
+    abstract class Comment extends _Comment {}
+
+    class Item
+    {
+        public int $id = 0;
+
+        /**
+         * @param \IPS\Member|null|false $member
+         */
+        public function hide($member, ?string $reason = null): void {}
+    }
+}
+
+namespace IPS\core\Messenger {
+    class Conversation extends \IPS\Content\Item {}
 }
 
 namespace IPS\Http\Request {

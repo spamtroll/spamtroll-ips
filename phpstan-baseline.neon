@@ -6,11 +6,6 @@ parameters:
 			path: Application.php
 
 		-
-			message: "#^Instantiated class IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient not found\\.$#"
-			count: 1
-			path: Application.php
-
-		-
 			message: "#^Method IPS\\\\spamtroll\\\\_Application\\:\\:getRecentLogs\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Application.php
@@ -41,34 +36,19 @@ parameters:
 			path: Application.php
 
 		-
-			message: "#^Parameter \\#3 \\$http of class Spamtroll\\\\Sdk\\\\Client constructor expects Spamtroll\\\\Sdk\\\\Http\\\\HttpClientInterface\\|null, IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient given\\.$#"
+			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) should return int\\|null but returns mixed\\.$#"
 			count: 1
-			path: Application.php
+			path: build/hooks-preprocessed/Member.php
+
+		-
+			message: "#^Parameter \\#1 \\$member of static method IPS\\\\spamtroll\\\\Scanner\\\\_Gateway\\:\\:applyToRegistration\\(\\) expects IPS\\\\Member, \\$this\\(IPS\\\\spamtroll_hook_Member\\) given\\.$#"
+			count: 1
+			path: build/hooks-preprocessed/Member.php
 
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\extensions\\\\core\\\\MemberSync\\\\_Spamtroll\\:\\:onMerge\\(\\) has parameter \\$mergedMembers with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: extensions/core/MemberSync/Spamtroll.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:dropTable\\(\\)\\.$#"
-			count: 1
-			path: extensions/core/Uninstall/Spamtroll.php
-
-		-
-			message: "#^Call to static method apiClient\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
-			count: 1
-			path: modules/admin/spamtroll/dashboard.php
-
-		-
-			message: "#^Call to static method getRecentLogs\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
-			count: 1
-			path: modules/admin/spamtroll/dashboard.php
-
-		-
-			message: "#^Call to static method getStatistics\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
-			count: 1
-			path: modules/admin/spamtroll/dashboard.php
 
 		-
 			message: "#^Cannot call method dashboard\\(\\) on mixed\\.$#"
@@ -97,11 +77,6 @@ parameters:
 
 		-
 			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
-			count: 2
-			path: modules/admin/spamtroll/logs.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Member\\:\\:link\\(\\)\\.$#"
 			count: 2
 			path: modules/admin/spamtroll/logs.php
 
@@ -181,18 +156,18 @@ parameters:
 			path: modules/admin/spamtroll/logs.php
 
 		-
-			message: "#^Parameter \\#1 \\$id of static method IPS\\\\Member\\:\\:load\\(\\) expects int, mixed given\\.$#"
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 5
+			path: modules/admin/spamtroll/logs.php
+
+		-
+			message: "#^Parameter \\#1 \\$id of static method IPS\\\\_Member\\:\\:load\\(\\) expects int, mixed given\\.$#"
 			count: 1
 			path: modules/admin/spamtroll/logs.php
 
 		-
 			message: "#^Parameter \\#1 \\$json of function json_decode expects string, mixed given\\.$#"
 			count: 4
-			path: modules/admin/spamtroll/logs.php
-
-		-
-			message: "#^Parameter \\#1 \\$string of function htmlspecialchars expects string, mixed given\\.$#"
-			count: 5
 			path: modules/admin/spamtroll/logs.php
 
 		-
@@ -216,27 +191,12 @@ parameters:
 			path: modules/admin/spamtroll/logs.php
 
 		-
-			message: "#^Call to static method apiClient\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
-			count: 1
-			path: modules/admin/spamtroll/settings.php
-
-		-
 			message: "#^Cannot call method settings\\(\\) on mixed\\.$#"
 			count: 1
 			path: modules/admin/spamtroll/settings.php
 
 		-
 			message: "#^Cannot cast mixed to int\\.$#"
-			count: 1
-			path: modules/admin/spamtroll/settings.php
-
-		-
-			message: "#^Instantiated class IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient not found\\.$#"
-			count: 1
-			path: modules/admin/spamtroll/settings.php
-
-		-
-			message: "#^Parameter \\#3 \\$http of class Spamtroll\\\\Sdk\\\\Client constructor expects Spamtroll\\\\Sdk\\\\Http\\\\HttpClientInterface\\|null, IPS\\\\spamtroll\\\\Api\\\\IpsHttpClient given\\.$#"
 			count: 1
 			path: modules/admin/spamtroll/settings.php
 
@@ -341,6 +301,11 @@ parameters:
 			path: setup/cli-install.php
 
 		-
+			message: "#^Cannot access offset numeric\\-string on mixed\\.$#"
+			count: 1
+			path: setup/cli-install.php
+
+		-
 			message: "#^Cannot call method compileCss\\(\\) on mixed\\.$#"
 			count: 1
 			path: setup/cli-install.php
@@ -372,7 +337,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$array of function array_keys expects array, mixed given\\.$#"
-			count: 1
+			count: 2
 			path: setup/cli-install.php
 
 		-
@@ -382,7 +347,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
-			count: 5
+			count: 6
 			path: setup/cli-install.php
 
 		-
@@ -441,19 +406,9 @@ parameters:
 			path: setup/cli-uninstall.php
 
 		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:dropTable\\(\\)\\.$#"
+			message: "#^Method IPS\\\\Db\\:\\:dropTable\\(\\) invoked with 2 parameters, 1 required\\.$#"
 			count: 1
 			path: setup/cli-uninstall.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:addColumn\\(\\)\\.$#"
-			count: 1
-			path: setup/install.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Db\\:\\:checkForColumn\\(\\)\\.$#"
-			count: 1
-			path: setup/install.php
 
 		-
 			message: "#^Caught class IPS\\\\Db\\\\Exception not found\\.$#"
@@ -507,10 +462,5 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method IPS\\\\spamtroll\\\\widgets\\\\_spamtrollStats\\:\\:output\\(\\)\\.$#"
-			count: 1
-			path: widgets/spamtrollStats.php
-
-		-
-			message: "#^Call to static method getStatistics\\(\\) on an unknown class IPS\\\\spamtroll\\\\Application\\.$#"
 			count: 1
 			path: widgets/spamtrollStats.php

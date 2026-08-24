@@ -110,3 +110,29 @@ describe('shouldBypass', function (): void {
         expect(Application::shouldBypass($member))->toBeFalse();
     });
 });
+
+describe('registrationScanningIsReachable', function (): void {
+    it('warns when the Suite spam defence is off but registration scanning is on', function (): void {
+        /* spamService() is only called when spam_service_enabled is set
+         * (docs/SUITE-FACTS.md, U4b), so the hook never runs and the AdminCP
+         * used to report itself as working anyway. */
+        settings()->spamtroll_check_registrations = true;
+        settings()->spam_service_enabled = false;
+
+        expect(Application::registrationScanningIsReachable())->toBeFalse();
+    });
+
+    it('says nothing when the Suite spam defence is on', function (): void {
+        settings()->spamtroll_check_registrations = true;
+        settings()->spam_service_enabled = true;
+
+        expect(Application::registrationScanningIsReachable())->toBeTrue();
+    });
+
+    it('says nothing when registration scanning is off here too', function (): void {
+        settings()->spamtroll_check_registrations = false;
+        settings()->spam_service_enabled = false;
+
+        expect(Application::registrationScanningIsReachable())->toBeTrue();
+    });
+});

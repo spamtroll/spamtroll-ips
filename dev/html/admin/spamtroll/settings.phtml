@@ -14,39 +14,3 @@
     </button>
     <span id="spamtrollTestResult" class="ipsType_light spamtroll-test-result"></span>
 </div>
-
-<script>
-(function () {
-    var btn = document.getElementById('spamtrollTestConnection');
-    var out = document.getElementById('spamtrollTestResult');
-    if (!btn || !out) { return; }
-    btn.addEventListener('click', function () {
-        var url = btn.getAttribute('data-test-url');
-        var testingText = btn.getAttribute('data-testing-text') || 'Testing...';
-        out.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + testingText;
-        btn.disabled = true;
-
-        var apiKey = document.querySelector('[name="spamtroll_api_key"]');
-        var apiUrl = document.querySelector('[name="spamtroll_api_url"]');
-        var params = new URLSearchParams();
-        if (typeof ips !== 'undefined' && ips.getSetting) {
-            params.append('csrfKey', ips.getSetting('csrfKey'));
-        }
-        if (apiKey) { params.append('api_key', apiKey.value); }
-        if (apiUrl) { params.append('api_url', apiUrl.value); }
-
-        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params })
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                var cls = data.success ? 'ipsType_success' : 'ipsType_warning';
-                var icon = data.success ? 'fa-check' : 'fa-times';
-                out.innerHTML = '<span class="' + cls + '"><i class="fa ' + icon + '"></i> ' + data.message + '</span>';
-                btn.disabled = false;
-            })
-            .catch(function () {
-                out.innerHTML = '<span class="ipsType_warning"><i class="fa fa-times"></i> Connection error</span>';
-                btn.disabled = false;
-            });
-    });
-})();
-</script>

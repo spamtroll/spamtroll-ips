@@ -3,25 +3,21 @@
 declare(strict_types=1);
 
 /*
- * Tests bootstrap. The IPS framework is closed-source and can't be
- * standalone-loaded, so unit tests cover only the pure-logic helpers
- * — `Application::determineAction()` and friends — by stubbing
- * `\IPS\Settings::i()` with a tiny in-memory fake. Anything that
- * needs IPS hooks, ACP routing, or the database stays as integration
- * tests on a live forum.
+ * Tests bootstrap.
  *
- * Composer autoload pulls in the SDK and the IPS stub file; no IPS
- * core is loaded.
+ * The IPS framework is closed-source and can't be loaded standalone, so
+ * `stubs/IPS.stub.php` declares just enough of its surface for the
+ * application code to run, and `stubs/aliases.php` registers the
+ * `_Foo` -> `Foo` aliases the IPS autoloader would create at runtime
+ * (docs/SUITE-FACTS.md, U12b). Both are pulled in by Composer's dev
+ * autoloader, so requiring the autoloader is all this file has to do.
+ *
+ * What that buys the suite:
+ *  - `tests/Unit`     — pure logic, no IPS at all;
+ *  - `tests/Scanner`  — the real SDK over a fake HttpClientInterface;
+ *  - `tests/Hooks`    — the hook files, transformed exactly as the Suite
+ *                       transforms them, over an instrumented fake parent.
+ * Only the live-forum checks in docs/SMOKE.md stay outside CI.
  */
 
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../stubs/IPS.stub.php';
-
-if (! class_exists('IPS\\spamtroll\\Application')) {
-    require __DIR__ . '/../Application.php';
-    if (! class_exists('IPS\\spamtroll\\Application')) {
-        // IPS resolves `_Application` -> `Application` at runtime via its
-        // autoloader. For tests we just register the alias manually.
-        class_alias('IPS\\spamtroll\\_Application', 'IPS\\spamtroll\\Application');
-    }
-}

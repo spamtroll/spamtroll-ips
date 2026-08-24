@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <build>
  <module key="admin/spamtroll"><![CDATA[{"default_controller":"dashboard","protected":false,"default":null}]]></module>
- <hook key="Post"><![CDATA[{"type":"C","class":"\\IPS\\forums\\Topic\\Post"}]]></hook>
- <hook key="Message"><![CDATA[{"type":"C","class":"\\IPS\\core\\Messenger\\Message"}]]></hook>
+ <hook key="Comment"><![CDATA[{"type":"C","class":"\\IPS\\Content\\Comment"}]]></hook>
  <hook key="Member"><![CDATA[{"type":"C","class":"\\IPS\\Member"}]]></hook>
  <setting key="spamtroll_api_key"><![CDATA[{"key":"spamtroll_api_key","default":""}]]></setting>
  <setting key="spamtroll_api_url"><![CDATA[{"key":"spamtroll_api_url","default":"https://api.spamtroll.io/api/v1"}]]></setting>
  <setting key="spamtroll_enabled"><![CDATA[{"key":"spamtroll_enabled","default":"0"}]]></setting>
+ <setting key="spamtroll_sensitivity"><![CDATA[{"key":"spamtroll_sensitivity","default":"balanced"}]]></setting>
+ <setting key="spamtroll_scan_scope"><![CDATA[{"key":"spamtroll_scan_scope","default":"all"}]]></setting>
+ <setting key="spamtroll_override_thresholds"><![CDATA[{"key":"spamtroll_override_thresholds","default":"0"}]]></setting>
  <setting key="spamtroll_spam_threshold"><![CDATA[{"key":"spamtroll_spam_threshold","default":"0.7"}]]></setting>
  <setting key="spamtroll_suspicious_threshold"><![CDATA[{"key":"spamtroll_suspicious_threshold","default":"0.4"}]]></setting>
  <setting key="spamtroll_check_posts"><![CDATA[{"key":"spamtroll_check_posts","default":"1"}]]></setting>
- <setting key="spamtroll_check_messages"><![CDATA[{"key":"spamtroll_check_messages","default":"1"}]]></setting>
  <setting key="spamtroll_check_registrations"><![CDATA[{"key":"spamtroll_check_registrations","default":"1"}]]></setting>
  <setting key="spamtroll_action_blocked"><![CDATA[{"key":"spamtroll_action_blocked","default":"block"}]]></setting>
  <setting key="spamtroll_action_suspicious"><![CDATA[{"key":"spamtroll_action_suspicious","default":"moderate"}]]></setting>
  <setting key="spamtroll_bypass_groups"><![CDATA[{"key":"spamtroll_bypass_groups","default":""}]]></setting>
+ <setting key="spamtroll_bypass_min_posts"><![CDATA[{"key":"spamtroll_bypass_min_posts","default":"0"}]]></setting>
+ <setting key="spamtroll_anonymize_ip"><![CDATA[{"key":"spamtroll_anonymize_ip","default":"0"}]]></setting>
  <setting key="spamtroll_log_retention_days"><![CDATA[{"key":"spamtroll_log_retention_days","default":"30"}]]></setting>
  <setting key="spamtroll_timeout"><![CDATA[{"key":"spamtroll_timeout","default":"5"}]]></setting>
- <widget key="null"><![CDATA[{"class":"\\IPS\\spamtroll\\widgets\\spamtrollStats","restrict":[],"allow_reuse":false,"menu_tab":"spamtroll","default_area":"sidebar"}]]></widget>
+ <setting key="spamtroll_quota_skipped_log"><![CDATA[{"key":"spamtroll_quota_skipped_log","default":""}]]></setting>
+ <task key="cleanup"><![CDATA[{"key":"cleanup","frequency":"P0Y0M1DT0H0M0S"}]]></task>
+ <widget key="spamtrollStats"><![CDATA[{"class":"\\IPS\\spamtroll\\widgets\\spamtrollStats","restrict":[],"allow_reuse":false,"menu_tab":"spamtroll","default_area":"sidebar"}]]></widget>
 </build>

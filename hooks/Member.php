@@ -6,160 +6,28 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
 }
 
 /**
- * Hook for member registration spam checking
+ * Hook on \IPS\Member::spamService — the registration spam check.
+ *
+ * An adapter and nothing more; see hooks/Comment.php for why. Note that the
+ * Suite only calls spamService() when its own spam defence is switched on
+ * (docs/SUITE-FACTS.md, U4b), so this hook can be installed and enabled and
+ * still never run. The AdminCP dashboard says so when that is the case.
  */
 abstract class spamtroll_hook_Member extends _HOOK_CLASS_
 {
     /**
-     * Check for spam on registration
+     * @param mixed $type
+     * @param mixed $emailAddress
+     * @param mixed $spamCode
+     * @param mixed $disposable
+     * @param mixed $geoBlock
      *
-     * @return bool|null
+     * @return int|null
      */
-    public function spamService($type = 'register', $emailAddress = null, &$spamCode = null, &$disposable = false, &$geoBlock = false)
+    public function spamService($type = 'register', $emailAddress = NULL, &$spamCode = NULL, &$disposable = FALSE, &$geoBlock = FALSE)
     {
-        try {
-            $result = parent::spamService($type, $emailAddress, $spamCode, $disposable, $geoBlock);
+        $result = parent::spamService($type, $emailAddress, $spamCode, $disposable, $geoBlock);
 
-            // Check if spam checking is enabled for registrations
-            if (!\IPS\spamtroll\Application::isEnabled()) {
-                return $result;
-            }
-
-            if (!\IPS\Settings::i()->spamtroll_check_registrations) {
-                return $result;
-            }
-
-            // Get IP address
-            $ipAddress = \IPS\Request::i()->ipAddress();
-
-            // Build content to check
-            $content = $this->name;
-            if ($this->email) {
-                $content .= ' ' . $this->email;
-            }
-
-            if (empty(trim($content))) {
-                return $result;
-            }
-
-            // Call API
-            try {
-                $client = \IPS\spamtroll\Application::apiClient();
-                $response = $client->checkSpam(new \Spamtroll\Sdk\Request\CheckSpamRequest(
-                    $content,
-                    \Spamtroll\Sdk\Request\CheckSpamRequest::SOURCE_REGISTRATION,
-                    $ipAddress,
-                    $this->name,
-                    $this->email
-                ));
-
-                if ($response->httpCode === 402) {
-                    \IPS\spamtroll\Application::recordQuotaSkipped($response);
-                    return $result;
-                }
-
-                if (!$response->success) {
-                    \IPS\Log::log('Spamtroll API error: ' . $response->error, 'spamtroll');
-                    return $result;
-                }
-
-                $spamScore = $response->getSpamScore();
-                $status = \IPS\spamtroll\Application::determineStatus($spamScore);
-                $action = \IPS\spamtroll\Application::determineAction($spamScore);
-
-                // Log the result
-                \IPS\spamtroll\Application::log(
-                    null,
-                    'registration',
-                    null,
-                    $ipAddress,
-                    $status,
-                    $spamScore,
-                    $response->getSymbols(),
-                    $response->getThreatCategories(),
-                    $action,
-                    'Username: ' . $this->name . ', Email: ' . ($this->email ?: 'N/A'),
-                    $response->getSubmissionId()
-                );
-
-                // Execute action based on spam score
-                return $this->executeRegistrationSpamAction($action, $spamScore, $result);
-
-            } catch (\Spamtroll\Sdk\Exception\SpamtrollException $e) {
-                \IPS\Log::log('Spamtroll API exception: ' . $e->getMessage(), 'spamtroll');
-                return $result;
-            }
-        } catch (\RuntimeException $e) {
-            if (method_exists(get_parent_class(), __FUNCTION__)) {
-                return \call_user_func_array('parent::' . __FUNCTION__, \func_get_args());
-            } else {
-                throw $e;
-            }
-        }
-    }
-
-    /**
-     * Execute spam action on registration
-     *
-     * @param string    $action Action to take
-     * @param float     $score  Spam score
-     * @param bool|null $parentResult Parent method result
-     * @return bool|null
-     */
-    protected function executeRegistrationSpamAction(string $action, float $score, $parentResult)
-    {
-        // Log the action
-        \IPS\Log::log(
-            sprintf(
-                'Spamtroll registration check: %s (score: %.2f) for %s',
-                $action,
-                $score,
-                $this->name
-            ),
-            'spamtroll'
-        );
-
-        switch ($action) {
-            case 'block':
-                // Return 4 to indicate spam (IPS spam service convention)
-                // 1 = not spam, 2 = moderate, 3 = review, 4 = block
-                return 4;
-
-            case 'moderate':
-                // Return 2 to put in moderation
-                return $parentResult === 4 ? 4 : 2;
-
-            case 'warn':
-                // Return 3 for review
-                return $parentResult === 4 ? 4 : ($parentResult === 2 ? 2 : 3);
-
-            case 'allow':
-            default:
-                // Keep parent result
-                return $parentResult;
-        }
-    }
-
-    /**
-     * Additional spam check during save
-     *
-     * @return void
-     */
-    public function save()
-    {
-        try {
-            // Only check on new registrations
-            if ($this->member_id === null && \IPS\spamtroll\Application::isEnabled()) {
-                // The spamService() method will be called by IPS during registration
-            }
-
-            parent::save();
-        } catch (\RuntimeException $e) {
-            if (method_exists(get_parent_class(), __FUNCTION__)) {
-                return \call_user_func_array('parent::' . __FUNCTION__, \func_get_args());
-            } else {
-                throw $e;
-            }
-        }
+        return \IPS\spamtroll\Scanner\Gateway::applyToRegistration($this, $type, $emailAddress, $result);
     }
 }

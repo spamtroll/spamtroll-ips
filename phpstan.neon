@@ -11,13 +11,14 @@ parameters:
         - tasks
         - extensions
         - setup
+        # IPS hook files start with `//<?php`, so they are not valid PHP
+        # until the Suite rewrites them. `composer stan` runs
+        # dev/preprocess-hooks.php first, which applies exactly the
+        # transformation the Suite applies (SUITE-FACTS U12) and drops the
+        # result here. Analysing the output means the hooks are covered by
+        # the same level-9 rules as everything else.
+        - build/hooks-preprocessed
     excludePaths:
-        # IPS hook files start with `//<?php` (a literal HTML comment),
-        # which means the file isn't valid PHP until the IPS hook
-        # preprocessor rewrites it. PHPStan would either choke on the
-        # parse error or treat the whole body as inline HTML. We rely
-        # on manual review for the two hook files instead.
-        - hooks/*
         # Language tables are not code; the `<?php` opens, the array
         # is assigned, end-of-file. Nothing to analyse.
         - dev/lang.php
@@ -25,7 +26,9 @@ parameters:
         - dev/lang_de.php
     bootstrapFiles:
         - vendor/autoload.php
-        - stubs/IPS.stub.php
+        # Loads stubs/IPS.stub.php and registers the `_Foo` -> `Foo` aliases
+        # the IPS autoloader would create at runtime.
+        - stubs/aliases.php
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: true
     tmpDir: .phpstan-cache

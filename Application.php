@@ -12,7 +12,7 @@ declare(strict_types=1);
  *
  * @since       01 Jan 2024
  *
- * @version     1.0.0
+ * @version     1.0.3
  */
 
 namespace IPS\spamtroll;
@@ -30,6 +30,18 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 class _Application extends \IPS\Application
 {
     /**
+     * Human-readable version. Kept in step with the highest key in
+     * data/versions.json and with setup/cli-install.php by
+     * dev/check-manifests.sh, which is a CI gate — the three used to drift,
+     * so a fresh install reported 1.0.0 while its upgrade steps had already
+     * run.
+     */
+    public const VERSION = '1.0.3';
+
+    /** IPS long version: the highest key in data/versions.json. */
+    public const VERSION_LONG = 10003;
+
+    /**
      * @var \Spamtroll\Sdk\Client|null Singleton instance
      */
     protected static $apiClient = null;
@@ -45,20 +57,19 @@ class _Application extends \IPS\Application
     }
 
     /**
-     * Get API Client singleton
+     * The client for AdminCP and background work.
+     *
+     * Not the one the hooks use: those go through
+     * \IPS\spamtroll\Scanner\ClientFactory::interactiveScanner(), which
+     * trades retries for latency because a member is waiting. See
+     * ClientFactory for the two budgets.
      *
      * @return \Spamtroll\Sdk\Client
      */
     public static function apiClient(): \Spamtroll\Sdk\Client
     {
         if (static::$apiClient === null) {
-            static::$apiClient = new \Spamtroll\Sdk\Client(
-                (string) \IPS\Settings::i()->spamtroll_api_key,
-                new \Spamtroll\Sdk\ClientConfig(
-                    userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION,
-                ),
-                new \IPS\spamtroll\Api\IpsHttpClient(),
-            );
+            static::$apiClient = \IPS\spamtroll\Scanner\ClientFactory::managementClient();
         }
 
         return static::$apiClient;
@@ -73,6 +84,27 @@ class _Application extends \IPS\Application
     {
         return (bool) \IPS\Settings::i()->spamtroll_enabled
             && !empty(\IPS\Settings::i()->spamtroll_api_key);
+    }
+
+    /**
+     * Whether the registration hook can actually run.
+     *
+     * The Suite only calls `\IPS\Member::spamService()` when its own spam
+     * defence is switched on (docs/SUITE-FACTS.md, U4b). With
+     * `spam_service_enabled` off, this application's registration hook is
+     * installed, enabled, and never reached — and until now the AdminCP
+     * reported registration scanning as working.
+     *
+     * Returns true when registration scanning is switched off here too, since
+     * then there is nothing to warn about.
+     */
+    public static function registrationScanningIsReachable(): bool
+    {
+        if (!\IPS\Settings::i()->spamtroll_check_registrations) {
+            return true;
+        }
+
+        return (bool) \IPS\Settings::i()->spam_service_enabled;
     }
 
     /**
@@ -167,6 +199,10 @@ class _Application extends \IPS\Application
      * @param array|null $threats Threat categories
      * @param string $actionTaken Action taken
      * @param string|null $contentPreview Content preview
+     * @param string|null $submissionId Spamtroll API submission UUID
+     * @param string|null $emailHash SHA-256 of the lower-cased address, so a
+     *                               registration scan can be deleted with the
+     *                               account it belongs to
      */
     public static function log(
         ?int $memberId,
@@ -180,6 +216,7 @@ class _Application extends \IPS\Application
         string $actionTaken,
         ?string $contentPreview = null,
         ?string $submissionId = null,
+        ?string $emailHash = null,
     ): void {
         try {
             \IPS\Db::i()->insert('spamtroll_logs', [
@@ -194,6 +231,7 @@ class _Application extends \IPS\Application
                 'log_action_taken' => $actionTaken,
                 'log_content_preview' => $contentPreview ? mb_substr($contentPreview, 0, 500) : null,
                 'log_submission_id' => $submissionId,
+                'log_email_hash' => $emailHash,
                 'log_date' => time(),
             ]);
         } catch (\Exception $e) {
@@ -219,7 +257,7 @@ class _Application extends \IPS\Application
         $byDay = isset($stored['days']) && is_array($stored['days']) ? $stored['days'] : [];
         $byDay[$today] = (isset($byDay[$today]) ? (int) $byDay[$today] : 0) + 1;
 
-        $cutoff = gmdate('Y-m-d', strtotime('-30 days'));
+        $cutoff = gmdate('Y-m-d', time() - (30 * 86400));
         foreach (array_keys($byDay) as $day) {
             if (!is_string($day) || $day < $cutoff) {
                 unset($byDay[$day]);
@@ -251,7 +289,7 @@ class _Application extends \IPS\Application
             $stored = [];
         }
         $byDay = isset($stored['days']) && is_array($stored['days']) ? $stored['days'] : [];
-        $cutoff = gmdate('Y-m-d', strtotime('-' . max(1, $days) . ' days'));
+        $cutoff = gmdate('Y-m-d', time() - (max(1, $days) * 86400));
 
         $window = [];
         $total = 0;

@@ -122,6 +122,13 @@ class _Install
                         'default' => null,
                     ],
                     [
+                        'name' => 'log_email_hash',
+                        'type' => 'VARCHAR',
+                        'length' => 64,
+                        'allow_null' => true,
+                        'default' => null,
+                    ],
+                    [
                         'name' => 'log_date',
                         'type' => 'INT',
                         'length' => 11,
@@ -156,17 +163,32 @@ class _Install
                         'name' => 'log_content_type',
                         'columns' => [ 'log_content_type' ],
                     ],
+                    [
+                        'type' => 'key',
+                        'name' => 'log_email_hash',
+                        'columns' => [ 'log_email_hash' ],
+                    ],
                 ],
                 'collation' => 'utf8mb4_unicode_ci',
             ]);
         } else {
-            /* Migration: ensure log_submission_id column exists on installs
-             * created before that column was added to schema.json. */
+            /* Migration: ensure columns added after the first release exist
+             * on installs created before them. */
             if (! \IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_submission_id')) {
                 \IPS\Db::i()->addColumn('spamtroll_logs', [
                     'name' => 'log_submission_id',
                     'type' => 'VARCHAR',
                     'length' => 36,
+                    'allow_null' => true,
+                    'default' => null,
+                ]);
+            }
+
+            if (! \IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_email_hash')) {
+                \IPS\Db::i()->addColumn('spamtroll_logs', [
+                    'name' => 'log_email_hash',
+                    'type' => 'VARCHAR',
+                    'length' => 64,
                     'allow_null' => true,
                     'default' => null,
                 ]);
@@ -178,16 +200,21 @@ class _Install
             'spamtroll_api_key' => '',
             'spamtroll_api_url' => 'https://api.spamtroll.io/api/v1',
             'spamtroll_enabled' => '0',
+            'spamtroll_sensitivity' => 'balanced',
+            'spamtroll_scan_scope' => 'all',
+            'spamtroll_override_thresholds' => '0',
             'spamtroll_spam_threshold' => '0.7',
             'spamtroll_suspicious_threshold' => '0.4',
             'spamtroll_check_posts' => '1',
-            'spamtroll_check_messages' => '1',
             'spamtroll_check_registrations' => '1',
             'spamtroll_action_blocked' => 'block',
             'spamtroll_action_suspicious' => 'moderate',
             'spamtroll_bypass_groups' => '',
+            'spamtroll_bypass_min_posts' => '0',
+            'spamtroll_anonymize_ip' => '0',
             'spamtroll_log_retention_days' => '30',
             'spamtroll_timeout' => '5',
+            'spamtroll_quota_skipped_log' => '',
         ];
 
         foreach ($defaults as $key => $value) {

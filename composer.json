@@ -31,12 +31,19 @@
         "test:coverage": "pest --coverage",
         "lint": "php-cs-fixer fix --dry-run --diff",
         "lint:fix": "php-cs-fixer fix",
-        "stan": "phpstan analyse --memory-limit=1G",
+        "hooks:preprocess": "php dev/preprocess-hooks.php",
+        "stan": [
+            "@hooks:preprocess",
+            "phpstan analyse --memory-limit=1G"
+        ],
+        "manifests": "bash dev/check-manifests.sh",
+        "regression": "bash dev/prove-regression.sh",
         "peck": "peck",
         "qa": [
             "@lint",
             "@stan",
             "@peck",
+            "@manifests",
             "@test"
         ]
     },
@@ -45,14 +52,20 @@
         "test:coverage": "Run tests with coverage report",
         "lint": "Check code style without modifying files",
         "lint:fix": "Auto-format code to match code style",
-        "stan": "Run PHPStan static analysis",
+        "hooks:preprocess": "Rewrite hooks/*.php the way the IPS Suite does, into build/hooks-preprocessed/",
+        "stan": "Run PHPStan static analysis (preprocesses the hooks first)",
+        "manifests": "Check data/*.json manifests against the files and settings they name",
+        "regression": "Run the hook tests against the pre-fix hooks and require them to fail",
         "peck": "Run the peck spell checker over identifiers and docblocks",
         "qa": "Full quality gate: lint check, static analysis, spell-check, and tests"
     },
     "autoload-dev": {
         "psr-4": {
             "IPS\\spamtroll\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "stubs/aliases.php"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true

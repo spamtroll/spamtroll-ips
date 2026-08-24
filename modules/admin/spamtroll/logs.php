@@ -125,12 +125,18 @@ class _logs extends \IPS\Dispatcher\Controller
                 if (!$val) {
                     return '<span class="ipsType_light">—</span>';
                 }
-                $escaped = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
-                $short = substr($val, 0, 8);
+                $escaped = htmlspecialchars((string) $val, ENT_QUOTES, 'UTF-8');
+                $short = htmlspecialchars(substr((string) $val, 0, 8), ENT_QUOTES, 'UTF-8');
+                $copied = htmlspecialchars(
+                    (string) \IPS\Member::loggedIn()->language()->get('spamtroll_copied'),
+                    ENT_QUOTES,
+                    'UTF-8',
+                );
+
                 return '<span class="spamtroll-uuid">'
                      . '<code title="' . $escaped . '">' . $short . '…</code>'
                      . '<button type="button" class="ipsButton ipsButton_verySmall ipsButton_light spamtroll-copy-btn" '
-                     . 'data-clipboard="' . $escaped . '" title="Copy UUID">'
+                     . 'data-clipboard="' . $escaped . '" data-copied-label="' . $copied . '" title="Copy UUID">'
                      . '<i class="fa fa-copy"></i>'
                      . '</button>'
                      . '</span>';
@@ -166,40 +172,8 @@ class _logs extends \IPS\Dispatcher\Controller
             </a>
         </div>';
 
-        // Inline clipboard handler for the UUID copy button — delegates so it
-        // still works after the table re-renders via AJAX filtering.
-        $copiedLabel = htmlspecialchars(\IPS\Member::loggedIn()->language()->get('spamtroll_copied'), ENT_QUOTES, 'UTF-8');
-        $copyScript = <<<HTML
-            <script>
-            document.addEventListener('click', function (e) {
-                const btn = e.target.closest('.spamtroll-copy-btn');
-                if (!btn) return;
-                e.preventDefault();
-                const value = btn.getAttribute('data-clipboard') || '';
-                const done = () => {
-                    const original = btn.innerHTML;
-                    btn.innerHTML = '<i class="fa fa-check"></i> {$copiedLabel}';
-                    setTimeout(() => { btn.innerHTML = original; }, 1200);
-                };
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(value).then(done).catch(() => {
-                        const ta = document.createElement('textarea');
-                        ta.value = value; document.body.appendChild(ta); ta.select();
-                        try { document.execCommand('copy'); } catch (_) {}
-                        ta.remove(); done();
-                    });
-                } else {
-                    const ta = document.createElement('textarea');
-                    ta.value = value; document.body.appendChild(ta); ta.select();
-                    try { document.execCommand('copy'); } catch (_) {}
-                    ta.remove(); done();
-                }
-            });
-            </script>
-            HTML;
-
         \IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('menu__spamtroll_spamtroll_logs');
-        \IPS\Output::i()->output = $buttons . $table . $copyScript;
+        \IPS\Output::i()->output = $buttons . $table;
     }
 
     /**
@@ -242,7 +216,7 @@ class _logs extends \IPS\Dispatcher\Controller
             $symbolsHtml = '';
             if (!empty($symbols)) {
                 foreach ($symbols as $symbol) {
-                    $symbolsHtml .= '<span class="ipsBadge ipsBadge_neutral">' . htmlspecialchars($symbol) . '</span> ';
+                    $symbolsHtml .= '<span class="ipsBadge ipsBadge_neutral">' . htmlspecialchars((string) $symbol, ENT_QUOTES, 'UTF-8') . '</span> ';
                 }
             } else {
                 $symbolsHtml = '-';
@@ -251,7 +225,7 @@ class _logs extends \IPS\Dispatcher\Controller
             $threatsHtml = '';
             if (!empty($threats)) {
                 foreach ($threats as $threat) {
-                    $threatsHtml .= '<span class="ipsBadge ipsBadge_warning">' . htmlspecialchars($threat) . '</span> ';
+                    $threatsHtml .= '<span class="ipsBadge ipsBadge_warning">' . htmlspecialchars((string) $threat, ENT_QUOTES, 'UTF-8') . '</span> ';
                 }
             } else {
                 $threatsHtml = '-';
@@ -289,7 +263,7 @@ class _logs extends \IPS\Dispatcher\Controller
                     </tr>
                     <tr>
                         <th>' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_ip_address') . '</th>
-                        <td>' . htmlspecialchars($log['log_ip_address']) . '</td>
+                        <td>' . htmlspecialchars((string) $log['log_ip_address'], ENT_QUOTES, 'UTF-8') . '</td>
                     </tr>
                     <tr>
                         <th>' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_symbols') . '</th>
@@ -303,7 +277,7 @@ class _logs extends \IPS\Dispatcher\Controller
             if ($log['log_content_preview']) {
                 $html .= '<tr>
                         <th>' . \IPS\Member::loggedIn()->language()->addToStack('spamtroll_log_content_preview') . '</th>
-                        <td><div class="spamtroll-content-preview">' . htmlspecialchars($log['log_content_preview']) . '</div></td>
+                        <td><div class="spamtroll-content-preview">' . htmlspecialchars((string) $log['log_content_preview'], ENT_QUOTES, 'UTF-8') . '</div></td>
                     </tr>';
             }
 

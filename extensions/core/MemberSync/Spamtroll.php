@@ -38,6 +38,15 @@ class _Spamtroll
     {
         try {
             \IPS\Db::i()->delete('spamtroll_logs', [ 'log_member_id=?', $member->member_id ]);
+
+            /* A registration is scanned before the account exists, so that row
+             * carries no member id and the delete above never reached it. The
+             * account went, its registration scan — with the IP address it was
+             * made from — stayed. */
+            $emailHash = \IPS\spamtroll\Log\Recorder::emailHash($member->email);
+            if ($emailHash !== null) {
+                \IPS\Db::i()->delete('spamtroll_logs', [ 'log_email_hash=?', $emailHash ]);
+            }
         } catch (\Exception $e) {
             \IPS\Log::log($e, 'spamtroll');
         }

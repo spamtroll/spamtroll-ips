@@ -57,24 +57,58 @@ library: `composer install --no-dev` pulls the matching version into
    (PHP 8.0 + ext-curl is enough). The plugin doesn't have to mock
    HTTP — it injects an IPS-flavoured `HttpClientInterface` adapter.
 
-## Why hooks are excluded from PHPStan
+## How the hooks are analysed and tested
 
-`hooks/Comment.php` and `hooks/Member.php` start with `//<?php`. That's
-a literal HTML comment, **not** a PHP tag. The IPS hook preprocessor
-rewrites the first line before each `include`, swapping in a real
-`<?php` plus `extends _HOOK_CLASS_` resolution.
+`hooks/Comment.php` and `hooks/Member.php` start with `//<?php`. That is a
+literal comment, **not** a PHP tag — and it has to be, because the Suite
+does not `include` a hook, it `eval()`s it, and `eval()` rejects an opening
+tag. Before evaluating, the Suite prepends a namespace and substitutes the
+parent class name (`docs/SUITE-FACTS.md`, U12):
 
-PHPStan parses files as PHP. With `//<?php` it sees inline HTML, no
-class declaration, nothing to analyse. We exclude these two files in
-`phpstan.neon` rather than fight the framework. The trade-off:
+```php
+$contents = "namespace {$namespace}; " . str_replace('_HOOK_CLASS_', $realClass, file_get_contents($file));
+@eval($contents);
+```
 
-- **Cost:** PHPStan can't catch a bug in the hook bodies. Roughly 250
-  LOC across the two files, mostly try/catch + delegation to
-  `Application::*` helpers (which **are** analysed).
-- **Mitigation:** the hooks are intentionally thin — every non-trivial
-  decision (bypass logic, action policy, log payload) lives in
-  `Application::*` static methods that PHPStan does check, and the
-  `tests/Unit/ApplicationTest.php` Pest suite covers them.
+Both the analyser and the test suite reproduce that transformation rather
+than working around it, from one place — `tests/Support/HookTransform.php`:
+
+- `dev/preprocess-hooks.php` writes the result to `build/hooks-preprocessed/`,
+  which is what `phpstan.neon` analyses. `composer stan` runs it first. The
+  hooks are covered by the same level-9 rules as everything else.
+- `tests/Support/HookHarness.php` `eval()`s the same string over an
+  instrumented stand-in for the framework class, then closes the chain with
+  `class Member extends {$lastHook} {}` the way `init.php` does (U12d). The
+  tests in `tests/Hooks/` therefore exercise the file that ships, not an
+  impression of it. `$SPAMTROLL_HOOKS_DIR` points the harness elsewhere,
+  which is how `dev/prove-regression.sh` runs the suite against the pre-fix
+  hooks and requires it to fail.
+
+Two things follow from this that are easy to undo by accident, so both are
+asserted in `tests/Unit/HookHygieneTest.php`: the leading `//` stays, and
+every class reference inside a hook is fully qualified (the harness compiles
+into a per-run namespace so one file can be loaded more than once).
+
+## Why the hooks contain almost nothing
+
+A hook calls its parent once, outside any `try`, and then calls one method
+on `\IPS\spamtroll\Scanner\Gateway`. That is the entire file.
+
+Fail-open used to be a matter of remembering the right `catch` in each hook,
+and the two hooks did not agree: `Member.php` caught `SpamtrollException`
+inside and `\RuntimeException` outside, so a `\Error` — what a package
+shipped without `vendor/` produces — escaped `spamService()` and nobody
+could register, while `Comment.php` caught `\Throwable` and shrugged the
+same failure off. Moving the boundary into `Gateway` makes it one thing that
+either works or does not, and it is covered by a matrix
+(`tests/Scanner/FailOpenMatrixTest.php`) with a reflective check that no
+public scan path escapes it.
+
+The hooks also no longer carry the framework's passthrough boilerplate —
+`catch (\RuntimeException)` followed by calling the parent again through
+`call_user_func_array`. That wrapper is written for a method that only
+forwards; around a body that does anything else it duplicates whatever the
+parent did, which here meant a second post row.
 
 ## Why `\IPS\spamtroll\Application` exists at all
 

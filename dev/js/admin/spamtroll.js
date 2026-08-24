@@ -5,6 +5,28 @@
  * @subpackage  Spamtroll Anti-Spam
  */
 
+/**
+ * Renders an icon and a message into a container.
+ *
+ * The message comes back from the API over the network, so it goes in as
+ * text. It used to be concatenated into innerHTML, which is a stored XSS
+ * hole one compromised or misconfigured API response wide, in the AdminCP
+ * of all places.
+ */
+function setResult(container, icon, className, message) {
+    container.textContent = '';
+
+    var wrapper = document.createElement('span');
+    if (className) { wrapper.className = className; }
+
+    var glyph = document.createElement('i');
+    glyph.className = icon === 'spinner' ? 'fa fa-spinner fa-spin' : 'fa fa-' + icon;
+    wrapper.appendChild(glyph);
+    wrapper.appendChild(document.createTextNode(' ' + message));
+
+    container.appendChild(wrapper);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
     /* Test Connection Handler */
@@ -16,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var testUrl = testBtn.getAttribute('data-test-url');
             var testingText = testBtn.getAttribute('data-testing-text') || 'Testing...';
 
-            resultSpan.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + testingText;
+            setResult(resultSpan, 'spinner', '', testingText);
             testBtn.disabled = true;
 
             var apiKey = document.querySelector('[name="spamtroll_api_key"]');
@@ -38,19 +60,61 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(function(response) { return response.json(); })
             .then(function(data) {
-                if (data.success) {
-                    resultSpan.innerHTML = '<span class="ipsType_success"><i class="fa fa-check"></i> ' + data.message + '</span>';
-                } else {
-                    resultSpan.innerHTML = '<span class="ipsType_warning"><i class="fa fa-times"></i> ' + data.message + '</span>';
-                }
+                setResult(
+                    resultSpan,
+                    data.success ? 'check' : 'times',
+                    data.success ? 'ipsType_success' : 'ipsType_warning',
+                    data.message
+                );
                 testBtn.disabled = false;
             })
-            .catch(function(error) {
-                resultSpan.innerHTML = '<span class="ipsType_warning"><i class="fa fa-times"></i> Connection error</span>';
+            .catch(function() {
+                setResult(resultSpan, 'times', 'ipsType_warning', 'Connection error');
                 testBtn.disabled = false;
             });
         });
     }
+
+    /* Clipboard handler for the submission-UUID copy button.
+     *
+     * Delegated, so it survives the table re-rendering through AJAX
+     * filtering. It used to be a <script> block built by string
+     * concatenation in modules/admin/spamtroll/logs.php — inline script in
+     * the AdminCP, which the Content-Security-Policy is entitled to refuse. */
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.spamtroll-copy-btn') : null;
+        if (!btn) { return; }
+        e.preventDefault();
+
+        var value = btn.getAttribute('data-clipboard') || '';
+        var copiedLabel = btn.getAttribute('data-copied-label') || 'Copied';
+
+        var done = function () {
+            var original = btn.getAttribute('data-original-label');
+            if (original === null) {
+                original = btn.textContent;
+                btn.setAttribute('data-original-label', original);
+            }
+            btn.textContent = copiedLabel;
+            setTimeout(function () { btn.textContent = original; }, 1200);
+        };
+
+        var fallback = function () {
+            var ta = document.createElement('textarea');
+            ta.value = value;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (err) { /* nothing else to try */ }
+            ta.remove();
+            done();
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(value).then(done).catch(fallback);
+        } else {
+            fallback();
+        }
+    });
 
     /* Chart initialization */
     var chartCanvas = document.getElementById('spamtrollChart');

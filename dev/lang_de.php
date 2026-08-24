@@ -112,6 +112,8 @@ $lang = array(
 
     'spamtroll_not_configured_message' => 'Spamtroll ist nicht konfiguriert. Trage deinen API-Schlüssel in den Einstellungen ein.',
     'spamtroll_disabled_message' => 'Spamtroll ist aktuell deaktiviert. Aktiviere ihn in den Einstellungen, um deine Community zu schützen.',
+    'spamtroll_spam_defense_off_message' => 'Die Registrierungsprüfung ist hier aktiviert, aber der eigene Spamschutz der Suite ist aus — und die Suite fragt einen Spamdienst nur dann nach einer Registrierung, wenn diese Einstellung aktiv ist. Es wird keine Registrierung geprüft.',
+    'spamtroll_go_to_spam_settings' => 'Spamschutz-Einstellungen öffnen',
     'spamtroll_go_to_settings' => 'Zu den Einstellungen',
 
     // Logs
