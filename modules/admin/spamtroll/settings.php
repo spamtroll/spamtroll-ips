@@ -215,17 +215,9 @@ class _settings extends \IPS\Dispatcher\Controller
         try {
             $apiKey = \IPS\Request::i()->api_key ?: null;
 
-            if ($apiKey) {
-                $client = new \Spamtroll\Sdk\Client(
-                    (string) $apiKey,
-                    new \Spamtroll\Sdk\ClientConfig(
-                        userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION,
-                    ),
-                    new \IPS\spamtroll\Api\IpsHttpClient(),
-                );
-            } else {
-                $client = \IPS\spamtroll\Application::apiClient();
-            }
+            $client = $apiKey
+                ? \IPS\spamtroll\Scanner\ClientFactory::managementClient((string) $apiKey)
+                : \IPS\spamtroll\Application::apiClient();
             $response = $client->testConnection();
 
             if ($response->success) {

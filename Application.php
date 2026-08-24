@@ -30,6 +30,18 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 class _Application extends \IPS\Application
 {
     /**
+     * Human-readable version. Kept in step with the highest key in
+     * data/versions.json and with setup/cli-install.php by
+     * dev/check-manifests.sh, which is a CI gate — the three used to drift,
+     * so a fresh install reported 1.0.0 while its upgrade steps had already
+     * run.
+     */
+    public const VERSION = '1.0.2';
+
+    /** IPS long version: the highest key in data/versions.json. */
+    public const VERSION_LONG = 10002;
+
+    /**
      * @var \Spamtroll\Sdk\Client|null Singleton instance
      */
     protected static $apiClient = null;
@@ -45,20 +57,19 @@ class _Application extends \IPS\Application
     }
 
     /**
-     * Get API Client singleton
+     * The client for AdminCP and background work.
+     *
+     * Not the one the hooks use: those go through
+     * \IPS\spamtroll\Scanner\ClientFactory::interactiveScanner(), which
+     * trades retries for latency because a member is waiting. See
+     * ClientFactory for the two budgets.
      *
      * @return \Spamtroll\Sdk\Client
      */
     public static function apiClient(): \Spamtroll\Sdk\Client
     {
         if (static::$apiClient === null) {
-            static::$apiClient = new \Spamtroll\Sdk\Client(
-                (string) \IPS\Settings::i()->spamtroll_api_key,
-                new \Spamtroll\Sdk\ClientConfig(
-                    userAgent: 'Spamtroll-IPS/1.0 spamtroll-php-sdk/' . \Spamtroll\Sdk\Version::VERSION,
-                ),
-                new \IPS\spamtroll\Api\IpsHttpClient(),
-            );
+            static::$apiClient = \IPS\spamtroll\Scanner\ClientFactory::managementClient();
         }
 
         return static::$apiClient;

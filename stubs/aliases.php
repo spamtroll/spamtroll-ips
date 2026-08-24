@@ -3,49 +3,62 @@
 declare(strict_types=1);
 
 /**
- * Registers `IPS\spamtroll\…\_Foo` → `IPS\spamtroll\…\Foo` for every class
- * this application ships.
+ * A stand-in for the part of the IPS autoloader this application relies on.
  *
- * IPS declares classes with a leading underscore and its autoloader resolves
- * the unprefixed name at runtime (see docs/SUITE-FACTS.md, U12b). Neither
- * PHPStan nor Pest runs that autoloader, so without this file every
- * `\IPS\spamtroll\Scanner\Gateway` reads as an unknown class.
+ * IPS declares every class with a leading underscore and resolves the
+ * unprefixed name at runtime: `\IPS\spamtroll\Scanner\Gateway` is loaded from
+ * `sources/Scanner/Gateway.php`, which declares `_Gateway`
+ * (docs/SUITE-FACTS.md, U12b). Neither PHPStan nor Pest runs that autoloader,
+ * so without this file every reference to a shipped class reads as unknown.
  *
- * Load order matters: `stubs/IPS.stub.php` must already be in memory, because
- * the application classes extend framework classes declared there.
+ * The path rule mirrors the framework's: a segment starting with a lowercase
+ * letter is a directory as written (`modules`, `extensions`, `tasks`,
+ * `widgets`), anything else lives under `sources/` — except a single segment,
+ * which is the application class itself.
+ *
+ * Loaded through Composer's dev autoloader, so it is never shipped.
  */
 
 require_once __DIR__ . '/IPS.stub.php';
 
-$spamtrollRoot = \dirname(__DIR__);
-
-$spamtrollFiles = array_merge(
-    [$spamtrollRoot . '/Application.php'],
-    glob($spamtrollRoot . '/sources/*/*.php') ?: [],
-    glob($spamtrollRoot . '/extensions/*/*/*.php') ?: [],
-);
-
-foreach ($spamtrollFiles as $spamtrollFile) {
-    require_once $spamtrollFile;
-}
-
-foreach (get_declared_classes() as $spamtrollClass) {
-    if (strpos($spamtrollClass, 'IPS\\spamtroll\\') !== 0) {
-        continue;
+spl_autoload_register(static function (string $class): void {
+    $prefix = 'IPS\\spamtroll\\';
+    if (strpos($class, $prefix) !== 0) {
+        return;
     }
 
-    $spamtrollSeparator = strrpos($spamtrollClass, '\\');
-    if ($spamtrollSeparator === false) {
-        continue;
+    $segments = explode('\\', substr($class, \strlen($prefix)));
+    $short = array_pop($segments);
+    if ($short === null) {
+        return;
     }
 
-    $spamtrollShort = substr($spamtrollClass, $spamtrollSeparator + 1);
-    if ($spamtrollShort === '' || $spamtrollShort[0] !== '_') {
-        continue;
+    /* `_Gateway` and `Gateway` come from the same file. */
+    $declared = $short[0] === '_' ? $short : '_' . $short;
+    $wanted = ltrim($short, '_');
+
+    if ($segments === []) {
+        $path = \dirname(__DIR__) . '/' . $wanted . '.php';
+    } else {
+        $first = $segments[0];
+        $root = preg_match('/^[a-z0-9]/', $first) === 1 ? '' : 'sources/';
+        $path = \dirname(__DIR__) . '/' . $root . implode('/', $segments) . '/' . $wanted . '.php';
     }
 
-    $spamtrollAlias = substr($spamtrollClass, 0, $spamtrollSeparator + 1) . substr($spamtrollShort, 1);
-    if (!class_exists($spamtrollAlias, false)) {
-        class_alias($spamtrollClass, $spamtrollAlias);
+    if (!is_file($path)) {
+        return;
     }
-}
+
+    require_once $path;
+
+    $namespace = $prefix . ($segments === [] ? '' : implode('\\', $segments) . '\\');
+
+    /* Interfaces and traits are declared unprefixed and need no alias. */
+    if (interface_exists($namespace . $wanted, false) || trait_exists($namespace . $wanted, false)) {
+        return;
+    }
+
+    if (class_exists($namespace . $declared, false) && !class_exists($namespace . $wanted, false)) {
+        class_alias($namespace . $declared, $namespace . $wanted);
+    }
+});

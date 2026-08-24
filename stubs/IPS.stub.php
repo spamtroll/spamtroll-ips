@@ -122,14 +122,14 @@ namespace IPS {
             return false;
         }
 
-        public static function loggedIn(?Member $member = null): self
+        public static function loggedIn(?Member $member = null): Member
         {
-            return new self();
+            return new Member();
         }
 
-        public static function load(int $id): self
+        public static function load(int $id): Member
         {
-            return new self();
+            return new Member();
         }
 
         public function language(): Lang
@@ -137,18 +137,30 @@ namespace IPS {
             return new Lang();
         }
 
-        public function save(): void {}
+        /**
+         * Untyped, like the Suite's own (`system/Member/Member.php:450`).
+         *
+         * @return mixed
+         */
+        public function save()
+        {
+            return null;
+        }
 
         /**
+         * Untyped on purpose: this is the Suite's own signature, character
+         * for character (docs/SUITE-FACTS.md, U4a).
+         *
+         * @param mixed $type
+         * @param mixed $emailAddress
+         * @param mixed $spamCode
+         * @param mixed $disposable
+         * @param mixed $geoBlock
+         *
          * @return int|null
          */
-        public function spamService(
-            string $type = 'register',
-            ?string $emailAddress = null,
-            mixed &$spamCode = null,
-            mixed &$disposable = false,
-            mixed &$geoBlock = false,
-        ) {
+        public function spamService($type = 'register', $emailAddress = null, &$spamCode = null, &$disposable = false, &$geoBlock = false)
+        {
             return null;
         }
     }
@@ -185,7 +197,18 @@ namespace IPS {
 
     class Log
     {
-        public static function log(\Throwable|string $what, string $category = ''): void {}
+        /**
+         * Test-only capture buffer. The live framework writes to core_log;
+         * the suite reads this instead of reaching for a database.
+         *
+         * @var array<int, array{what: \Throwable|string, category: string}>
+         */
+        public static array $entries = [];
+
+        public static function log(\Throwable|string $what, string $category = ''): void
+        {
+            static::$entries[] = ['what' => $what, 'category' => $category];
+        }
     }
 
     class Db

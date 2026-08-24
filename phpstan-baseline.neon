@@ -36,97 +36,12 @@ parameters:
 			path: Application.php
 
 		-
-			message: "#^Cannot access property \\$email on mixed\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Cannot access property \\$member_id on mixed\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Cannot access property \\$name on mixed\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Cannot cast mixed to string\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Method IPS\\\\Content\\\\spamtroll_hook_Comment\\:\\:create\\(\\) should return static\\(IPS\\\\Content\\\\spamtroll_hook_Comment\\) but returns mixed\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, 'parent\\:\\:create' given\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Parameter \\#1 \\$member of static method IPS\\\\spamtroll\\\\_Application\\:\\:shouldBypass\\(\\) expects IPS\\\\Member, mixed given\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Parameter \\#3 \\$ipAddress of class Spamtroll\\\\Sdk\\\\Request\\\\CheckSpamRequest constructor expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Parameter \\#4 \\$ipAddress of static method IPS\\\\spamtroll\\\\_Application\\:\\:log\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Comment.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:executeRegistrationSpamAction\\(\\) should return bool\\|null but returns int\\.$#"
-			count: 3
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) has parameter \\$disposable with no type specified\\.$#"
+			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) should return int\\|null but returns mixed\\.$#"
 			count: 1
 			path: build/hooks-preprocessed/Member.php
 
 		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) has parameter \\$emailAddress with no type specified\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) has parameter \\$geoBlock with no type specified\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) has parameter \\$spamCode with no type specified\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) has parameter \\$type with no type specified\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) should return bool\\|null but returns int\\|null\\.$#"
-			count: 6
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) should return bool\\|null but returns mixed\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, 'parent\\:\\:spamService' given\\.$#"
-			count: 1
-			path: build/hooks-preprocessed/Member.php
-
-		-
-			message: "#^Parameter \\#3 \\$parentResult of method IPS\\\\spamtroll_hook_Member\\:\\:executeRegistrationSpamAction\\(\\) expects bool\\|null, int\\|null given\\.$#"
+			message: "#^Parameter \\#1 \\$member of static method IPS\\\\spamtroll\\\\Scanner\\\\_Gateway\\:\\:applyToRegistration\\(\\) expects IPS\\\\Member, \\$this\\(IPS\\\\spamtroll_hook_Member\\) given\\.$#"
 			count: 1
 			path: build/hooks-preprocessed/Member.php
 

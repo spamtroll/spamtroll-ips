@@ -37,6 +37,7 @@
             "phpstan analyse --memory-limit=1G"
         ],
         "manifests": "bash dev/check-manifests.sh",
+        "regression": "bash dev/prove-regression.sh",
         "peck": "peck",
         "qa": [
             "@lint",
@@ -54,6 +55,7 @@
         "hooks:preprocess": "Rewrite hooks/*.php the way the IPS Suite does, into build/hooks-preprocessed/",
         "stan": "Run PHPStan static analysis (preprocesses the hooks first)",
         "manifests": "Check data/*.json manifests against the files and settings they name",
+        "regression": "Run the hook tests against the pre-fix hooks and require them to fail",
         "peck": "Run the peck spell checker over identifiers and docblocks",
         "qa": "Full quality gate: lint check, static analysis, spell-check, and tests"
     },
