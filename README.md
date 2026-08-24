@@ -287,6 +287,16 @@ rm -rf applications/spamtroll
 
 IPS runs `extensions/core/Uninstall/Spamtroll.php` automatically to clean up the logs table and related tasks.
 
+## For developers
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — request flow, how the hooks
+  are analysed and tested, why the `_ClassName` prefix exists.
+- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — local setup, the quality
+  gate, release checklist.
+- [`docs/SUITE-FACTS.md`](docs/SUITE-FACTS.md) — every behaviour of IPS
+  Community Suite this application depends on, with the file and line it was
+  read from, and what still needs a running Suite to answer.
+
 ## Support
 
 - Documentation: <https://spamtroll.io/docs>

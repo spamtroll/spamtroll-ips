@@ -35,13 +35,28 @@ In order:
 
 1. `composer lint` — php-cs-fixer dry-run. Failure → `composer lint:fix`.
 2. `composer stan` — PHPStan level 9 against the IPS-shaped stubs in
-   `stubs/IPS.stub.php` plus a thin baseline (`phpstan-baseline.neon`)
-   for IPS-specific magic that's not worth fixing in code.
+   `stubs/IPS.stub.php` plus a baseline (`phpstan-baseline.neon`) for IPS
+   magic that isn't worth fixing in code. Runs `dev/preprocess-hooks.php`
+   first, so `hooks/*.php` are analysed too.
 3. `composer peck` — aspell spell-check.
-4. `composer test` — Pest unit suite for the pure-logic helpers in
-   `Application.php`.
+4. `composer manifests` — `dev/check-manifests.sh`. Cross-checks
+   `data/*.json` against the code it names: hooks against `hooks/`,
+   settings against `setup/install.php` and the AdminCP form, every
+   `extensions.json` class against a file that declares it, versions
+   against each other. Each check exists because that manifest has been
+   wrong at least once, and the Suite validates none of them.
+5. `composer test` — Pest. Four layers: pure logic (`tests/Unit`), the
+   fail-open matrix over the real SDK and a fake network
+   (`tests/Scanner`), the hook files compiled the way the Suite compiles
+   them (`tests/Hooks`), and — outside CI — the live-forum procedure.
 
-CI runs the same set on every push / PR.
+CI runs the same set on every push / PR, plus a job that regenerates
+`data/build.xml` and diffs it.
+
+`composer regression` is not part of the gate. It points the hook suite at
+the hooks as they were before a fix (`$SPAMTROLL_HOOKS_DIR`) and fails if
+they pass — worth running when you add a test for a defect, to check the
+test can tell the difference.
 
 ## Why parts of the codebase are excluded from PHPStan
 
@@ -58,12 +73,18 @@ has a custom autoloader that resolves `_ClassName` to
    extending stubs). Don't add to the baseline lightly — that's the
    "noise" budget; real bugs should still surface as new errors.
 
-The following paths are **excluded entirely** from PHPStan:
+`stubs/aliases.php` registers the `_Foo` → `Foo` aliases the IPS autoloader
+would create, so PHPStan, Pest and peck all resolve
+`\IPS\spamtroll\Scanner\Gateway` instead of guessing.
 
-- **`hooks/*.php`** — IPS hook files start with `//<?php`, a literal
-  HTML comment, not a PHP tag. The hook preprocessor rewrites it
-  before include. PHPStan parses the original file and sees no PHP,
-  so we don't try.
+`hooks/*.php` used to be excluded — they start with `//<?php`, which is a
+comment rather than a tag, so PHPStan saw no PHP. They are analysed now:
+`composer stan` runs `dev/preprocess-hooks.php`, which applies the Suite's
+own transformation and writes the result to `build/hooks-preprocessed/`.
+See `docs/ARCHITECTURE.md` for the mechanism.
+
+One path is still **excluded entirely**:
+
 - **`dev/lang*.php`** — pure data tables (return `$lang = […];`).
   Nothing to analyse.
 
@@ -79,21 +100,34 @@ The following paths are **excluded entirely** from PHPStan:
 
 ## Tests
 
-Pest, in `tests/Unit/`. The IPS framework can't be bootstrapped, so
-unit tests cover only **pure-logic helpers**:
+Pest, in four layers. The Suite can't be bootstrapped in CI, but that turns
+out to constrain far less than it looks.
 
-- `Application::determineStatus()`, `determineAction()` — score → label
-- `Application::shouldBypass()` — admin/group/post-count short-circuit
-
-Real flows (hooks, ACP routing, database) need a live forum.
-Integration testing is documented in `cli-install.php` + the
-existing dogomania.com staging procedure.
+1. **`tests/Unit/`** — pure logic and structure. `Policy`, `ApiError`,
+   `Breaker` (with an injected clock and an in-memory store), `Recorder`'s
+   hashing and IP masking, the manifests, and two guards: the hooks against
+   the Suite signatures recorded in `tests/Support/suite-signatures.php`,
+   and the hooks against the properties the Suite's loader depends on.
+2. **`tests/Scanner/`** — the fail-open matrix. Eighteen rows through the
+   *real* SDK — request building, retry loop, status handling, parsing —
+   over a fake `HttpClientInterface`. Each asserts the action and that
+   nothing propagated. A reflective test walks the gateway's public methods
+   and fails if one is not exercised, so a new scan path cannot arrive
+   without fail-open coverage.
+3. **`tests/Hooks/`** — `hooks/*.php` themselves, read off disk and
+   compiled the way the Suite compiles them, over parents that count calls
+   and throw on demand and carry no defensive `method_exists()`. A stub
+   more forgiving than the platform hides the defects the harness exists to
+   find.
+4. **A live forum** — installing the tar through the AdminCP, the widget,
+   the theme templates. Not automatable here; `docs/SUITE-FACTS.md` lists
+   what still needs one.
 
 `tests/Mocks/FakeMember` extends the `\IPS\Member` stub with the few
-properties `shouldBypass()` reads. `tests/Pest.php` defines a
-`settings()` helper that wraps `\IPS\Settings::i()` (a singleton in
-the stub so per-test mutations stick) and resets every property
-before each test.
+properties `shouldBypass()` reads. `tests/Pest.php` resets the settings
+singleton, the IPS log buffer, the gateway's scanner and the instrumented
+parents before every test, and gives you `scannerOver(FakeHttpClient)` to
+wire a scanner to a canned response.
 
 ## Release checklist
 
@@ -101,8 +135,11 @@ before each test.
    `setup/upgrade/<long_version>/upgrade.php` (no-op if no schema
    change).
 2. Move `[Unreleased]` in `CHANGELOG.md` under a dated version.
-3. `composer qa` — must be green.
-4. `bash dev/build-xml.sh` regenerates `data/build.xml`.
+3. `composer qa` — must be green. It includes `composer manifests`, which
+   checks the version you just bumped against `data/versions.json`,
+   `setup/cli-install.php` and `Application::VERSION`.
+4. `bash dev/build-xml.sh` regenerates `data/build.xml`. CI diffs it, so a
+   stale copy fails the build rather than shipping.
 5. `composer install --no-dev --optimize-autoloader` so the release
    tar contains only production deps.
 6. Build flat tar:
