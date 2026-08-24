@@ -34,13 +34,14 @@ class _Recorder
         ?int $contentId,
         ?string $ipAddress,
         ?string $contentPreview = null,
+        ?string $email = null,
     ): void {
         try {
             \IPS\spamtroll\Application::log(
                 $memberId,
                 $contentType,
                 $contentId,
-                $ipAddress,
+                self::anonymiseIp($ipAddress),
                 $decision->status,
                 $decision->score,
                 $decision->symbols,
@@ -48,6 +49,7 @@ class _Recorder
                 $decision->action,
                 $contentPreview,
                 $decision->submissionId,
+                self::emailHash($email),
             );
         } catch (\Throwable $t) {
             /* A log write must never be the reason a post fails. The gateway
@@ -55,6 +57,64 @@ class _Recorder
              * from aborting the rest of the scan's bookkeeping. */
             self::note('recorder', $t);
         }
+    }
+
+    /**
+     * Drop the host part of the address when the admin asked for it: the
+     * last octet of an IPv4, everything past the first 64 bits of an IPv6.
+     * Enough left to spot a noisy network, not enough to identify a person.
+     */
+    public static function anonymiseIp(?string $ipAddress): ?string
+    {
+        if ($ipAddress === null || $ipAddress === '') {
+            return $ipAddress;
+        }
+
+        try {
+            if (!\IPS\Settings::i()->spamtroll_anonymize_ip) {
+                return $ipAddress;
+            }
+        } catch (\Throwable $t) {
+            return $ipAddress;
+        }
+
+        if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            $octets = explode('.', $ipAddress);
+            $octets[3] = '0';
+
+            return implode('.', $octets);
+        }
+
+        if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+            $packed = inet_pton($ipAddress);
+            if ($packed === false) {
+                return $ipAddress;
+            }
+            $masked = substr($packed, 0, 8) . str_repeat("\0", 8);
+            $text = inet_ntop($masked);
+
+            return $text === false ? $ipAddress : $text;
+        }
+
+        return $ipAddress;
+    }
+
+    /**
+     * A registration is scanned before the account exists, so its log row has
+     * no member id and MemberSync's `DELETE ... WHERE log_member_id = ?` never
+     * matched it: deleting an account left its registration scan behind, with
+     * the IP address it was made from. The hash gives the extension a second
+     * thing to match on without storing the address itself.
+     */
+    public static function emailHash(?string $email): ?string
+    {
+        if ($email === null) {
+            return null;
+        }
+
+        $normalised = mb_strtolower(trim($email));
+
+        return $normalised === '' ? null : hash('sha256', $normalised);
     }
 
     /**

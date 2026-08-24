@@ -49,8 +49,21 @@ class _cleanup extends \IPS\Task
 
             $deleted = \IPS\Db::i()->delete('spamtroll_logs', ['log_date < ?', $cutoffTime]);
 
-            if ($deleted > 0) {
-                \IPS\Log::log("Spamtroll cleanup: Deleted {$deleted} log entries older than {$retentionDays} days", 'spamtroll');
+            /* core_log has no retention of its own — the Suite keeps rows
+             * until an administrator prunes them by hand. This application
+             * writes there whenever a scan fails, so on a busy forum with a
+             * flaky connection its own diagnostics were the fastest-growing
+             * table nobody was watching. */
+            $deletedDiagnostics = \IPS\Db::i()->delete(
+                'core_log',
+                ['category=? AND time < ?', 'spamtroll', $cutoffTime],
+            );
+
+            if ($deleted > 0 || $deletedDiagnostics > 0) {
+                \IPS\Log::log(
+                    "Spamtroll cleanup: deleted {$deleted} scan log entries and {$deletedDiagnostics} diagnostic entries older than {$retentionDays} days",
+                    'spamtroll',
+                );
             }
 
             return null;

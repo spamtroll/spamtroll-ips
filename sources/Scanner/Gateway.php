@@ -256,6 +256,7 @@ final class _Gateway
                 null,
                 $ip,
                 'Username: ' . $member->name . ', Email: ' . ($emailAddress ?: ($member->email ?: 'N/A')),
+                $emailAddress ?: ($member->email ?: null),
             );
         }
 

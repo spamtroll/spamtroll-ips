@@ -137,6 +137,11 @@ namespace IPS {
             return new Lang();
         }
 
+        public function link(?string $warningRef = null, bool $showProfileLink = true): string
+        {
+            return '';
+        }
+
         /**
          * Untyped, like the Suite's own (`system/Member/Member.php:450`).
          *
@@ -253,6 +258,24 @@ namespace IPS {
         }
 
         public function checkForTable(string $name): bool
+        {
+            return true;
+        }
+
+        public function checkForColumn(string $table, string $column): bool
+        {
+            return true;
+        }
+
+        /**
+         * @param array<string, mixed> $definition
+         */
+        public function addColumn(string $table, array $definition): bool
+        {
+            return true;
+        }
+
+        public function dropTable(string $table): bool
         {
             return true;
         }

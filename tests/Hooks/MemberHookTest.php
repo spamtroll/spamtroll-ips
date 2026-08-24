@@ -149,6 +149,17 @@ it('records the registration scan', function (): void {
     expect($rows[0]['preview'])->toBe('Username: spammer, Email: spam@example.test');
 });
 
+it('records the address hash so deleting the account also deletes the scan', function (): void {
+    /* A registration is scanned before the account exists, so its row has no
+     * member id and MemberSync's delete-by-member-id never reached it. */
+    $scanner = scannerOver(FakeHttpClient::json(200, scanBody(CheckSpamResponse::STATUS_BLOCKED, 16.0)));
+    FakeMemberParent::$result = 1;
+
+    registeringMember($this->hook, 'spammer', 'spam@example.test')->spamService();
+
+    expect(recorderOf($scanner)->rows[0]['email'])->toBe('spam@example.test');
+});
+
 it('does nothing when registration scanning is switched off', function (): void {
     $http = FakeHttpClient::json(200, scanBody(CheckSpamResponse::STATUS_BLOCKED, 16.0));
     scannerOver($http);

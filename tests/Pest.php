@@ -40,6 +40,7 @@ uses()
             'spamtroll_sensitivity' => 'balanced',
             'spamtroll_override_thresholds' => false,
             'spamtroll_timeout' => 5,
+            'spamtroll_anonymize_ip' => false,
             'spam_service_enabled' => true,
             'reg_auth_type' => 'none',
         ];

@@ -12,7 +12,7 @@ use IPS\spamtroll\Scanner\Decision;
  */
 final class RecordingRecorder extends Recorder
 {
-    /** @var array<int, array{decision: Decision, memberId: int|null, contentType: string, contentId: int|null, ip: string|null, preview: string|null}> */
+    /** @var array<int, array{decision: Decision, memberId: int|null, contentType: string, contentId: int|null, ip: string|null, preview: string|null, email: string|null}> */
     public array $rows = [];
 
     public function record(
@@ -22,6 +22,7 @@ final class RecordingRecorder extends Recorder
         ?int $contentId,
         ?string $ipAddress,
         ?string $contentPreview = null,
+        ?string $email = null,
     ): void {
         $this->rows[] = [
             'decision' => $decision,
@@ -30,6 +31,7 @@ final class RecordingRecorder extends Recorder
             'contentId' => $contentId,
             'ip' => $ipAddress,
             'preview' => $contentPreview,
+            'email' => $email,
         ];
     }
 }

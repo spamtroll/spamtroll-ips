@@ -135,10 +135,12 @@ class _dashboard extends \IPS\Dispatcher\Controller
                 'status' => 'error',
                 'message' => $response->error ?: \IPS\Member::loggedIn()->language()->addToStack('spamtroll_api_error'),
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $t) {
+            \IPS\spamtroll\Log\Recorder::note('api status', $t);
+
             return [
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => \IPS\Member::loggedIn()->language()->addToStack('spamtroll_api_error'),
             ];
         }
     }

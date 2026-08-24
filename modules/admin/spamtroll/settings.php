@@ -231,10 +231,16 @@ class _settings extends \IPS\Dispatcher\Controller
                     'message' => $response->error ?: \IPS\Member::loggedIn()->language()->addToStack('spamtroll_connection_failed'),
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $t) {
+            /* The detail goes to the log, not to the browser: an exception
+             * message from the HTTP layer can carry the request URL, and the
+             * request carries the API key. */
+            \IPS\spamtroll\Log\Recorder::note('test connection', $t);
+
             \IPS\Output::i()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \IPS\Member::loggedIn()->language()->addToStack('spamtroll_connection_failed'),
+                'code' => $t instanceof \Spamtroll\Sdk\Exception\SpamtrollException ? $t->httpCode : 0,
             ]);
         }
     }

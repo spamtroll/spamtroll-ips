@@ -199,6 +199,10 @@ class _Application extends \IPS\Application
      * @param array|null $threats Threat categories
      * @param string $actionTaken Action taken
      * @param string|null $contentPreview Content preview
+     * @param string|null $submissionId Spamtroll API submission UUID
+     * @param string|null $emailHash SHA-256 of the lower-cased address, so a
+     *                               registration scan can be deleted with the
+     *                               account it belongs to
      */
     public static function log(
         ?int $memberId,
@@ -212,6 +216,7 @@ class _Application extends \IPS\Application
         string $actionTaken,
         ?string $contentPreview = null,
         ?string $submissionId = null,
+        ?string $emailHash = null,
     ): void {
         try {
             \IPS\Db::i()->insert('spamtroll_logs', [
@@ -226,6 +231,7 @@ class _Application extends \IPS\Application
                 'log_action_taken' => $actionTaken,
                 'log_content_preview' => $contentPreview ? mb_substr($contentPreview, 0, 500) : null,
                 'log_submission_id' => $submissionId,
+                'log_email_hash' => $emailHash,
                 'log_date' => time(),
             ]);
         } catch (\Exception $e) {

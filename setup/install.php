@@ -122,6 +122,13 @@ class _Install
                         'default' => null,
                     ],
                     [
+                        'name' => 'log_email_hash',
+                        'type' => 'VARCHAR',
+                        'length' => 64,
+                        'allow_null' => true,
+                        'default' => null,
+                    ],
+                    [
                         'name' => 'log_date',
                         'type' => 'INT',
                         'length' => 11,
@@ -156,17 +163,32 @@ class _Install
                         'name' => 'log_content_type',
                         'columns' => [ 'log_content_type' ],
                     ],
+                    [
+                        'type' => 'key',
+                        'name' => 'log_email_hash',
+                        'columns' => [ 'log_email_hash' ],
+                    ],
                 ],
                 'collation' => 'utf8mb4_unicode_ci',
             ]);
         } else {
-            /* Migration: ensure log_submission_id column exists on installs
-             * created before that column was added to schema.json. */
+            /* Migration: ensure columns added after the first release exist
+             * on installs created before them. */
             if (! \IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_submission_id')) {
                 \IPS\Db::i()->addColumn('spamtroll_logs', [
                     'name' => 'log_submission_id',
                     'type' => 'VARCHAR',
                     'length' => 36,
+                    'allow_null' => true,
+                    'default' => null,
+                ]);
+            }
+
+            if (! \IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_email_hash')) {
+                \IPS\Db::i()->addColumn('spamtroll_logs', [
+                    'name' => 'log_email_hash',
+                    'type' => 'VARCHAR',
+                    'length' => 64,
                     'allow_null' => true,
                     'default' => null,
                 ]);
