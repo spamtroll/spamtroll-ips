@@ -1,6 +1,6 @@
 # Spamtroll Anti-Spam for IPS Community Suite
 
-Official Spamtroll integration for IPS Community Suite 4.5+ and 5.x. Automatically checks forum posts, private messages, and registrations for spam using the Spamtroll API.
+Spamtroll integration for IPS Community Suite. The current hooks and manifests have been audited against Suite 4.7.22; native installation testing remains pending. IPS 5 compatibility has not been verified. Automatically checks forum posts, private messages, and registrations for spam using the Spamtroll API.
 
 ## Features
 
@@ -16,10 +16,23 @@ Official Spamtroll integration for IPS Community Suite 4.5+ and 5.x. Automatical
 
 ## Requirements
 
-- IPS Community Suite 4.5+ or 5.x
-- PHP 7.4+
+- IPS Community Suite 4.7.x development installation (native lifecycle verification pending)
+- PHP 8.0+ (CI tests PHP 8.2–8.4)
 - Spamtroll API key (get one at <https://spamtroll.io>)
 - Running Spamtroll API server (for self-hosted setups)
+
+## Release package
+
+The GitHub `v1.0.3` prerelease includes `spamtroll-ips-1.0.3-dev.zip`,
+a developer installation bundle with the production PHP SDK and templates.
+Extract its `spamtroll/` directory into `applications/`, then use Method A.
+This ZIP is not an ACP-uploadable application TAR. Do not upload it through
+**System → Applications** or **System → Plugins**. Native installation,
+upgrade and uninstall validation and an ACP export are tracked separately.
+
+To build the bundle from a checkout, run `bash dev/build-release.sh`.
+The builder resolves production dependencies in an isolated temporary directory;
+it does not include tests, stubs, QA tools or any licensed Suite files.
 
 ## Installation
 
@@ -35,7 +48,7 @@ Two install paths are supported, depending on whether the target forum has Devel
 
 ### Method A — CLI install (Developer Mode, `IN_DEV=1`)
 
-This is the fastest path for development forums and for self-hosted production forums where you have SSH access. A bundled PHP script performs every step the ACP Developer Center would perform (register the app, create the logs table, register hooks/tasks/widgets, import language strings and templates, compile templates, clear caches).
+Use this path on an isolated development forum until the native lifecycle has been verified. A bundled PHP script performs every step the ACP Developer Center would perform (register the app, create the logs table, register hooks/tasks/widgets, import language strings and templates, compile templates, clear caches).
 
 **Step 1.** Copy the application folder into the IPS installation:
 
