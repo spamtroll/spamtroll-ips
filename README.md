@@ -319,3 +319,22 @@ IPS runs `extensions/core/Uninstall/Spamtroll.php` automatically to clean up the
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+### IPS database checker reports `spamtroll_logs`
+
+CLI installs before 1.0.4 omitted the column comments declared in
+`data/schema.json`. IPS compares those comments and can propose changing every
+column. Its generated `UPDATE ... IS NULL` statements are also emitted for a
+comment mismatch on a NOT NULL column; their presence does not prove NULL rows
+exist or that the database is corrupt.
+
+For an existing installation, the AdminCP support tool can apply the proposed
+schema correction. Back up the database first and schedule it for a quiet period
+if the log table is large: `ALTER TABLE` may lock or rebuild the table. Rerun the
+checker afterwards. If it fails or still reports differences, inspect the error
+and `SHOW CREATE TABLE spamtroll_logs` before retrying.
+
+Source version 1.0.4 fixes new CLI installs and includes a versioned upgrade that
+repairs comments while preserving actual column attributes. The published 1.0.3
+developer bundle does not contain this fix. The migration has automated coverage;
+a native IPS installation/upgrade and the live forum still need verification.

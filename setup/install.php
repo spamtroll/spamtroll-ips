@@ -31,167 +31,20 @@ class _Install
      */
     public function step1($data)
     {
-        /* Create spamtroll_logs table if it doesn't exist */
-        if (!\IPS\Db::i()->checkForTable('spamtroll_logs')) {
-            \IPS\Db::i()->createTable([
-                'name' => 'spamtroll_logs',
-                'columns' => [
-                    [
-                        'name' => 'log_id',
-                        'type' => 'BIGINT',
-                        'length' => 20,
-                        'unsigned' => true,
-                        'auto_increment' => true,
-                        'allow_null' => false,
-                    ],
-                    [
-                        'name' => 'log_member_id',
-                        'type' => 'INT',
-                        'length' => 11,
-                        'unsigned' => true,
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_content_type',
-                        'type' => 'VARCHAR',
-                        'length' => 50,
-                        'allow_null' => false,
-                        'default' => '',
-                    ],
-                    [
-                        'name' => 'log_content_id',
-                        'type' => 'BIGINT',
-                        'length' => 20,
-                        'unsigned' => true,
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_ip_address',
-                        'type' => 'VARCHAR',
-                        'length' => 46,
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_status',
-                        'type' => 'VARCHAR',
-                        'length' => 20,
-                        'allow_null' => false,
-                        'default' => 'safe',
-                    ],
-                    [
-                        'name' => 'log_spam_score',
-                        'type' => 'DECIMAL',
-                        'length' => 5,
-                        'decimals' => 4,
-                        'allow_null' => false,
-                        'default' => '0.0000',
-                    ],
-                    [
-                        'name' => 'log_symbols',
-                        'type' => 'TEXT',
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_threat_categories',
-                        'type' => 'TEXT',
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_action_taken',
-                        'type' => 'VARCHAR',
-                        'length' => 20,
-                        'allow_null' => false,
-                        'default' => 'allow',
-                    ],
-                    [
-                        'name' => 'log_content_preview',
-                        'type' => 'TEXT',
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_submission_id',
-                        'type' => 'VARCHAR',
-                        'length' => 36,
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_email_hash',
-                        'type' => 'VARCHAR',
-                        'length' => 64,
-                        'allow_null' => true,
-                        'default' => null,
-                    ],
-                    [
-                        'name' => 'log_date',
-                        'type' => 'INT',
-                        'length' => 11,
-                        'unsigned' => true,
-                        'allow_null' => false,
-                        'default' => 0,
-                    ],
-                ],
-                'indexes' => [
-                    [
-                        'type' => 'primary',
-                        'name' => 'PRIMARY',
-                        'columns' => [ 'log_id' ],
-                    ],
-                    [
-                        'type' => 'key',
-                        'name' => 'log_member_id',
-                        'columns' => [ 'log_member_id' ],
-                    ],
-                    [
-                        'type' => 'key',
-                        'name' => 'log_date',
-                        'columns' => [ 'log_date' ],
-                    ],
-                    [
-                        'type' => 'key',
-                        'name' => 'log_status',
-                        'columns' => [ 'log_status' ],
-                    ],
-                    [
-                        'type' => 'key',
-                        'name' => 'log_content_type',
-                        'columns' => [ 'log_content_type' ],
-                    ],
-                    [
-                        'type' => 'key',
-                        'name' => 'log_email_hash',
-                        'columns' => [ 'log_email_hash' ],
-                    ],
-                ],
-                'collation' => 'utf8mb4_unicode_ci',
-            ]);
-        } else {
-            /* Migration: ensure columns added after the first release exist
-             * on installs created before them. */
-            if (! \IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_submission_id')) {
-                \IPS\Db::i()->addColumn('spamtroll_logs', [
-                    'name' => 'log_submission_id',
-                    'type' => 'VARCHAR',
-                    'length' => 36,
-                    'allow_null' => true,
-                    'default' => null,
-                ]);
-            }
+        /* Use the same definition as the native IPS installer and checker. */
+        /** @var array<string, array{columns: array<string, array<string, mixed>>}> $schema */
+        $schema = json_decode((string) file_get_contents(\dirname(__DIR__) . '/data/schema.json'), true, 512, JSON_THROW_ON_ERROR);
+        $table = $schema['spamtroll_logs'];
 
-            if (! \IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_email_hash')) {
-                \IPS\Db::i()->addColumn('spamtroll_logs', [
-                    'name' => 'log_email_hash',
-                    'type' => 'VARCHAR',
-                    'length' => 64,
-                    'allow_null' => true,
-                    'default' => null,
-                ]);
+        if (!\IPS\Db::i()->checkForTable('spamtroll_logs')) {
+            \IPS\Db::i()->createTable($table);
+        } else {
+            /* Keep the existing-install path additive. Comment repair belongs
+             * to the versioned upgrade so rerunning this installer is cheap. */
+            foreach (['log_submission_id', 'log_email_hash'] as $column) {
+                if (!\IPS\Db::i()->checkForColumn('spamtroll_logs', $column)) {
+                    \IPS\Db::i()->addColumn('spamtroll_logs', $table['columns'][$column]);
+                }
             }
         }
 

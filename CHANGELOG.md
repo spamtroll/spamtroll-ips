@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-10-10
+
+### Fixed
+
+- CLI installation now creates log tables and missing columns from
+  `data/schema.json`, including column comments. The previous handwritten
+  definition omitted those comments, causing the IPS database checker to report
+  every column and propose redundant NULL cleanup and index changes.
+- The 1.0.4 upgrade fills column comments from the manifest while preserving live
+  types, nullability, defaults and collation. It does not update log rows or drop
+  indexes; failures reach the IPS upgrader so the step can be retried.
+
 ## [1.0.3] - 2026-10-04
 
 ### Fixed

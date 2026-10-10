@@ -46,6 +46,23 @@ in this table. A row is either answered, or explicitly marked
 | U12b | What are `$namespace` and `$realClass` for our two hooks? | Derived by the autoloader: the class name is split, the last segment is the class, the rest is the namespace, and `$realClass` starts as `_{$class}`. So `\IPS\Content\Comment` → namespace `IPS\Content`, parent `_Comment`; `\IPS\Member` → namespace `IPS`, parent `_Member`. The plan's blanket claim that `$namespace` is `IPS` holds only for the Member hook | 4.7.22 | read | `init.php:703-705` (split), `:912` (`monkeyPatch($namespace, $class, …)`), `:925` (`$realClass = "_{$finalClass}"`) | 2026-08-24 |
 | U12c | What class name does the Suite give a hook from an application? | `"{$app}_hook_{$filename}"` — for this app, `spamtroll_hook_Comment` and `spamtroll_hook_Member`, matching the two files in `hooks/` | 4.7.22 | read | `system/Plugin/Hook.php:247` (inside `writeDataFile()`) | 2026-08-24 |
 
+### Database checker metadata comparison
+
+In IPS 4.7.22, `system/Application/Application.php:2708-2720` compares normalized
+column properties including `comment`. A comment difference alone enters the
+column alteration path. At `:2800-2824`, any changed NOT NULL column also gets an
+`UPDATE ... IS NULL` statement, regardless of whether NULL values exist. Indexes
+may be dropped/re-added while altering indexed columns. This explains the broad
+repair proposed for CLI-created Spamtroll tables whose comments were omitted.
+
+`system/Db/Db.php:1930-2010` reads live column definitions, including comments and
+optional collation; `:2098-2101` changes a column from the supplied definition.
+`compileColumnDefinition()` at `:1493-1496` uses the connection charset and
+collation, ignoring the column definition's collation. The 1.0.4 upgrade
+therefore borrows each text column's live charset/collation for its DDL call and
+restores the connection settings in `finally`. It changes only the comment. These
+are source findings, not confirmation of the live dogomania.com database state.
+
 ## Requires a test install
 
 These are not answerable by reading the Suite. They need a scratch installation —

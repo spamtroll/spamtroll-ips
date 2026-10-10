@@ -218,6 +218,9 @@ namespace IPS {
 
     class Db
     {
+        public string $charset = 'utf8mb4';
+        public string $collation = 'utf8mb4_unicode_ci';
+
         public static function i(): self
         {
             return new self();
@@ -273,6 +276,17 @@ namespace IPS {
         public function addColumn(string $table, array $definition): bool
         {
             return true;
+        }
+
+        /** @return array{columns: array<string, array<string, mixed>>} */
+        public function getTableDefinition(string $table, bool $columnsOnly = false, bool $getCollation = false): array
+        {
+            return ['columns' => []];
+        }
+
+        /** @param array<string, mixed> $definition */
+        public function changeColumn(string $table, string $column, array $definition): void
+        {
         }
 
         public function dropTable(string $table): bool
