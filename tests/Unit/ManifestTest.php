@@ -116,6 +116,18 @@ it('ships an upgrade step for every version past the first', function (): void {
             continue;
         }
 
-        expect(\dirname(__DIR__, 2) . '/setup/upgrade/' . $long . '/upgrade.php')->toBeFile();
+        expect(\dirname(__DIR__, 2) . '/setup/upg_' . $long . '/upgrade.php')->toBeFile();
+    }
+});
+
+it('ships upgrade methods callable by the native IPS zero-argument dispatcher', function (): void {
+    foreach (array_map('intval', array_keys(manifest('versions'))) as $long) {
+        if ($long === 10000) {
+            continue;
+        }
+        require_once \dirname(__DIR__, 2) . '/setup/upg_' . $long . '/upgrade.php';
+        $class = 'IPS\\spamtroll\\setup\\upg_' . $long . '\\_Upgrade';
+        $method = new ReflectionMethod($class, 'step1');
+        expect($method->getNumberOfRequiredParameters())->toBe(0);
     }
 });

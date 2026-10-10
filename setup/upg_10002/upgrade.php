@@ -21,7 +21,7 @@ namespace IPS\spamtroll\setup\upg_10002;
 
 class _Upgrade
 {
-    public function step1($data)
+    public function step1($data = null)
     {
         try {
             \IPS\Db::i()->delete('core_sys_conf_settings', [ 'conf_key=?', 'spamtroll_check_messages' ]);

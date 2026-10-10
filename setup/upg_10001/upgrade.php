@@ -17,7 +17,7 @@ namespace IPS\spamtroll\setup\upg_10001;
 
 class _Upgrade
 {
-    public function step1($data)
+    public function step1($data = null)
     {
         return true;
     }

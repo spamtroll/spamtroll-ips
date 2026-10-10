@@ -2,6 +2,7 @@
     "preset": "base",
     "ignore": {
         "words": [
+            "upg",
             "acp",
             "acp's",
             "acpmenu",

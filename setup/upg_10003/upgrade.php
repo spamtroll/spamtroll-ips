@@ -21,7 +21,7 @@ class _Upgrade
      *
      * @return mixed
      */
-    public function step1($data)
+    public function step1($data = null)
     {
         /* The AdminCP form has rendered spamtroll_sensitivity and
          * spamtroll_scan_scope since 1.0.2 and saved them through

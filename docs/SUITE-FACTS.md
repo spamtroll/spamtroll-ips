@@ -77,3 +77,12 @@ These are not answerable by reading the Suite. They need a scratch installation 
 Nothing in this application depends on an unanswered row: the circuit breaker
 fails open regardless of U14 (`sources/Scanner/Breaker.php`), and the widget is
 untouched by this work.
+
+### Native upgrade dispatch
+
+IPS 4.7.22 `init.php:731-734` resolves the Upgrade class to the lowercase
+`upgrade.php` in `setup/upg_<version>/`. The native ACP dispatcher in
+`applications/core/modules/admin/applications/applications.php:893-911` loads
+that class and calls `step1()` without arguments. Upgrade routines must accept
+that call; a `setup/upgrade/<version>/` directory is not discovered.
+Production inspection on IPS 4.7.24 confirmed this same contract on 2026-10-10.

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Upgrade routines now use the native IPS `setup/upg_<version>/upgrade.php`
+  layout and accept the dispatcher's zero-argument `step1()` call. The previous
+  path and required argument prevented native upgrades from running.
+- Repair the missing `log_email_hash` lookup index on upgraded installations.
 - CLI installation now creates log tables and missing columns from
   `data/schema.json`, including column comments. The previous handwritten
   definition omitted those comments, causing the IPS database checker to report
@@ -117,7 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the first 64 bits of an IPv6 before the scan row is written. Off by default.
 - `spamtroll_override_thresholds` — see **Changed**.
 - `log_email_hash` column (SHA-256 of the lower-cased address, indexed) with
-  migration `setup/upgrade/10003/`.
+  migration `setup/upg_10003/`.
 - `tasks/cleanup.php` prunes `core_log` rows in the `spamtroll` category on the
   same retention as the scan log. `core_log` has no retention of its own.
 - `docs/SUITE-FACTS.md` — every behaviour of IPS Community Suite 4.7.22 this

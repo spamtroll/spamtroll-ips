@@ -138,8 +138,8 @@ for v in $(jq -r 'keys[]' data/versions.json); do
   if [ "$v" = "10000" ]; then
     continue
   fi
-  if [ ! -f "setup/upgrade/${v}/upgrade.php" ]; then
-    bad "versions.json declares $v but setup/upgrade/${v}/upgrade.php does not exist"
+  if [ ! -f "setup/upg_${v}/upgrade.php" ]; then
+    bad "versions.json declares $v but setup/upg_${v}/upgrade.php does not exist"
   fi
 done
 

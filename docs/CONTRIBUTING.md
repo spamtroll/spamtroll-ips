@@ -132,7 +132,7 @@ wire a scanner to a canned response.
 ## Release checklist
 
 1. Bump `app_version` and add a `data/versions.json` entry +
-   `setup/upgrade/<long_version>/upgrade.php` (no-op if no schema
+   `setup/upg_<long_version>/upgrade.php` (no-op if no schema
    change).
 2. Move `[Unreleased]` in `CHANGELOG.md` under a dated version.
 3. `composer qa` — must be green. It includes `composer manifests`, which

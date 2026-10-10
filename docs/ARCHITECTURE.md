@@ -144,7 +144,7 @@ The settings registered in `data/settings.json` get default values
 inserted on first install via `setup/install.php::step1`. Subsequent
 upgrades that *add* settings should add them to both `data/settings.json`
 (for fresh installs) and a versioned upgrade handler under
-`setup/upgrade/<long_version>/upgrade.php` (for existing installs).
+`setup/upg_<long_version>/upgrade.php` (for existing installs).
 The 1.0.2 release demonstrates the pattern: it adds
 `spamtroll_bypass_min_posts` to the JSON and deletes the now-obsolete
 `spamtroll_check_messages` from existing DBs.

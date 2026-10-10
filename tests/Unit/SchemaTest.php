@@ -49,3 +49,11 @@ it('does not hide a failed schema repair from the IPS upgrader', function (): vo
     expect($result['connection'])->toBe(['utf8mb4', 'utf8mb4_unicode_ci']);
     expect($result['table'])->toBe($result['before']);
 });
+
+it('adds the declared hash lookup index missing from 1.0.3 upgrades', function (): void {
+    $result = runSchemaScenario('legacy');
+    $schema = json_decode((string) file_get_contents(\dirname(__DIR__, 2) . '/data/schema.json'), true, 512, JSON_THROW_ON_ERROR)['spamtroll_logs'];
+    expect($result['error'])->toBeNull();
+    expect($result['addedIndexes'])->toBe([$schema['indexes']['log_email_hash']]);
+    expect($result['table']['indexes'])->toBe($schema['indexes']);
+});

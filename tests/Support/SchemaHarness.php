@@ -11,6 +11,7 @@ class Db
     public static array $changes = [];
     public static array $creates = [];
     public static array $adds = [];
+    public static array $addedIndexes = [];
     public static bool $fail = false;
     public string $charset = 'utf8mb4';
     public string $collation = 'utf8mb4_unicode_ci';
@@ -41,6 +42,17 @@ class Db
     {
         self::$adds[] = $definition;
         self::$table['columns'][$definition['name']] = $definition;
+    }
+
+    public function checkForIndex(string $table, string $name): bool
+    {
+        return isset(self::$table['indexes'][$name]);
+    }
+
+    public function addIndex(string $table, array $definition): void
+    {
+        self::$addedIndexes[] = $definition;
+        self::$table['indexes'][$definition['name']] = $definition;
     }
 
     public function getTableDefinition(string $table, bool $columnsOnly = false, bool $getCollation = false): array
@@ -90,6 +102,9 @@ if ($scenario !== 'fresh' && $scenario !== 'missing') {
         unset(Db::$table['columns']['log_submission_id'], Db::$table['columns']['log_email_hash']);
     }
 }
+if ($scenario === 'legacy') {
+    unset(Db::$table['indexes']['log_email_hash']);
+}
 $before = Db::$table;
 $error = null;
 try {
@@ -97,7 +112,7 @@ try {
         require $root . '/setup/install.php';
         (new \IPS\spamtroll\setup\install\_Install())->step1([]);
     } else {
-        require $root . '/setup/upgrade/10004/upgrade.php';
+        require $root . '/setup/upg_10004/upgrade.php';
         Db::$fail = $scenario === 'failure';
         if (Db::$fail) {
             /* Fail on a text column after adopting its connection settings. */
@@ -106,10 +121,10 @@ try {
             $before = Db::$table;
         }
         $upgrade = new \IPS\spamtroll\setup\upg_10004\_Upgrade();
-        $upgrade->step1([]);
+        $upgrade->step1();
         $firstChanges = Db::$changes;
         Db::$changes = [];
-        $upgrade->step1([]);
+        $upgrade->step1();
         $repeatedChanges = Db::$changes;
         Db::$changes = $firstChanges;
     }
@@ -122,6 +137,7 @@ echo json_encode([
     'creates' => Db::$creates,
     'adds' => Db::$adds,
     'changes' => Db::$changes,
+    'addedIndexes' => Db::$addedIndexes,
     'repeatedChanges' => $repeatedChanges ?? null,
     'error' => $error,
     'connection' => [Db::i()->charset, Db::i()->collation],

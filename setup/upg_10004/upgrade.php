@@ -12,10 +12,10 @@ class _Upgrade
      *
      * @return bool
      */
-    public function step1($data)
+    public function step1($data = null)
     {
-        /** @var array<string, array{columns: array<string, array<string, mixed>>}> $schema */
-        $schema = json_decode((string) file_get_contents(\dirname(__DIR__, 3) . '/data/schema.json'), true, 512, JSON_THROW_ON_ERROR);
+        /** @var array<string, array{columns: array<string, array<string, mixed>>, indexes: array<string, array<string, mixed>>}> $schema */
+        $schema = json_decode((string) file_get_contents(\dirname(__DIR__, 2) . '/data/schema.json'), true, 512, JSON_THROW_ON_ERROR);
         $table = $schema['spamtroll_logs'];
         $db = \IPS\Db::i();
         if (!$db->checkForTable('spamtroll_logs')) {
@@ -50,6 +50,11 @@ class _Upgrade
                     $db->collation = $collation;
                 }
             }
+        }
+
+        /* 1.0.3 added the email hash column without its declared lookup index. */
+        if ($db->checkForColumn('spamtroll_logs', 'log_email_hash') && !$db->checkForIndex('spamtroll_logs', 'log_email_hash')) {
+            $db->addIndex('spamtroll_logs', $table['indexes']['log_email_hash']);
         }
 
         return true;

@@ -278,6 +278,16 @@ namespace IPS {
             return true;
         }
 
+        public function checkForIndex(string $table, string $name): bool
+        {
+            return true;
+        }
+
+        /** @param array<string, mixed> $definition */
+        public function addIndex(string $table, array $definition, bool $discardDuplicates = true): void
+        {
+        }
+
         /** @return array{columns: array<string, array<string, mixed>>} */
         public function getTableDefinition(string $table, bool $columnsOnly = false, bool $getCollation = false): array
         {

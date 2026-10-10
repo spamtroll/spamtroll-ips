@@ -433,32 +433,32 @@ parameters:
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10001\\\\_Upgrade\\:\\:step1\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: setup/upgrade/10001/upgrade.php
+			path: setup/upg_10001/upgrade.php
 
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10001\\\\_Upgrade\\:\\:step1\\(\\) has parameter \\$data with no type specified\\.$#"
 			count: 1
-			path: setup/upgrade/10001/upgrade.php
+			path: setup/upg_10001/upgrade.php
 
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10001\\\\_Upgrade\\:\\:step1CustomTitle\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: setup/upgrade/10001/upgrade.php
+			path: setup/upg_10001/upgrade.php
 
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10002\\\\_Upgrade\\:\\:step1\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: setup/upgrade/10002/upgrade.php
+			path: setup/upg_10002/upgrade.php
 
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10002\\\\_Upgrade\\:\\:step1\\(\\) has parameter \\$data with no type specified\\.$#"
 			count: 1
-			path: setup/upgrade/10002/upgrade.php
+			path: setup/upg_10002/upgrade.php
 
 		-
 			message: "#^Method IPS\\\\spamtroll\\\\setup\\\\upg_10002\\\\_Upgrade\\:\\:step1CustomTitle\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: setup/upgrade/10002/upgrade.php
+			path: setup/upg_10002/upgrade.php
 
 		-
 			message: "#^Call to an undefined method IPS\\\\spamtroll\\\\widgets\\\\_spamtrollStats\\:\\:output\\(\\)\\.$#"
