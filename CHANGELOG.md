@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Scanner classes support the IPS-generated subclasses: remove `final` from
+  prefixed base classes and let decision factories instantiate the runtime
+  subclass. Tests now use the Suite's subclass model instead of class aliases,
+  which previously hid fatal errors when loading the 1.0.3 scanner on IPS.
 - Upgrade routines now use the native IPS `setup/upg_<version>/upgrade.php`
   layout and accept the dispatcher's zero-argument `step1()` call. The previous
   path and required argument prevented native upgrades from running.

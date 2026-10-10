@@ -38,7 +38,7 @@ use IPS\spamtroll\Log\Recorder;
  * would have set, then return a code that does not undo it. The member is
  * saved right after `spamService()` returns (U4d), so the property sticks.
  */
-final class _RegistrationAction
+class _RegistrationAction
 {
     /** The only code `register.php` reacts to. */
     public const DENY = 4;

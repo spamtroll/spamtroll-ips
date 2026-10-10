@@ -36,12 +36,12 @@ use Spamtroll\Sdk\Request\CheckSpamRequest;
  * \RuntimeException from anywhere inside made the hook call the parent a
  * second time — a duplicated post row, a duplicated spam-service query.
  */
-final class _Gateway
+class _Gateway
 {
     /** Public methods that are plumbing rather than a scan path. */
     public const NON_SCAN_METHODS = ['setScanner', 'scanner'];
 
-    private static ?Scanner $scanner = null;
+    protected static ?Scanner $scanner = null;
 
     /**
      * Replace the scanner, or pass null to go back to the configured one.
@@ -179,7 +179,7 @@ final class _Gateway
      * @param mixed $member
      * @param mixed $ipAddress
      */
-    private static function commentDecision($result, $item, $comment, $first, $member, $ipAddress): Decision
+    protected static function commentDecision($result, $item, $comment, $first, $member, $ipAddress): Decision
     {
         if (!\IPS\spamtroll\Application::isEnabled()) {
             return Decision::allow('disabled');
@@ -235,7 +235,7 @@ final class _Gateway
      *
      * @return mixed
      */
-    private static function registrationResult(\IPS\Member $member, string $type, ?string $emailAddress, $parentResult)
+    protected static function registrationResult(\IPS\Member $member, string $type, ?string $emailAddress, $parentResult)
     {
         if (!\IPS\spamtroll\Application::isEnabled()) {
             return $parentResult;
@@ -278,7 +278,7 @@ final class _Gateway
      * @param mixed $comment
      * @param mixed $item
      */
-    private static function hide($comment, $item, bool $first): void
+    protected static function hide($comment, $item, bool $first): void
     {
         self::hideOne($comment, 'comment');
 
@@ -290,7 +290,7 @@ final class _Gateway
     /**
      * @param mixed $target
      */
-    private static function hideOne($target, string $what): void
+    protected static function hideOne($target, string $what): void
     {
         if (!\is_object($target) || !method_exists($target, 'hide')) {
             Recorder::note('hide', new \RuntimeException(
@@ -311,7 +311,7 @@ final class _Gateway
         }
     }
 
-    private static function requestIp(): ?string
+    protected static function requestIp(): ?string
     {
         try {
             $ip = \IPS\Request::i()->ipAddress();
@@ -325,7 +325,7 @@ final class _Gateway
     /**
      * @param mixed $result
      */
-    private static function contentId($result): ?int
+    protected static function contentId($result): ?int
     {
         if (!\is_object($result)) {
             return null;

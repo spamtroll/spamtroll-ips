@@ -85,3 +85,10 @@ it('hooks the classes the signatures were taken from', function (): void {
     expect($declared['Comment']['class'])->toBe(HookTransform::MAP['Comment']['class']);
     expect($declared['Member']['class'])->toBe(HookTransform::MAP['Member']['class']);
 });
+
+it('returns the IPS-generated decision subclass from both factories', function (): void {
+    expect(\IPS\spamtroll\Scanner\Decision::allow('disabled'))
+        ->toBeInstanceOf(\IPS\spamtroll\Scanner\Decision::class);
+    expect(\IPS\spamtroll\Scanner\Decision::verdict('allow', 'safe', 0.0))
+        ->toBeInstanceOf(\IPS\spamtroll\Scanner\Decision::class);
+});

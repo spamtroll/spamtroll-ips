@@ -248,9 +248,6 @@ it('covers every public scan path on the gateway', function (): void {
 
     $public = [];
     foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-        if ($method->getDeclaringClass()->getName() !== $reflection->getName()) {
-            continue;
-        }
         if (\in_array($method->getName(), Gateway::NON_SCAN_METHODS, true)) {
             continue;
         }

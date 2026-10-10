@@ -24,7 +24,7 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
  * always one of the four constants — there is no "unknown" state, because a
  * scan that could not produce a verdict is an `allow` with a `skipReason`.
  */
-final class _Decision
+class _Decision
 {
     public const ACTION_ALLOW = 'allow';
     public const ACTION_WARN = 'warn';
@@ -64,6 +64,11 @@ final class _Decision
     /** @var array<string, mixed> The `usage` block from a 402 response. */
     public array $quotaUsage = [];
 
+    /** Keep factory construction stable for the IPS-generated subclass. */
+    final public function __construct()
+    {
+    }
+
     /** True when the API answered with a verdict. */
     public function scanned(): bool
     {
@@ -79,9 +84,9 @@ final class _Decision
     /**
      * The fail-open answer. Everything that is not a verdict is one of these.
      */
-    public static function allow(string $skipReason = '', string $errorCode = '', string $errorMessage = ''): self
+    public static function allow(string $skipReason = '', string $errorCode = '', string $errorMessage = ''): static
     {
-        $decision = new self();
+        $decision = new static();
         $decision->skipReason = $skipReason;
         $decision->errorCode = $errorCode;
         $decision->errorMessage = $errorMessage;
@@ -100,8 +105,8 @@ final class _Decision
         array $symbols = [],
         array $threats = [],
         ?string $submissionId = null,
-    ): self {
-        $decision = new self();
+    ): static {
+        $decision = new static();
         $decision->action = $action;
         $decision->status = $status;
         $decision->score = $score;

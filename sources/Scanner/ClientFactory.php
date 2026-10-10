@@ -39,7 +39,7 @@ use Spamtroll\Sdk\Version;
  * positionally, and a future reordering would otherwise quietly turn the
  * timeout into the retry count.
  */
-final class _ClientFactory
+class _ClientFactory
 {
     /** One attempt. A member is waiting, and a retry costs quota either way. */
     public const INTERACTIVE_MAX_RETRIES = 1;

@@ -35,7 +35,7 @@ use Spamtroll\Sdk\Response\Response;
  * @deprecated Once the SDK ships a fixed `Client::extractError()` (>= 0.10),
  *             delete this file and read `$response->error` directly.
  */
-final class _ApiError
+class _ApiError
 {
     public const KIND_ENVELOPE = 'envelope';
     public const KIND_FLAT = 'flat';

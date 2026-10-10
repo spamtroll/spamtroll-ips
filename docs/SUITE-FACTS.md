@@ -63,6 +63,15 @@ therefore borrows each text column's live charset/collation for its DDL call and
 restores the connection settings in `finally`. It changes only the comment. These
 are source findings, not confirmation of the live dogomania.com database state.
 
+### U12d · Native class generation
+
+IPS 4.7.22 `init.php:958-962` (also confirmed in production 4.7.24) creates an
+unprefixed subclass with `class Name extends _Name {}`. It does not use
+`class_alias()`. Therefore prefixed base classes must not be final, and factories
+returning objects to unprefixed type declarations must instantiate `new static()`
+so the resulting object belongs to the generated subclass. The test autoloader
+now mirrors this inheritance instead of using aliases.
+
 ## Requires a test install
 
 These are not answerable by reading the Suite. They need a scratch installation —

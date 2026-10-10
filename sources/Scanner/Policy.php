@@ -32,7 +32,7 @@ use Spamtroll\Sdk\Response\CheckSpamResponse;
  * So the preset no longer moves a threshold. It decides what this forum does
  * with each verdict, which is the question a forum admin can actually answer.
  */
-final class _Policy
+class _Policy
 {
     public const SENSITIVITY_LENIENT = 'lenient';
     public const SENSITIVITY_BALANCED = 'balanced';

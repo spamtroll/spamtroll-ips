@@ -59,6 +59,10 @@ spl_autoload_register(static function (string $class): void {
     }
 
     if (class_exists($namespace . $declared, false) && !class_exists($namespace . $wanted, false)) {
-        class_alias($namespace . $declared, $namespace . $wanted);
+        /* The Suite creates an unprefixed subclass, not an alias (U12d).
+         * An alias hid final classes and factories returning the base type. */
+        $reflection = new ReflectionClass($namespace . $declared);
+        $abstract = $reflection->isAbstract() ? 'abstract ' : '';
+        eval('namespace ' . rtrim($namespace, '\\') . '; ' . $abstract . 'class ' . $wanted . ' extends ' . $declared . ' {}');
     }
 });
