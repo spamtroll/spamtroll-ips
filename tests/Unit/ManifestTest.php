@@ -131,3 +131,9 @@ it('ships upgrade methods callable by the native IPS zero-argument dispatcher', 
         expect($method->getNumberOfRequiredParameters())->toBe(0);
     }
 });
+
+it('uses a globally unique task key without replacing the core cleanup task', function (): void {
+    expect(manifest('tasks'))->toHaveKey('spamtrollCleanup')->not->toHaveKey('cleanup');
+    expect((string) file_get_contents(\dirname(__DIR__, 2) . '/tasks/spamtrollCleanup.php'))
+        ->toContain('class _spamtrollCleanup extends');
+});

@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The retention task uses the globally unique `spamtrollCleanup` key and matching
+  class/file. The generic `cleanup` key collided with the core task: CLI installs
+  failed, while native task replacement could overwrite the core task.
 - Scanner classes support the IPS-generated subclasses: remove `final` from
   prefixed base classes and let decision factories instantiate the runtime
   subclass. Tests now use the Suite's subclass model instead of class aliases,
@@ -126,7 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `spamtroll_override_thresholds` — see **Changed**.
 - `log_email_hash` column (SHA-256 of the lower-cased address, indexed) with
   migration `setup/upg_10003/`.
-- `tasks/cleanup.php` prunes `core_log` rows in the `spamtroll` category on the
+- `tasks/spamtrollCleanup.php` prunes `core_log` rows in the `spamtroll` category on the
   same retention as the scan log. `core_log` has no retention of its own.
 - `docs/SUITE-FACTS.md` — every behaviour of IPS Community Suite 4.7.22 this
   application depends on, with the file and line it was read from, and an

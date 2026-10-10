@@ -21,6 +21,6 @@
  <setting key="spamtroll_log_retention_days"><![CDATA[{"key":"spamtroll_log_retention_days","default":"30"}]]></setting>
  <setting key="spamtroll_timeout"><![CDATA[{"key":"spamtroll_timeout","default":"5"}]]></setting>
  <setting key="spamtroll_quota_skipped_log"><![CDATA[{"key":"spamtroll_quota_skipped_log","default":""}]]></setting>
- <task key="cleanup"><![CDATA[{"key":"cleanup","frequency":"P0Y0M1DT0H0M0S"}]]></task>
+ <task key="spamtrollCleanup"><![CDATA[{"key":"spamtrollCleanup","frequency":"P0Y0M1DT0H0M0S"}]]></task>
  <widget key="spamtrollStats"><![CDATA[{"class":"\\IPS\\spamtroll\\widgets\\spamtrollStats","restrict":[],"allow_reuse":false,"menu_tab":"spamtroll","default_area":"sidebar"}]]></widget>
 </build>

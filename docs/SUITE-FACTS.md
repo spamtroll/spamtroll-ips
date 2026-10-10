@@ -95,3 +95,10 @@ IPS 4.7.22 `init.php:731-734` resolves the Upgrade class to the lowercase
 that class and calls `step1()` without arguments. Upgrade routines must accept
 that call; a `setup/upgrade/<version>/` directory is not discovered.
 Production inspection on IPS 4.7.24 confirmed this same contract on 2026-10-10.
+
+### Task keys are global
+
+Live IPS 4.7.24 `core_tasks` has a unique index on `key` alone, not `(app, key)`.
+The `cleanup` key belongs to the core app. `Application::installTasks()` uses
+`replace()`, so reusing that key can replace the core task. The plugin uses
+`spamtrollCleanup` with the matching task file/class instead.

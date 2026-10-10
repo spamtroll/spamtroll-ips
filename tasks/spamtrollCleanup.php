@@ -26,7 +26,7 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
  *
  * Removes old spam logs based on retention settings.
  */
-class _cleanup extends \IPS\Task
+class _spamtrollCleanup extends \IPS\Task
 {
     /**
      * Execute
