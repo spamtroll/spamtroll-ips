@@ -1,10 +1,10 @@
 # Contributing
 
 This page documents the development setup for the Spamtroll IPS
-Community Suite application. End users install the plugin through
-ACP → Applications → Install/Upload (or by extracting the tar into
-`applications/spamtroll/` on a dev forum and running
-`setup/cli-install.php`).
+Community Suite application. The release is a developer ZIP, not an ACP TAR.
+See [the README](../README.md), [upgrade guide](UPGRADING.md) and
+[isolated lab requirements](SUITE-LAB.md). Native distribution remains pending
+independent ACP export and installation verification.
 
 ## Local setup
 

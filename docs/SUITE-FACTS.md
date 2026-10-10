@@ -60,8 +60,10 @@ optional collation; `:2098-2101` changes a column from the supplied definition.
 `compileColumnDefinition()` at `:1493-1496` uses the connection charset and
 collation, ignoring the column definition's collation. The 1.0.4 upgrade
 therefore borrows each text column's live charset/collation for its DDL call and
-restores the connection settings in `finally`. It changes only the comment. These
-are source findings, not confirmation of the live dogomania.com database state.
+restores the connection settings in `finally`. The column alteration changes
+only the comment; the upgrade also adds a missing hash lookup index. Subsequent
+manual production upgrade verification on IPS 4.7.24 returned zero repair queries;
+see [SMOKE.md](SMOKE.md).
 
 ### U12d · Native class generation
 

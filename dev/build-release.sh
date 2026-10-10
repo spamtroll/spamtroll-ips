@@ -7,7 +7,7 @@ version="$(sed -nE "s/.*const VERSION = '([^']+)'.*/\1/p" Application.php)"
 stage="$(mktemp -d "${TMPDIR:-/tmp}/spamtroll-ips-release.XXXXXX")"
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/spamtroll/dev" build
-for path in Application.php data extensions hooks modules setup sources tasks widgets LICENSE README.md CHANGELOG.md composer.json; do
+for path in Application.php data extensions hooks modules setup sources tasks widgets LICENSE README.md CHANGELOG.md docs composer.json; do
   cp -R "$path" "$stage/spamtroll/"
 done
 for path in dev/html dev/js dev/css dev/lang.php dev/lang_pl.php dev/lang_de.php dev/jslang.php dev/index.html; do

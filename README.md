@@ -1,11 +1,10 @@
 # Spamtroll Anti-Spam for IPS Community Suite
 
-Spamtroll integration for IPS Community Suite. The current hooks and manifests have been audited against Suite 4.7.22; native installation testing remains pending. IPS 5 compatibility has not been verified. Automatically checks forum posts, private messages, and registrations for spam using the Spamtroll API.
+Spamtroll integration for IPS Community Suite. A manual upgrade to 1.0.4 has been verified on IPS 4.7.24, including live post and registration scans. Fresh ACP installation, native package export and uninstall remain pending; see [verification results](docs/SMOKE.md). IPS 5 is unverified. Private messages are excluded from scanning.
 
 ## Features
 
 - **Forum Post Protection**: Automatically scans new posts for spam
-- **Private Message Protection**: Checks private messages for spam content
 - **Registration Protection**: Screens new member registrations
 - **Configurable Actions**: Block, moderate, warn, or allow based on spam score
 - **Group Bypass**: Exclude trusted groups from spam checking
@@ -16,19 +15,21 @@ Spamtroll integration for IPS Community Suite. The current hooks and manifests h
 
 ## Requirements
 
-- IPS Community Suite 4.7.x development installation (native lifecycle verification pending)
+- IPS Community Suite 4.7.x (manual upgrade verified on 4.7.24; fresh native lifecycle verification pending)
 - PHP 8.0+ (CI tests PHP 8.2–8.4)
 - Spamtroll API key (get one at <https://spamtroll.io>)
 - Running Spamtroll API server (for self-hosted setups)
 
 ## Release package
 
-The GitHub `v1.0.3` prerelease includes `spamtroll-ips-1.0.3-dev.zip`,
+The GitHub [`v1.0.4` prerelease](https://github.com/spamtroll/spamtroll-ips/releases/tag/v1.0.4) includes `spamtroll-ips-1.0.4-dev.zip`,
 a developer installation bundle with the production PHP SDK and templates.
 Extract its `spamtroll/` directory into `applications/`, then use Method A.
 This ZIP is not an ACP-uploadable application TAR. Do not upload it through
-**System → Applications** or **System → Plugins**. Native installation,
-upgrade and uninstall validation and an ACP export are tracked separately.
+**System → Applications** or **System → Plugins**. Existing installations must
+follow [the upgrade guide](docs/UPGRADING.md); the CLI installer alone does not
+dispatch migrations. A manual production upgrade is verified, while native ACP
+installation/upgrade, uninstall and export remain pending.
 
 To build the bundle from a checkout, run `bash dev/build-release.sh`.
 The builder resolves production dependencies in an isolated temporary directory;
@@ -44,7 +45,7 @@ it does not include tests, stubs, QA tools or any licensed Suite files.
 >
 > If you try to upload this repository as a plugin, IPS will reject it with **"plugin is invalid"**. Follow the steps below instead.
 
-Two install paths are supported, depending on whether the target forum has Developer Mode enabled.
+The development installation and native packaging paths below still require isolated fresh-install verification. Rehearse them on a test forum.
 
 ### Method A — CLI install (Developer Mode, `IN_DEV=1`)
 
@@ -117,7 +118,6 @@ In Admin CP go to: **Community** > **Spamtroll** > **Settings**
 ### Step 4: Select content types to check
 
 - Forum Posts
-- Private Messages
 - Registrations
 
 ### Step 5: Configure actions
@@ -147,9 +147,7 @@ Once configured, Spamtroll works automatically:
 
 1. **Posts**: When a member creates a post, it's checked against the Spamtroll API. Based on the spam score and your configured thresholds, the appropriate action is taken.
 
-2. **Messages**: Private messages are scanned similarly to posts.
-
-3. **Registrations**: New member registrations are checked using username and email. High-risk registrations can be blocked or sent for review.
+2. **Registrations**: New member registrations are checked using username and email. High-risk registrations can be blocked or sent for review.
 
 ## Dashboard
 
@@ -166,7 +164,7 @@ Access the dashboard at **Admin CP** > **Community** > **Spamtroll** > **Dashboa
 View detailed logs at **Admin CP** > **Community** > **Spamtroll** > **Logs**:
 
 - Filter by status (blocked/suspicious/safe)
-- Filter by content type (posts/messages/registrations)
+- Filter by content type (posts/registrations)
 - Search by IP address
 - View detection details including symbols and threat categories
 - Export logs to JSON
@@ -185,7 +183,7 @@ API URL: http://localhost:8080/api/v1
 ```
 
 Make sure that:
-1. The Spamtroll backend is running (`cd backend && uvicorn main:app --host 0.0.0.0 --port 8080`)
+1. The Spamtroll backend is reachable at the configured API URL
 2. You have created a user account in Spamtroll
 3. You have generated an API key in the Spamtroll panel
 
@@ -209,7 +207,7 @@ Go to **Community** > **Spamtroll** > **Dashboard**. You should see:
 ### Test 3: Logs
 
 The logs should show entries with:
-- Content type (post/message/registration)
+- Content type (post/registration)
 - Spam score result
 - Action taken
 
@@ -334,7 +332,9 @@ if the log table is large: `ALTER TABLE` may lock or rebuild the table. Rerun th
 checker afterwards. If it fails or still reports differences, inspect the error
 and `SHOW CREATE TABLE spamtroll_logs` before retrying.
 
-Source version 1.0.4 fixes new CLI installs and includes a versioned upgrade that
-repairs comments while preserving actual column attributes. The published 1.0.3
-developer bundle does not contain this fix. The migration has automated coverage;
-a native IPS installation/upgrade and the live forum still need verification.
+Version 1.0.4 fixes new CLI installs and includes a versioned upgrade that
+repairs comments while preserving actual column attributes. The 1.0.4 developer
+bundle includes this fix. A manual 1.0.2 → 1.0.4 upgrade on IPS 4.7.24 passed the
+live checker with zero repair queries and preserved prior settings/log rows.
+Automated tests also cover upgrades from 1.0.0–1.0.3. Fresh ACP installation and
+ACP-driven upgrade remain pending; see [SMOKE.md](docs/SMOKE.md).

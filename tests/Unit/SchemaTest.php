@@ -57,3 +57,33 @@ it('adds the declared hash lookup index missing from 1.0.3 upgrades', function (
     expect($result['addedIndexes'])->toBe([$schema['indexes']['log_email_hash']]);
     expect($result['table']['indexes'])->toBe($schema['indexes']);
 });
+
+it('preserves administrator settings across the ordered upgrade chain and repeated imports', function (string $scenario, string $sensitivity, string $scope, string $anonymize, string $override): void {
+    $result = runSchemaScenario($scenario);
+    expect($result['error'])->toBeNull();
+    foreach ($result['settingsBefore'] as $key => $value) {
+        if ($key === 'spamtroll_check_messages') {
+            expect($result['settings'])->not->toHaveKey($key);
+
+            continue;
+        }
+        expect($result['settings'][$key])->toBe($value);
+    }
+    expect($result['settings']['spamtroll_sensitivity'])->toBe($sensitivity);
+    expect($result['settings']['spamtroll_scan_scope'])->toBe($scope);
+    expect($result['settings']['spamtroll_anonymize_ip'])->toBe($anonymize);
+    expect($result['settings']['spamtroll_override_thresholds'])->toBe($override);
+    expect($result['settings'])->toBe($result['firstSettings']);
+    expect($result['table'])->toBe($result['firstTable']);
+    expect($result['table']['columns'])->toHaveKey('log_email_hash');
+    expect($result['table']['indexes'])->toHaveKey('log_email_hash');
+    expect($result['repeatedChanges'])->toBe([]);
+    expect($result['adds'])->toBe([]);
+    expect($result['addedIndexes'])->toBe([]);
+})->with([
+    '1.0.0 strict, all scans' => ['chain-10000-strict', 'strict', 'all', '0', '1'],
+    '1.0.1 lenient, posts only' => ['chain-10001-lenient', 'lenient', 'posts_only', '0', '1'],
+    '1.0.2 scans disabled' => ['chain-10002-off', 'balanced', 'off', '0', '1'],
+    '1.0.2 existing custom settings' => ['chain-10002-custom', 'lenient', 'off', '1', '0'],
+    '1.0.3 existing custom settings' => ['chain-10003-custom', 'lenient', 'off', '1', '0'],
+]);

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.4] - 2026-10-10
 
+### Added
+
+- Ordered-upgrade regression coverage from 1.0.0–1.0.3 verifies administrator
+  settings survive migrations and repeated imports.
+- Developer bundles include upgrade/rollback instructions, the production smoke
+  report and isolated native-lifecycle test requirements. The README now reflects
+  live 4.7.24 verification and the intended private-message scanning exclusion.
+
 ### Fixed
 
 - The retention task uses the globally unique `spamtrollCleanup` key and matching
