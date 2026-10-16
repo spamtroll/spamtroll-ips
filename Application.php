@@ -122,9 +122,19 @@ class _Application extends \IPS\Application
 
         $bypassGroups = \IPS\Settings::i()->spamtroll_bypass_groups;
         if (!empty($bypassGroups)) {
-            $groups = explode(',', $bypassGroups);
+            /* Bypass lists are hand-typed in ACP ("4, 7" with spaces, trailing
+             * commas). Compare trimmed strings strictly so whitespace, empty
+             * entries, or loose int/string overlap can never match the wrong
+             * group. */
+            $groups = [];
+            foreach (explode(',', (string) $bypassGroups) as $group) {
+                $group = trim($group);
+                if ($group !== '') {
+                    $groups[] = $group;
+                }
+            }
             foreach ($member->groups as $groupId) {
-                if (\in_array($groupId, $groups)) {
+                if (\in_array((string) $groupId, $groups, true)) {
                     return true;
                 }
             }
@@ -314,41 +324,94 @@ class _Application extends \IPS\Application
     /**
      * Get statistics for dashboard
      *
+     * Fail-open: a missing or unreadable spamtroll_logs table (for example a
+     * forum mid-upgrade) yields zeroed statistics instead of throwing, so the
+     * AdminCP dashboard and the front-end widget keep rendering.
+     *
+     * Daily buckets use UTC day boundaries to match log_date, which is stored
+     * as a UTC Unix timestamp — server-zone midnights would shift rows into
+     * the wrong day on any non-UTC forum.
+     *
      * @param int $days Number of days to get stats for
      *
      * @return array
      */
     public static function getStatistics(int $days = 7): array
     {
-        $since = time() - ($days * 86400);
+        try {
+            $since = time() - ($days * 86400);
 
-        $total = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ?', $since])->first();
-        $blocked = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ? AND log_status = ?', $since, 'blocked'])->first();
-        $suspicious = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ? AND log_status = ?', $since, 'suspicious'])->first();
-        $safe = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ? AND log_status = ?', $since, 'safe'])->first();
+            $total = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ?', $since])->first();
+            $blocked = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ? AND log_status = ?', $since, 'blocked'])->first();
+            $suspicious = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ? AND log_status = ?', $since, 'suspicious'])->first();
+            $safe = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date > ? AND log_status = ?', $since, 'safe'])->first();
 
+            $todayMidnightUtc = self::utcTodayMidnight();
+            $dailyStats = [];
+            for ($i = $days - 1; $i >= 0; $i--) {
+                $dayStart = $todayMidnightUtc - ($i * 86400);
+                $dayEnd = $dayStart + 86400;
+
+                $dayTotal = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date >= ? AND log_date < ?', $dayStart, $dayEnd])->first();
+                $dayBlocked = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date >= ? AND log_date < ? AND log_status = ?', $dayStart, $dayEnd, 'blocked'])->first();
+
+                $dailyStats[] = [
+                    'date' => gmdate('Y-m-d', $dayStart),
+                    'total' => (int) $dayTotal,
+                    'blocked' => (int) $dayBlocked,
+                ];
+            }
+
+            return [
+                'total' => (int) $total,
+                'blocked' => (int) $blocked,
+                'suspicious' => (int) $suspicious,
+                'safe' => (int) $safe,
+                'daily' => $dailyStats,
+            ];
+        } catch (\Throwable $e) {
+            \IPS\Log::log($e, 'spamtroll');
+
+            return self::emptyStatistics($days);
+        }
+    }
+
+    /**
+     * Zeroed statistics in the getStatistics() shape, for the fail-open paths
+     * (widget and dashboard) that must render without log data.
+     *
+     * @param int $days Number of days to get stats for
+     *
+     * @return array{total: int, blocked: int, suspicious: int, safe: int, daily: array<int, array{date: string, total: int, blocked: int}>}
+     */
+    public static function emptyStatistics(int $days = 7): array
+    {
+        $todayMidnightUtc = self::utcTodayMidnight();
         $dailyStats = [];
         for ($i = $days - 1; $i >= 0; $i--) {
-            $dayStart = strtotime("-{$i} days midnight");
-            $dayEnd = $dayStart + 86400;
-
-            $dayTotal = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date >= ? AND log_date < ?', $dayStart, $dayEnd])->first();
-            $dayBlocked = \IPS\Db::i()->select('COUNT(*)', 'spamtroll_logs', ['log_date >= ? AND log_date < ? AND log_status = ?', $dayStart, $dayEnd, 'blocked'])->first();
-
             $dailyStats[] = [
-                'date' => date('Y-m-d', $dayStart),
-                'total' => (int) $dayTotal,
-                'blocked' => (int) $dayBlocked,
+                'date' => gmdate('Y-m-d', $todayMidnightUtc - ($i * 86400)),
+                'total' => 0,
+                'blocked' => 0,
             ];
         }
 
         return [
-            'total' => (int) $total,
-            'blocked' => (int) $blocked,
-            'suspicious' => (int) $suspicious,
-            'safe' => (int) $safe,
+            'total' => 0,
+            'blocked' => 0,
+            'suspicious' => 0,
+            'safe' => 0,
             'daily' => $dailyStats,
         ];
+    }
+
+    /**
+     * Midnight UTC today as a Unix timestamp. log_date values are UTC
+     * timestamps, so bucket edges must not use the server timezone.
+     */
+    private static function utcTodayMidnight(): int
+    {
+        return (int) gmmktime(0, 0, 0, (int) gmdate('n'), (int) gmdate('j'), (int) gmdate('Y'));
     }
 
     /**

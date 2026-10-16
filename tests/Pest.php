@@ -24,6 +24,7 @@ use Spamtroll\Sdk\Client;
 uses()
     ->beforeEach(function (): void {
         \IPS\Settings::setInstance(null);
+        \IPS\Db::setTestInstance(null);
 
         $defaults = [
             'spamtroll_enabled' => true,

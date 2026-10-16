@@ -29,6 +29,20 @@ class _Upgrade
             // delete is best-effort; absence is fine
         }
 
+        /* Install the trust-threshold setting this version introduces.
+         * Insert-only, so a re-run keeps the administrator's value: the
+         * duplicate-key failure is the existence check. */
+        try {
+            \IPS\Db::i()->insert('core_sys_conf_settings', [
+                'conf_key' => 'spamtroll_bypass_min_posts',
+                'conf_value' => '0',
+                'conf_default' => '0',
+                'conf_app' => 'spamtroll',
+            ]);
+        } catch (\Exception $e) {
+            /* Already present — leave the administrator's value alone. */
+        }
+
         // Cache invalidation so the dropped setting and the new one
         // both show up correctly on the next page load.
         unset(\IPS\Data\Store::i()->settings);

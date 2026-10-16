@@ -50,7 +50,14 @@ class _spamtrollStats extends \IPS\Widget
      */
     public function render()
     {
-        $stats = \IPS\spamtroll\Application::getStatistics(7);
+        /* Fail-open: a missing spamtroll_logs table (partial upgrade) must
+         * never break page render — show zeroed statistics instead. */
+        try {
+            $stats = \IPS\spamtroll\Application::getStatistics(7);
+        } catch (\Throwable $e) {
+            \IPS\Log::log($e, 'spamtroll');
+            $stats = \IPS\spamtroll\Application::emptyStatistics(7);
+        }
 
         return $this->output($stats);
     }

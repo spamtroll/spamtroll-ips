@@ -221,9 +221,20 @@ namespace IPS {
         public string $charset = 'utf8mb4';
         public string $collation = 'utf8mb4_unicode_ci';
 
+        protected static ?self $testInstance = null;
+
         public static function i(): self
         {
-            return new self();
+            return static::$testInstance ?? new self();
+        }
+
+        /**
+         * Replace the singleton. Test-only seam: the live framework has no
+         * such method, so nothing shipped may call it.
+         */
+        public static function setTestInstance(?self $instance): void
+        {
+            static::$testInstance = $instance;
         }
 
         /**

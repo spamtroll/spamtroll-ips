@@ -109,6 +109,33 @@ describe('shouldBypass', function (): void {
 
         expect(Application::shouldBypass($member))->toBeFalse();
     });
+
+    it('trims whitespace around bypass group ids', function (): void {
+        settings()->spamtroll_bypass_groups = '4, 7 ';
+        $member = member(memberPosts: 5, groups: [7]);
+
+        expect(Application::shouldBypass($member))->toBeTrue();
+    });
+
+    it('ignores empty entries in the bypass group list', function (): void {
+        settings()->spamtroll_bypass_groups = ',,4,,';
+
+        expect(Application::shouldBypass(member(memberPosts: 5, groups: [4])))->toBeTrue();
+        expect(Application::shouldBypass(member(memberPosts: 5, groups: [3])))->toBeFalse();
+    });
+
+    it('does not bypass anyone for a whitespace-only group list', function (): void {
+        settings()->spamtroll_bypass_groups = ' , ';
+
+        expect(Application::shouldBypass(member(memberPosts: 5, groups: [3])))->toBeFalse();
+    });
+
+    it('compares group ids strictly, not loosely', function (): void {
+        /* Loose comparison would match group 7 against '7abc'; strict must not. */
+        settings()->spamtroll_bypass_groups = '7abc';
+
+        expect(Application::shouldBypass(member(memberPosts: 5, groups: [7])))->toBeFalse();
+    });
 });
 
 describe('registrationScanningIsReachable', function (): void {

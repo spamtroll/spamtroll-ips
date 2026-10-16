@@ -31,11 +31,6 @@ parameters:
 			path: Application.php
 
 		-
-			message: "#^Parameter \\#2 \\$timestamp of function date expects int\\|null, int\\|false given\\.$#"
-			count: 1
-			path: Application.php
-
-		-
 			message: "#^Method IPS\\\\spamtroll_hook_Member\\:\\:spamService\\(\\) should return int\\|null but returns mixed\\.$#"
 			count: 1
 			path: build/hooks-preprocessed/Member.php

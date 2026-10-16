@@ -45,23 +45,20 @@ class _Upgrade
              * forum blocks, so existing forums keep the old path until their
              * administrator turns this off. See CHANGELOG. */
             'spamtroll_override_thresholds' => '1',
+            /* The quota-skip counter (HTTP 402 fail-open) reads and writes
+             * this key via changeValues(), which silently drops unknown keys
+             * — without it, upgraded forums never persist a skip. Fresh
+             * installs get '' from install.php; match that default here. */
+            'spamtroll_quota_skipped_log' => '',
         ]);
 
-        /* Registration scans carry no member id, so deleting an account never
-         * removed them. The hash gives MemberSync something to match on. */
-        try {
-            if (!\IPS\Db::i()->checkForColumn('spamtroll_logs', 'log_email_hash')) {
-                \IPS\Db::i()->addColumn('spamtroll_logs', [
-                    'name' => 'log_email_hash',
-                    'type' => 'VARCHAR',
-                    'length' => 64,
-                    'allow_null' => true,
-                    'default' => null,
-                ]);
-            }
-        } catch (\Exception $e) {
-            /* An install that already has the column is fine. */
-        }
+        /* 1.0.2 started writing the scan UUID and 1.0.3 the address hash, but
+         * no upgrade step ever added the columns — only fresh installs have
+         * them. Add both from the declared schema so upgraded forums match a
+         * fresh install. Registration scans carry no member id, so deleting
+         * an account never removed them; the hash gives MemberSync something
+         * to match on. */
+        $this->ensureLogColumns(['log_submission_id', 'log_email_hash']);
 
         unset(\IPS\Data\Store::i()->settings);
 
@@ -101,6 +98,28 @@ class _Upgrade
         }
 
         return \IPS\Settings::i()->spamtroll_check_registrations ? 'all' : 'posts_only';
+    }
+
+    /**
+     * Add log columns missing from pre-1.0.3 tables, using the declared
+     * schema as the single source of truth. Guarded per column and
+     * idempotent: re-running the upgrader changes nothing.
+     *
+     * @param array<int, string> $columns
+     */
+    protected function ensureLogColumns(array $columns): void
+    {
+        /** @var array<string, array{columns: array<string, array<string, mixed>>}> $schema */
+        $schema = json_decode((string) file_get_contents(\dirname(__DIR__, 2) . '/data/schema.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($columns as $column) {
+            try {
+                if (!\IPS\Db::i()->checkForColumn('spamtroll_logs', $column)) {
+                    \IPS\Db::i()->addColumn('spamtroll_logs', $schema['spamtroll_logs']['columns'][$column]);
+                }
+            } catch (\Exception $e) {
+                /* An install that already has the column is fine. */
+            }
+        }
     }
 
     /**

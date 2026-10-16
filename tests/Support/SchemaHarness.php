@@ -209,6 +209,47 @@ try {
     } elseif ($scenario === 'fresh' || $scenario === 'existing') {
         require $root . '/setup/install.php';
         (new \IPS\spamtroll\setup\install\_Install())->step1([]);
+    } elseif ($scenario === 'upg10002' || $scenario === 'upg10003') {
+        if ($scenario === 'upg10002') {
+            /* A 1.0.1 forum: the obsolete message-scan toggle exists, the
+             * trust-threshold setting does not. */
+            Db::$settings = [
+                'spamtroll_api_key' => 'test-key-preserve-me',
+                'spamtroll_enabled' => '1',
+                'spamtroll_check_messages' => '1',
+            ];
+            require_once $root . '/setup/upg_10002/upgrade.php';
+            $upgrade = new \IPS\spamtroll\setup\upg_10002\_Upgrade();
+        } else {
+            /* A pre-1.0.3 logs table: neither the scan UUID nor the address
+             * hash column exists yet. */
+            unset(Db::$table['columns']['log_submission_id'], Db::$table['columns']['log_email_hash']);
+            Db::$settings = [
+                'spamtroll_spam_threshold' => '0.7',
+                'spamtroll_suspicious_threshold' => '0.4',
+                'spamtroll_check_posts' => '1',
+                'spamtroll_check_registrations' => '1',
+            ];
+            require_once $root . '/setup/upg_10003/upgrade.php';
+            $upgrade = new \IPS\spamtroll\setup\upg_10003\_Upgrade();
+        }
+        $before = Db::$table;
+        $beforeSettings = Db::$settings;
+        $upgrade->step1();
+        $firstSettings = Db::$settings;
+        $firstTable = Db::$table;
+        $firstAdds = Db::$adds;
+        if ($scenario === 'upg10002') {
+            /* The administrator customises the new setting; a re-run (the
+             * upgrader uses multi-redirects) must keep their value. */
+            Db::$settings['spamtroll_bypass_min_posts'] = '25';
+        }
+        Db::$changes = [];
+        Db::$adds = [];
+        Db::$addedIndexes = [];
+        $upgrade->step1();
+        $repeatedChanges = Db::$changes;
+        $repeatedAdds = Db::$adds;
     } else {
         require $root . '/setup/upg_10004/upgrade.php';
         Db::$fail = $scenario === 'failure';
@@ -236,6 +277,8 @@ echo json_encode([
     'adds' => Db::$adds,
     'changes' => Db::$changes,
     'addedIndexes' => Db::$addedIndexes,
+    'firstAdds' => $firstAdds ?? null,
+    'repeatedAdds' => $repeatedAdds ?? null,
     'repeatedChanges' => $repeatedChanges ?? null,
     'error' => $error,
     'connection' => [Db::i()->charset, Db::i()->collation],
