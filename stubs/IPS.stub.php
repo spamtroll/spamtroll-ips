@@ -396,8 +396,10 @@ namespace IPS {
 
     class Theme
     {
-        public static ?self $memberTheme = null;
-        public static ?self $adminSkin = null;
+        /** @var mixed Native IPS keeps these public properties untyped. */
+        public static $memberTheme = null;
+        /** @var mixed */
+        public static $adminSkin = null;
 
         public static function i(): self
         {
