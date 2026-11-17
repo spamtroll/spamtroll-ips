@@ -38,3 +38,22 @@ Dogo still has runtime `b2dfd39`; the subsequent T-101 changes are not deployed.
 Coordinate a separate supported rollout before treating newer source as tested
 production code. Remaining install/uninstall and fault-injection checks require
 the isolated resources listed above.
+
+
+## Completed native lab and cleanup — 2026-11-17
+
+T-161 provisioned an owner-authorized real IPS4.7.24 runtime on dogo with a
+separate224-table schema, restricted database user, static/default and
+allowlisted non-customer metadata, loopback services and blocked outbound
+network access. No members, content or production settings were copied. The
+native framework built/exported the TAR, and actual ACP browser upload,
+fresh install, upgrade and uninstall passed. Functional/action/failure/widget,
+member-cleanup and cross-process checks are recorded in SMOKE.md.
+
+The missing frontend template from T-160 and T-101 fixes are deployed in1.0.5.
+The additional CLI disk-cache context fix is included. Production verification
+and the limited live-probe result are explicitly separated in SMOKE.md.
+All task services, scratch schema/user/source copies and temporary credentials
+were removed after verification; repeat setup is required for future native labs.
+The earlier outstanding-check list is historical planning context, superseded by
+these dated results and the canonical T-048/T-161 journals.

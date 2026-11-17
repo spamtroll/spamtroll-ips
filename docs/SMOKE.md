@@ -179,3 +179,65 @@ and test credentials are private and are not release artifacts.
 Final native archive upload/ACP lifecycle and production rollout evidence are
 recorded by the subsequent T-161 checkpoints; this section alone does not assert
 that candidate code is already deployed on the public forum.
+
+
+## Final candidate and production verification — 2026-11-17
+
+Final candidate source is `b271a49d0e51876ea319a6f731c30adb3f72a6ad`.
+[Exact-source CI](https://github.com/spamtroll/spamtroll-ips/actions/runs/44183616293)
+passed all5jobs (PHP8.2/8.3/8.4 tests, quality, manifests). Local fullQA passed
+167tests/497assertions. Final native TAR SHA256:
+`de52b7f717c13a422233fae3d6fba65f3131b7682c8d596f48749375bfd5d39c`.
+All32packaged runtime PHP files match the source commit; the native builder
+applies IPS's normal hook-export wrapping. No proprietary Suite source, lab
+credentials or customer content is included in release artifacts.
+
+Actual authenticated Chromium ACP checks on the isolated real Suite completed:
+confirmed native Uninstall; uploaded the native TAR and completed a fresh install;
+then uploaded the candidate as a1.0.4->1.0.5 update, preserving custom settings
+and an owned log sentinel. Final candidate upgrade had zero browser errors.
+Dashboard,Settings,Logs and settings save/reload also passed. The CLI installer
+now explicitly sets the current native theme context before compiling: a full
+CLI reimport with template disk caching enabled completed successfully.
+
+Dogomania production was atomically upgraded at21:24:18UTC. The first attempt
+hit a native CLI template-disk-cache context error and automatically rolled back;
+all baseline data was verified intact. The same error was reproduced on the
+isolated disk-cache configuration, and the corrected theme-context setup passed
+all-theme/CSS/widget compilation before retry. The production retry succeeded.
+Subsequent targeted changes remove the unavailable404update-check URL and apply
+the same CLI theme-context fix. Updates use the native ACP TAR upload workflow.
+
+| Production verification | Result |
+| --- | --- |
+| Actual PHP-FPM through private Unix FastCGI probe | 1.0.5/10005 enabled, both hook chains active, schema checker0 |
+| Exact installed artifact | All132files byte-identical to final native TAR |
+| Existing retained log data | 3,431baseline rows preserved by full-row digest |
+| Existing configuration | All existing static values preserved; operational quota counter excluded from concurrency comparison |
+| Other integrations | Core cleanup and non-Spamtroll hook metadata unchanged |
+| Configured service API | HTTP200 / success |
+| Public forum/registration/API health | HTTP200 with strict public TLS verification |
+| Normal traffic after rollout | Four safe/allow post scans observed in the21:24–21:36UTC sample |
+| Configured Redis-backed breaker | Separate PHP processes shared backoff through uniquely prefixed test keys; test keys removed |
+| Test cleanup | Zero owned member/topic/post/forum/group markers remain |
+
+A separate controlled live CRUD probe was stopped when the test's outbound
+network guard blocked an unrelated native HTTPS integration. Its InnoDB
+transaction was rolled back and caches invalidated; no successful live CRUD
+result is claimed from that probe. Positive action/failure/member/uninstall
+checks above were executed on the isolated real Suite. Live verification uses
+actual FPM, API, artifact integrity, configuration/log preservation, normal scan
+traffic and the isolated Redis-prefix probe.
+
+Task web/API fixture services and the SSH tunnel were stopped. The separate
+scratch database/user, private Suite copies, temporary FPM helper and browser
+credentials were removed. Root-only backup and sanitized evidence remain at
+`/var/backups/spamtroll/T-161-codex-6711/attempt2/`, including original source,
+filtered metadata snapshots and rollback instructions. Active scan logs must not
+be overwritten with an older dump during rollback.
+
+Native TAR, developer ZIP and SHA256SUMS are attached to the
+[1.0.5 draft release](https://github.com/spamtroll/spamtroll-ips/releases/tag/untagged-236e47aaaaef9c1462fd).
+The draft assets were downloaded again and their checksums verified. This task
+prepares the release; it does not claim a public stable release has been published.
+IPS5 remains outside the supported/tested scope.

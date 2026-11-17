@@ -23,3 +23,11 @@ release record; do not infer publication from a candidate file in build/.
 The unavailable /ips/version update-check URL has been removed from application
 metadata. Native updates use the ACP TAR upload flow; no automatic update feed
 is advertised until a supported published feed exists.
+
+
+Final candidate source: b271a49d0e51876ea319a6f731c30adb3f72a6ad.
+Final native TAR SHA256: de52b7f717c13a422233fae3d6fba65f3131b7682c8d596f48749375bfd5d39c.
+The candidate is deployed on Dogomania and all132installed files match it.
+Its GitHub release remains a draft with verified native TAR/devZIP/checksums;
+publication is a separate release step. See the final SMOKE.md section for the
+exact runtime, complete tests, production evidence and cleanup boundaries.
