@@ -21,6 +21,7 @@ it('repairs already installed 1.0.4 settings without replacing administrator val
     expect($result['settings']['spamtroll_bypass_min_posts'])->toBe('25');
     expect($result['settings']['spamtroll_quota_skipped_log'])->toBe('');
     expect($result['firstTable']['columns'])->toHaveKeys(['log_submission_id', 'log_email_hash']);
+    expect($result['firstTable']['indexes'])->toHaveKey('log_email_hash');
     expect($result['repeatedAdds'])->toBe([]);
     expect($result['repeatedChanges'])->toBe([]);
 });

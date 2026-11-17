@@ -41,12 +41,15 @@ class _Upgrade
             }
         }
 
-        /** @var array<string, array{columns: array<string, array<string, mixed>>}> $schema */
+        /** @var array<string, array{columns: array<string, array<string, mixed>>, indexes: array<string, array<string, mixed>>}> $schema */
         $schema = json_decode((string) file_get_contents(\dirname(__DIR__, 2) . '/data/schema.json'), true, 512, JSON_THROW_ON_ERROR);
         foreach (['log_submission_id', 'log_email_hash'] as $column) {
             if (!$db->checkForColumn('spamtroll_logs', $column)) {
                 $db->addColumn('spamtroll_logs', $schema['spamtroll_logs']['columns'][$column]);
             }
+        }
+        if (!$db->checkForIndex('spamtroll_logs', 'log_email_hash')) {
+            $db->addIndex('spamtroll_logs', $schema['spamtroll_logs']['indexes']['log_email_hash']);
         }
         $db->delete('core_sys_conf_settings', ['conf_key=?', 'spamtroll_check_messages']);
         unset(\IPS\Data\Store::i()->settings);

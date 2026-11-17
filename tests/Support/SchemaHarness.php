@@ -233,6 +233,7 @@ try {
             require_once $root . '/setup/upg_10003/upgrade.php';
             $upgrade = new \IPS\spamtroll\setup\upg_10003\_Upgrade();
             if ($scenario === 'upg10005') {
+                unset(Db::$table['indexes']['log_email_hash']);
                 Db::$settings['spamtroll_api_key'] = 'test-key-preserve-me';
                 Db::$settings['spamtroll_enabled'] = '1';
                 Db::$settings['spamtroll_bypass_min_posts'] = '25';
