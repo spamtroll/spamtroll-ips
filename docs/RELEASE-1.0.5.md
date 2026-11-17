@@ -19,3 +19,7 @@ application directory in normal production mode as ACP does.
 See SMOKE.md for native lifecycle, functional, browser and rollout evidence.
 Exact package/source checksums and the final release decision belong to the
 release record; do not infer publication from a candidate file in build/.
+
+The unavailable /ips/version update-check URL has been removed from application
+metadata. Native updates use the ACP TAR upload flow; no automatic update feed
+is advertised until a supported published feed exists.

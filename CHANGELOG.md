@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Treat malformed successful API replies as failed scans while allowing content through.
 - Use the native IPS uninstall lifecycle from CLI, including CSS, metadata and hook cleanup.
 - Generate manifest snapshots in the native IPS format and verify the exported widget resource.
+- Remove the unavailable update-check URL instead of making ACP request a nonexistent endpoint.
 
 
 ## [Unreleased]
