@@ -12,6 +12,19 @@ function runUpgradeScenario(string $scenario): array
     return json_decode(implode("\n", $output), true, 512, JSON_THROW_ON_ERROR);
 }
 
+it('repairs already installed 1.0.4 settings without replacing administrator values', function (): void {
+    $result = runUpgradeScenario('upg10005');
+
+    expect($result['error'])->toBeNull();
+    expect($result['settings']['spamtroll_api_key'])->toBe('test-key-preserve-me');
+    expect($result['settings']['spamtroll_enabled'])->toBe('1');
+    expect($result['settings']['spamtroll_bypass_min_posts'])->toBe('25');
+    expect($result['settings']['spamtroll_quota_skipped_log'])->toBe('');
+    expect($result['firstTable']['columns'])->toHaveKeys(['log_submission_id', 'log_email_hash']);
+    expect($result['repeatedAdds'])->toBe([]);
+    expect($result['repeatedChanges'])->toBe([]);
+});
+
 it('creates the 1.0.2 trust-threshold setting and drops the message toggle', function (): void {
     $result = runUpgradeScenario('upg10002');
 

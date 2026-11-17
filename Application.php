@@ -12,7 +12,7 @@ declare(strict_types=1);
  *
  * @since       01 Jan 2024
  *
- * @version     1.0.4
+ * @version     1.0.5
  */
 
 namespace IPS\spamtroll;
@@ -36,10 +36,10 @@ class _Application extends \IPS\Application
      * so a fresh install reported 1.0.0 while its upgrade steps had already
      * run.
      */
-    public const VERSION = '1.0.4';
+    public const VERSION = '1.0.5';
 
     /** IPS long version: the highest key in data/versions.json. */
-    public const VERSION_LONG = 10004;
+    public const VERSION_LONG = 10005;
 
     /**
      * @var \Spamtroll\Sdk\Client|null Singleton instance

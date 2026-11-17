@@ -209,7 +209,7 @@ try {
     } elseif ($scenario === 'fresh' || $scenario === 'existing') {
         require $root . '/setup/install.php';
         (new \IPS\spamtroll\setup\install\_Install())->step1([]);
-    } elseif ($scenario === 'upg10002' || $scenario === 'upg10003') {
+    } elseif (in_array($scenario, ['upg10002', 'upg10003', 'upg10005'], true)) {
         if ($scenario === 'upg10002') {
             /* A 1.0.1 forum: the obsolete message-scan toggle exists, the
              * trust-threshold setting does not. */
@@ -232,6 +232,13 @@ try {
             ];
             require_once $root . '/setup/upg_10003/upgrade.php';
             $upgrade = new \IPS\spamtroll\setup\upg_10003\_Upgrade();
+            if ($scenario === 'upg10005') {
+                Db::$settings['spamtroll_api_key'] = 'test-key-preserve-me';
+                Db::$settings['spamtroll_enabled'] = '1';
+                Db::$settings['spamtroll_bypass_min_posts'] = '25';
+                require_once $root . '/setup/upg_10005/upgrade.php';
+                $upgrade = new \IPS\spamtroll\setup\upg_10005\_Upgrade();
+            }
         }
         $before = Db::$table;
         $beforeSettings = Db::$settings;
