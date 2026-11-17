@@ -44,3 +44,73 @@ Local PHP 8.2 full QA passed: 150 tests / 415 assertions, style, PHPStan, spelli
 and manifest checks. Automated coverage includes ordered upgrades from 1.0.0–1.0.3, preservation of administrator settings, repeated imports, schema metadata/collation/index repair, native subclass loading, hooks and fail-open behavior. Doubles do not establish a fresh native installation.
 
 Fresh ACP installation, TAR export/install, ACP-driven upgrade, uninstall, real widget rendering and cross-worker datastore behavior remain pending under T-048. Private messages are intentionally excluded; the remaining native test verifies bypass. See [SUITE-LAB.md](SUITE-LAB.md).
+
+
+## Native production checks on dogo — 2026-11-17
+
+T-048 resumed using the authorized SSH endpoint `root@dogo:2022`. The identified
+installation is the live community at `/home/dogo/public_html/forum`; no separate
+IPS test installation was found under `/home`, `/opt`, `/var/www` or `/root`.
+The following checks ran at 10:08:53 UTC with the real IPS subclass loader.
+No accounts, posts or private messages were created, and no application settings
+were changed. SQL diagnostics used a read-only transaction. Widget rendering used
+an existing frontend theme and a separate transaction that was rolled back; normal
+cache generation was the only allowed write activity.
+
+| Native check | Result |
+| --- | --- |
+| Suite/application/runtime | IPS 4.7.24; Spamtroll 1.0.4 / 10004 enabled; PHP 8.3.6; MariaDB 10.11.14 |
+| Schema | Zero repair queries; all 14 log columns present |
+| Hooks | Comment and Member hooks installed and present in native inheritance chains |
+| Class loading | All 10 checked classes loaded, including scanner, widget, cleanup and lifecycle extensions |
+| Registration routing | Registration checking enabled and reachable through native spam service |
+| Scheduled cleanup | Dedicated enabled `spamtrollCleanup`; original core `cleanup` preserved |
+| API authentication/status | Configured client GET `/scan/status`: HTTP 200, success |
+| Private-message exclusion | Unsaved real IPS Conversation returned allow / private_message / scanned=false |
+| Diagnostics over seven days | Seven routine retention-cleanup messages; zero other matching plugin diagnostics; zero matching HTTP error records |
+| Public forum/registration/API health | HTTP 200 with strict TLS validation from the workstation |
+| Statistics widget | Failed: native initialization/rendering raises `ErrorException: template_store_missing` |
+
+The private-message probe establishes the native gateway exclusion branch; it does
+not establish a full browser message-send lifecycle or member side effects.
+
+Retained seven-day scan decisions totaled 1,076:
+
+| Content | Status/action | Count |
+| --- | --- | ---: |
+| Post | safe / allow | 1,055 |
+| Post | blocked / block | 2 |
+| Post | suspicious / moderate | 4 |
+| Registration | safe / allow | 8 |
+| Registration | blocked / block | 3 |
+| Registration | suspicious / moderate | 4 |
+
+These are recorded scan decisions, not a new controlled verification of every
+posting, moderation or registration side effect. Current settings were unchanged
+across diagnostics by an in-memory value hash; no secrets or member content were
+included in the receipts.
+
+All 41 selected runtime, manifest and migration files match deployed source
+`b2dfd39ace1d392721a812274734a059a5655eb6`. Four differ from checkout `c5881b9`:
+`Application.php`, `setup/upg_10002/upgrade.php`, `setup/upg_10003/upgrade.php` and
+`widgets/spamtrollStats.php`. The later T-101 changes have not been deployed.
+This comparison does not assert that every installed file was rechecked.
+
+The widget failure is corroborated by native template metadata: the application
+has only `admin/spamtroll/widgetStats`, whereas native `Widget::init()` requests
+`front/widgets/spamtrollStats`. Track its correction and native rendering/package
+verification in canonical T-160. The missing frontend template is also absent
+from current plugin source; the T-101 widget exception guard does not add it.
+
+The dogo host resolves the forum through an origin presenting an old self-signed
+certificate. This prevented strict host-local forum curl checks; independent
+public HTTPS verification passed, with the public certificate valid through
+2027-02-14. This origin-only observation is not evidence of a public TLS outage.
+
+Sanitized receipts remain outside the web root in
+`/tmp/spamtroll-T048-codex-6711/{native-runtime,source-comparison}.json` on dogo
+and the workstation. No production application deployment took place. Native ACP
+fresh install/upgrade, TAR export/install, controlled failure injection, full
+browser posting/registration/PM flows, cross-worker breaker behavior, member
+removal and uninstall remain pending on an isolated licensed test forum. T-048
+therefore remains open.

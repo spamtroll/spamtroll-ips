@@ -23,3 +23,18 @@ Never run uninstall, deliberate API failures or synthetic accounts/posts on the 
 8. Test-member deletion, ACP uninstall and CLI uninstall on separate snapshots; verify owned-data removal and unrelated-data/task preservation.
 
 Record exact versions, source commit, package SHA256 and expected/actual results in [SMOKE.md](SMOKE.md). T-048 stays open until its acceptance criteria have supporting evidence.
+
+
+## Dogo handoff — 2026-11-17
+
+The user-authorized `root@dogo:2022` endpoint hosts the live dogomania.com forum.
+Native safe checks and seven-day aggregates are recorded in [SMOKE.md](SMOKE.md).
+An unsaved native Conversation confirms private-message exclusion; it does not
+replace a browser send test. No isolated IPS installation was identified.
+
+Before native widget acceptance, fix T-160: the application lacks the native
+`front/widgets/spamtrollStats` template and raises `template_store_missing`.
+Dogo still has runtime `b2dfd39`; the subsequent T-101 changes are not deployed.
+Coordinate a separate supported rollout before treating newer source as tested
+production code. Remaining install/uninstall and fault-injection checks require
+the isolated resources listed above.
