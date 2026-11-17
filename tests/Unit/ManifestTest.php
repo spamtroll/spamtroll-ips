@@ -137,3 +137,14 @@ it('uses a globally unique task key without replacing the core cleanup task', fu
     expect((string) file_get_contents(\dirname(__DIR__, 2) . '/tasks/spamtrollCleanup.php'))
         ->toContain('class _spamtrollCleanup extends');
 });
+
+it('ships the native frontend template for every declared widget', function (): void {
+    foreach (array_keys(manifest('widgets')) as $key) {
+        // IPS Widget::init resolves front/widgets/{key}, even when an admin
+        // template with similar markup exists. Developer bundles include dev/html.
+        $path = \dirname(__DIR__, 2) . '/dev/html/front/widgets/' . $key . '.phtml';
+        expect($path)->toBeFile();
+        expect((string) file_get_contents($path))
+            ->toContain('<ips:template parameters="$stats, $orientation=');
+    }
+});
