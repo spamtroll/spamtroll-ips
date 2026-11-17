@@ -1,6 +1,6 @@
 # Spamtroll Anti-Spam for IPS Community Suite
 
-Spamtroll integration for IPS Community Suite. A manual upgrade to 1.0.4 has been verified on IPS 4.7.24, including live post and registration scans. Fresh ACP installation, native package export and uninstall remain pending; see [verification results](docs/SMOKE.md). IPS 5 is unverified. Private messages are excluded from scanning.
+Spamtroll integration for IPS Community Suite 4.7.x. The 1.0.5 candidate has passed native TAR installation, upgrade, uninstall, saved post/private-message checks and native registration actions on IPS 4.7.24. See [verification results](docs/SMOKE.md) for exact scope and production rollout evidence. IPS 5 is unverified. Private messages are excluded from scanning.
 
 ## Features
 
