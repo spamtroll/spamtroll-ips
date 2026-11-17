@@ -396,6 +396,9 @@ namespace IPS {
 
     class Theme
     {
+        public static ?self $memberTheme = null;
+        public static ?self $adminSkin = null;
+
         public static function i(): self
         {
             return new self();

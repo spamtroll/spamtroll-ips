@@ -415,6 +415,10 @@ $cssFiles = iterator_to_array(\IPS\Db::i()->select(
 ));
 
 foreach ($themes as $theme) {
+    // The disk-cache template adapter uses the active theme singleton even
+    // when compilation is invoked directly from CLI.
+    \IPS\Theme::$memberTheme = $theme;
+    \IPS\Theme::$adminSkin = $theme;
     foreach ($groups as $g) {
         $theme->compileTemplates($appDir, $g['template_location'], $g['template_group']);
     }
