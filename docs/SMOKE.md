@@ -114,3 +114,24 @@ fresh install/upgrade, TAR export/install, controlled failure injection, full
 browser posting/registration/PM flows, cross-worker breaker behavior, member
 removal and uninstall remain pending on an isolated licensed test forum. T-048
 therefore remains open.
+
+
+## Widget candidate repair — 2026-11-17 (T-160)
+
+Source `1a5479d` adds the native `dev/html/front/widgets/spamtrollStats.phtml`
+resource and a manifest regression covering every declared widget's native path.
+Existing admin markup and the T-101 statistics fail-open guard remain available.
+PHP 8.2 full QA passed: 163 tests / 476 assertions, formatting, PHPStan, spelling
+and manifest checks. The developer ZIP includes the exact candidate template
+(SHA256 `64bb63ce08057e6cff3b621078f1deaf8ff7ec23c358382809fcfe2f947441d8`).
+
+On dogo at 2026-11-17T20:17:50Z, the real IPS 4.7.24 template compiler compiled
+and rendered this resource with native language expansion: vertical, horizontal
+and empty-statistics cases all passed. The diagnostic used a rolled-back SQL
+transaction and did not install or deploy application code. Receipt:
+`/tmp/spamtroll-T160-codex-6711/native-template.json` on dogo.
+
+This establishes native compiler compatibility and developer-bundle inclusion.
+The corrected resource still needs native application import/package verification
+and rollout alongside T-101; that release work continues in T-161 and the broader
+T-048 lifecycle checks.
