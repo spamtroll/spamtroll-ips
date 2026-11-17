@@ -25,6 +25,11 @@ use Spamtroll\Sdk\Response\CheckSpamResponse;
 
 /** @return array<string, array{0: callable(): FakeHttpClient, 1: string, 2: string}> */
 dataset('fail-open matrix', [
+    '00 malformed 200 response' => [
+        fn () => new FakeHttpClient(200, '<html>T161 invalid API reply</html>'),
+        Decision::ACTION_ALLOW,
+        'invalid_response',
+    ],
     '01 200 safe' => [
         fn () => FakeHttpClient::json(200, scanBody(CheckSpamResponse::STATUS_SAFE, 1.0)),
         Decision::ACTION_ALLOW,
@@ -94,7 +99,7 @@ dataset('fail-open matrix', [
     '13 empty body' => [
         fn () => new FakeHttpClient(200, ''),
         Decision::ACTION_ALLOW,
-        '',
+        'invalid_response',
     ],
     '14 html instead of json' => [
         fn () => new FakeHttpClient(502, '<html><body>502 Bad Gateway</body></html>'),

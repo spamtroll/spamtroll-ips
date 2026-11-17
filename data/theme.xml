@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="Default" author_name="Invision Power Services, Inc" author_url="https://www.invisioncommunity.com">
+ <template template_group="spamtroll" template_name="dashboard" template_data="$stats, $recentLogs, $apiStatus, $isConfigured, $isEnabled, $chartLabels, $chartTotal, $chartBlocked, $registrationScanningReachable" template_app="spamtroll" template_location="admin"><![CDATA[
+<div class="spamtroll-dashboard">
+{{if !$registrationScanningReachable}}
+<div class="ipsBox">
+    <div class="ipsMessage ipsMessage_error">
+        <i class="fa fa-exclamation-triangle"></i>
+        {lang="spamtroll_spam_defense_off_message"}
+        <a href="{url="app=core&module=settings&controller=spam"}" class="ipsButton ipsButton_verySmall ipsButton_light">{lang="spamtroll_go_to_spam_settings"}</a>
+    </div>
+</div>
+{{endif}}
+{{if !$isConfigured}}
+<div class="ipsBox">
+    <div class="ipsMessage ipsMessage_warning">
+        <i class="fa fa-exclamation-triangle"></i>
+        {lang="spamtroll_not_configured_message"}
+        <a href="{url="app=spamtroll&module=spamtroll&controller=settings"}" class="ipsButton ipsButton_verySmall ipsButton_light">{lang="spamtroll_go_to_settings"}</a>
+    </div>
+</div>
+{{elseif !$isEnabled}}
+<div class="ipsBox">
+    <div class="ipsMessage ipsMessage_info">
+        <i class="fa fa-info-circle"></i>
+        {lang="spamtroll_disabled_message"}
+        <a href="{url="app=spamtroll&module=spamtroll&controller=settings"}" class="ipsButton ipsButton_verySmall ipsButton_light">{lang="spamtroll_go_to_settings"}</a>
+    </div>
+</div>
+{{endif}}
+
+<div class="ipsGrid ipsGrid_collapsePhone">
+    <div class="ipsGrid_span4">
+        <div class="ipsWidget ipsWidget_vertical">
+            <h3 class="ipsWidget_title">{lang="spamtroll_dashboard_api_status"}</h3>
+            <div class="ipsWidget_inner ipsPad">
+                {{if $apiStatus['status'] == 'online'}}
+                <span class="ipsBadge ipsBadge_positive ipsBadge_large"><i class="fa fa-check"></i> {lang="spamtroll_api_online"}</span>
+                {{elseif $apiStatus['status'] == 'not_configured'}}
+                <span class="ipsBadge ipsBadge_neutral ipsBadge_large"><i class="fa fa-cog"></i> {lang="spamtroll_api_not_configured"}</span>
+                {{else}}
+                <span class="ipsBadge ipsBadge_negative ipsBadge_large"><i class="fa fa-times"></i> {lang="spamtroll_api_error"}</span>
+                <p class="ipsType_light ipsType_small">{$apiStatus['message']}</p>
+                {{endif}}
+            </div>
+        </div>
+    </div>
+    <div class="ipsGrid_span8">
+        <div class="ipsWidget ipsWidget_vertical">
+            <h3 class="ipsWidget_title">{lang="spamtroll_dashboard_stats"}</h3>
+            <div class="ipsWidget_inner">
+                <div class="ipsGrid ipsGrid_collapsePhone">
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-total">{$stats['total']}</div>
+                        <div class="ipsType_light">{lang="spamtroll_stat_total"}</div>
+                    </div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-blocked">{$stats['blocked']}</div>
+                        <div class="ipsType_light">{lang="spamtroll_stat_blocked"}</div>
+                    </div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-suspicious">{$stats['suspicious']}</div>
+                        <div class="ipsType_light">{lang="spamtroll_stat_suspicious"}</div>
+                    </div>
+                    <div class="ipsGrid_span3 ipsPad ipsAreaBackground_reset spamtroll-stat-card">
+                        <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-safe">{$stats['safe']}</div>
+                        <div class="ipsType_light">{lang="spamtroll_stat_safe"}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="ipsBox">
+    <h2 class="ipsBox_title">{lang="spamtroll_chart_title"}</h2>
+    <div class="ipsBox_content">
+        {{if count($stats['daily'])}}
+        <table class="spamtroll-table">
+            <thead>
+                <tr>
+                    <th>{lang="spamtroll_log_date"}</th>
+                    <th class="ipsType_right">{lang="spamtroll_chart_total"}</th>
+                    <th class="ipsType_right">{lang="spamtroll_chart_blocked"}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{foreach $stats['daily'] as $day}}
+                <tr>
+                    <td>{$day['date']}</td>
+                    <td class="ipsType_right">{$day['total']}</td>
+                    <td class="ipsType_right">
+                        {{if $day['blocked'] > 0}}
+                        <span class="ipsType_warning">{$day['blocked']}</span>
+                        {{else}}
+                        0
+                        {{endif}}
+                    </td>
+                </tr>
+                {{endforeach}}
+            </tbody>
+        </table>
+        {{else}}
+        <div class="ipsPad ipsType_center ipsType_light">
+            {lang="spamtroll_no_data"}
+        </div>
+        {{endif}}
+    </div>
+</div>
+
+<br />
+
+<div class="ipsBox">
+    <h2 class="ipsBox_title">{lang="spamtroll_dashboard_recent"}</h2>
+    <div class="ipsBox_content">
+        {{if count($recentLogs)}}
+        <table class="spamtroll-table">
+            <thead>
+                <tr>
+                    <th>{lang="spamtroll_log_date"}</th>
+                    <th>{lang="spamtroll_log_content_type"}</th>
+                    <th>{lang="spamtroll_log_status"}</th>
+                    <th>{lang="spamtroll_log_spam_score"}</th>
+                    <th>{lang="spamtroll_log_action_taken"}</th>
+                    <th>{lang="spamtroll_log_ip_address"}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{foreach $recentLogs as $log}}
+                <tr>
+                    <td>{datetime="$log['log_date']"}</td>
+                    <td>{lang="spamtroll_content_type_{$log['log_content_type']}"}</td>
+                    <td>
+                        {{if $log['log_status'] == 'blocked'}}
+                        <span class="ipsBadge ipsBadge_negative">{lang="spamtroll_status_blocked"}</span>
+                        {{elseif $log['log_status'] == 'suspicious'}}
+                        <span class="ipsBadge ipsBadge_warning">{lang="spamtroll_status_suspicious"}</span>
+                        {{else}}
+                        <span class="ipsBadge ipsBadge_positive">{lang="spamtroll_status_safe"}</span>
+                        {{endif}}
+                    </td>
+                    <td>{expression="round($log['log_spam_score'] * 100)"}%</td>
+                    <td>{lang="spamtroll_action_{$log['log_action_taken']}"}</td>
+                    <td>{$log['log_ip_address']}</td>
+                </tr>
+                {{endforeach}}
+            </tbody>
+        </table>
+        <div class="ipsPad ipsType_right">
+            <a href="{url="app=spamtroll&module=spamtroll&controller=logs"}" class="ipsButton ipsButton_small ipsButton_light">{lang="spamtroll_logs_title"} &rarr;</a>
+        </div>
+        {{else}}
+        <div class="ipsPad ipsType_center ipsType_light">
+            {lang="spamtroll_no_data"}
+        </div>
+        {{endif}}
+    </div>
+</div>
+</div>
+]]></template>
+ <template template_group="spamtroll" template_name="settings" template_data="$form" template_app="spamtroll" template_location="admin"><![CDATA[
+<div class="ipsBox">
+    <div class="ipsBox_content">
+        {$form|raw}
+    </div>
+</div>
+
+<div class="ipsPad">
+    <button type="button" class="ipsButton ipsButton_primary" id="spamtrollTestConnection"
+        data-test-url='{url="app=spamtroll&module=spamtroll&controller=settings&do=testConnection" csrf="true"}'
+        data-testing-text='{lang="spamtroll_testing" jsEscape="true"}'>
+        <i class="fa fa-plug"></i> {lang="spamtroll_test_connection"}
+    </button>
+    <span id="spamtrollTestResult" class="ipsType_light spamtroll-test-result"></span>
+</div>
+]]></template>
+ <template template_group="spamtroll" template_name="widgetStats" template_data="$stats" template_app="spamtroll" template_location="admin"><![CDATA[
+<div class="ipsWidget ipsWidget_vertical">
+    <h3 class="ipsWidget_title">{lang="block_spamtrollStats"}</h3>
+    <div class="ipsWidget_inner">
+        <div class="ipsPad">
+            <div class="spamtroll-widget-total">
+                <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-total">{$stats['total']}</div>
+                <div class="ipsType_light">{lang="spamtroll_stat_total"}</div>
+            </div>
+            <ul class="ipsList_reset">
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_blocked"}</span>
+                    <span class="ipsBadge ipsBadge_negative">{$stats['blocked']}</span>
+                </li>
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_suspicious"}</span>
+                    <span class="ipsBadge ipsBadge_warning">{$stats['suspicious']}</span>
+                </li>
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_safe"}</span>
+                    <span class="ipsBadge ipsBadge_positive">{$stats['safe']}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+]]></template>
+ <template template_group="widgets" template_name="spamtrollStats" template_data="$stats, $orientation='vertical'" template_app="spamtroll" template_location="front"><![CDATA[
+<div class="ipsWidget ipsWidget_{$orientation}">
+    <h3 class="ipsWidget_title">{lang="block_spamtrollStats"}</h3>
+    <div class="ipsWidget_inner">
+        <div class="ipsPad">
+            <div class="spamtroll-widget-total">
+                <div class="ipsType_large ipsType_bold spamtroll-stat-value spamtroll-stat-total">{$stats['total']}</div>
+                <div class="ipsType_light">{lang="spamtroll_stat_total"}</div>
+            </div>
+            <ul class="ipsList_reset">
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_blocked"}</span>
+                    <span class="ipsBadge ipsBadge_negative">{$stats['blocked']}</span>
+                </li>
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_suspicious"}</span>
+                    <span class="ipsBadge ipsBadge_warning">{$stats['suspicious']}</span>
+                </li>
+                <li class="ipsPad_half spamtroll-widget-row">
+                    <span>{lang="spamtroll_stat_safe"}</span>
+                    <span class="ipsBadge ipsBadge_positive">{$stats['safe']}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+]]></template>
+ <css css_location="admin" css_app="spamtroll" css_attributes="" css_path="spamtroll" css_name="styles.css"><![CDATA[/**
+ * Spamtroll Admin Styles
+ *
+ * @package     IPS Community Suite
+ * @subpackage  Spamtroll Anti-Spam
+ */
+
+/* Dashboard wrapper — overrides ACP defaults (ipsWidget / ipsBox) that
+ * ship with white backgrounds and look out of place on dark ACP themes.
+ * Scoped to .spamtroll-dashboard so we don't leak into the rest of the ACP.
+ *
+ * !important is needed here: IPS core CSS has rules like
+ *   .ipsBox:not(.ipsBox_transparent):not(.ipsModerated) { background: var(--c0) }
+ * whose specificity (0,0,3,0) beats our descendant selector (0,0,2,0).
+ * Rather than racing the selector arms, we assert our background choice.
+ */
+.spamtroll-dashboard .ipsWidget,
+.spamtroll-dashboard .ipsBox {
+    background: transparent !important;
+    border: 1px solid rgba(128, 128, 128, 0.18) !important;
+    box-shadow: none !important;
+}
+
+.spamtroll-dashboard .ipsWidget_title,
+.spamtroll-dashboard .ipsBox_title {
+    background: rgba(0, 0, 0, 0.06) !important;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+    color: inherit;
+}
+
+.spamtroll-dashboard .ipsWidget_inner,
+.spamtroll-dashboard .ipsBox_content {
+    background: transparent !important;
+}
+
+.spamtroll-dashboard .ipsAreaBackground_reset,
+.spamtroll-dashboard .spamtroll-stat-card {
+    background: transparent !important;
+}
+
+/* Empty leading ipsBox rendered when isConfigured && isEnabled is true —
+ * collapse it so there's no ghost block at the top of the dashboard. */
+.spamtroll-dashboard > .ipsBox:empty,
+.spamtroll-dashboard > .ipsBox:not(:has(*)) {
+    display: none;
+}
+
+/* Tables inside our dashboard inherit the same transparent background */
+.spamtroll-table {
+    background: transparent;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.spamtroll-table thead th {
+    background: rgba(0, 0, 0, 0.04);
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.spamtroll-table tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.spamtroll-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.spamtroll-table .ipsType_right,
+.spamtroll-table th.ipsType_right {
+    text-align: right;
+}
+
+/* Dashboard - Stat cards */
+.spamtroll-stat-card {
+    text-align: center;
+}
+
+.spamtroll-stat-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.spamtroll-stat-total {
+    color: #3498db;
+}
+
+.spamtroll-stat-blocked {
+    color: #e74c3c;
+}
+
+.spamtroll-stat-suspicious {
+    color: #f39c12;
+}
+
+.spamtroll-stat-safe {
+    color: #27ae60;
+}
+
+/* Settings - Test connection */
+.spamtroll-test-result {
+    margin-left: 10px;
+}
+
+/* Log details */
+.spamtroll-detail-label {
+    width: 30%;
+}
+
+/* Scan UUID column in the logs list — shows truncated UUID + copy button */
+.spamtroll-uuid {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.spamtroll-uuid code {
+    font-size: 0.85em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(128, 128, 128, 0.12);
+}
+
+.spamtroll-copy-btn {
+    padding: 2px 6px !important;
+    line-height: 1 !important;
+    min-width: 0 !important;
+}
+
+.spamtroll-content-preview {
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    background: #f5f5f5;
+    padding: 10px;
+}
+
+.spamtroll-progress-bar {
+    max-width: 200px;
+}
+
+/* Widget - Stat summary */
+.spamtroll-widget-total {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.spamtroll-widget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+]]></css>
+</theme>

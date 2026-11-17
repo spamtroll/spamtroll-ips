@@ -21,7 +21,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: curl, json, mbstring
+          extensions: curl, json, mbstring, simplexml, xmlwriter
           coverage: none
           tools: composer:v2
 
@@ -41,7 +41,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: curl, json, mbstring
+          extensions: curl, json, mbstring, simplexml, xmlwriter
           coverage: none
           tools: composer:v2
 
@@ -65,6 +65,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up PHP for the native manifest serializer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: xmlwriter
+          coverage: none
 
       # data/build.xml is generated from the JSON manifests. Nothing in the
       # Suite reads it (docs/SUITE-FACTS.md, U1), but a stale copy misleads

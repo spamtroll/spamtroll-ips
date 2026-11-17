@@ -148,3 +148,24 @@ it('ships the native frontend template for every declared widget', function (): 
             ->toContain('<ips:template parameters="$stats, $orientation=');
     }
 });
+
+it('exports frontend widget templates in the native install resource', function (): void {
+    $xml = simplexml_load_file(\dirname(__DIR__, 2) . '/data/theme.xml');
+    expect($xml)->not->toBeFalse();
+
+    foreach (array_keys(manifest('widgets')) as $key) {
+        $templates = $xml->xpath("template[@template_app='spamtroll'][@template_location='front'][@template_group='widgets'][@template_name='" . $key . "']");
+        expect($templates)->toHaveCount(1);
+        expect((string) $templates[0]['template_data'])->toContain('$stats', '$orientation');
+    }
+});
+
+it('keeps the task snapshot in the native IPS build format', function (): void {
+    $xml = simplexml_load_file(\dirname(__DIR__, 2) . '/data/build.xml');
+    expect($xml)->not->toBeFalse();
+    $tasks = [];
+    foreach ($xml->task as $task) {
+        $tasks[(string) $task] = (string) $task['frequency'];
+    }
+    expect($tasks)->toBe(manifest('tasks'));
+});

@@ -119,6 +119,16 @@ class _Scanner
             return Decision::allow('api_error', $error['code'], $error['message']);
         }
 
+        $payload = isset($response->data['data']) && \is_array($response->data['data'])
+            ? $response->data['data'] : $response->data;
+        if (!\in_array($payload['status'] ?? null, ['safe', 'suspicious', 'blocked'], true)
+            || !isset($payload['spam_score']) || !is_numeric($payload['spam_score'])) {
+            $this->breaker->recordTransportFailure();
+            Recorder::note('api', new \RuntimeException('Invalid scan response payload'));
+
+            return Decision::allow('invalid_response', 'INVALID_RESPONSE');
+        }
+
         $this->breaker->recordSuccess();
 
         return $this->verdict($response);

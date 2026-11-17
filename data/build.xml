@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <build>
- <module key="admin/spamtroll"><![CDATA[{"default_controller":"dashboard","protected":false,"default":null}]]></module>
- <hook key="Comment"><![CDATA[{"type":"C","class":"\\IPS\\Content\\Comment"}]]></hook>
- <hook key="Member"><![CDATA[{"type":"C","class":"\\IPS\\Member"}]]></hook>
+ <module key="admin/spamtroll"><![CDATA[{"default_controller":"dashboard","protected":0,"default":0}]]></module>
+ <task frequency="P0Y0M1DT0H0M0S">spamtrollCleanup</task>
  <setting key="spamtroll_api_key"><![CDATA[{"key":"spamtroll_api_key","default":""}]]></setting>
- <setting key="spamtroll_api_url"><![CDATA[{"key":"spamtroll_api_url","default":"https://api.spamtroll.io/api/v1"}]]></setting>
+ <setting key="spamtroll_api_url"><![CDATA[{"key":"spamtroll_api_url","default":"https:\/\/api.spamtroll.io\/api\/v1"}]]></setting>
  <setting key="spamtroll_enabled"><![CDATA[{"key":"spamtroll_enabled","default":"0"}]]></setting>
  <setting key="spamtroll_sensitivity"><![CDATA[{"key":"spamtroll_sensitivity","default":"balanced"}]]></setting>
  <setting key="spamtroll_scan_scope"><![CDATA[{"key":"spamtroll_scan_scope","default":"all"}]]></setting>
@@ -21,6 +20,22 @@
  <setting key="spamtroll_log_retention_days"><![CDATA[{"key":"spamtroll_log_retention_days","default":"30"}]]></setting>
  <setting key="spamtroll_timeout"><![CDATA[{"key":"spamtroll_timeout","default":"5"}]]></setting>
  <setting key="spamtroll_quota_skipped_log"><![CDATA[{"key":"spamtroll_quota_skipped_log","default":""}]]></setting>
- <task key="spamtrollCleanup"><![CDATA[{"key":"spamtrollCleanup","frequency":"P0Y0M1DT0H0M0S"}]]></task>
  <widget key="spamtrollStats"><![CDATA[{"class":"\\IPS\\spamtroll\\widgets\\spamtrollStats","restrict":[],"allow_reuse":false,"menu_tab":"spamtroll","default_area":"sidebar"}]]></widget>
+ <acpsearch key="0"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_enabled","keywords":["spam","spamtroll","anti-spam","enable","disable"]}]]></acpsearch>
+ <acpsearch key="1"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_api_key","keywords":["spam","spamtroll","api","api key","authentication"]}]]></acpsearch>
+ <acpsearch key="2"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_api_url","keywords":["spam","spamtroll","api","api url","endpoint"]}]]></acpsearch>
+ <acpsearch key="3"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_spam_threshold","keywords":["spam","spamtroll","threshold","score","detection","sensitivity"]}]]></acpsearch>
+ <acpsearch key="4"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_suspicious_threshold","keywords":["spam","spamtroll","threshold","suspicious","score","detection"]}]]></acpsearch>
+ <acpsearch key="5"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_check_posts","keywords":["spam","spamtroll","posts","forum","content checking","detection"]}]]></acpsearch>
+ <acpsearch key="6"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_check_messages","keywords":["spam","spamtroll","messages","private messages","content checking","detection"]}]]></acpsearch>
+ <acpsearch key="7"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_check_registrations","keywords":["spam","spamtroll","registration","sign up","content checking","detection"]}]]></acpsearch>
+ <acpsearch key="8"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_action_blocked","keywords":["spam","spamtroll","block","action","moderation","anti-spam"]}]]></acpsearch>
+ <acpsearch key="9"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_action_suspicious","keywords":["spam","spamtroll","suspicious","action","moderation","anti-spam"]}]]></acpsearch>
+ <acpsearch key="10"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_bypass_groups","keywords":["spam","spamtroll","bypass","groups","whitelist","exclude"]}]]></acpsearch>
+ <acpsearch key="11"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_log_retention_days","keywords":["spam","spamtroll","logs","retention","cleanup","maintenance"]}]]></acpsearch>
+ <acpsearch key="12"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=settings","restriction":"spamtroll_settings","lang_key":"spamtroll_timeout","keywords":["spam","spamtroll","api","timeout","connection"]}]]></acpsearch>
+ <acpsearch key="13"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=dashboard","restriction":"spamtroll_dashboard","lang_key":"spamtroll_dashboard_title","keywords":["spam","spamtroll","dashboard","statistics","overview"]}]]></acpsearch>
+ <acpsearch key="14"><![CDATA[{"url":"app=spamtroll&module=spamtroll&controller=logs","restriction":"spamtroll_logs","lang_key":"spamtroll_logs_title","keywords":["spam","spamtroll","logs","history","activity"]}]]></acpsearch>
+ <hook key="Comment"><![CDATA[{"type":"C","class":"\\IPS\\Content\\Comment"}]]></hook>
+ <hook key="Member"><![CDATA[{"type":"C","class":"\\IPS\\Member"}]]></hook>
 </build>

@@ -286,10 +286,9 @@ Language strings for the application were not imported into `core_sys_lang_words
 ```bash
 cd /path/to/ips/forum
 php applications/spamtroll/setup/cli-uninstall.php
-rm -rf applications/spamtroll
 ```
 
-`cli-uninstall.php` drops `spamtroll_logs` and removes every row in `core_applications`, `core_modules`, `core_hooks`, `core_tasks`, `core_widgets`, `core_sys_conf_settings`, `core_sys_lang_words`, and `core_theme_templates` where `app = 'spamtroll'`, then clears caches.
+`cli-uninstall.php` runs the native IPS application uninstall lifecycle, just like the Admin CP. It removes the application's log table, settings, tasks, hooks, language/template/CSS resources and metadata, rebuilds hook data and clears the relevant caches. In normal production mode, IPS also removes the application directory.
 
 ### Via Admin CP
 

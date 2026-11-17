@@ -391,21 +391,6 @@ parameters:
 			path: setup/cli-install.php
 
 		-
-			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: setup/cli-uninstall.php
-
-		-
-			message: "#^Call to an undefined method IPS\\\\Data\\\\Store\\:\\:clearAll\\(\\)\\.$#"
-			count: 1
-			path: setup/cli-uninstall.php
-
-		-
-			message: "#^Method IPS\\\\Db\\:\\:dropTable\\(\\) invoked with 2 parameters, 1 required\\.$#"
-			count: 1
-			path: setup/cli-uninstall.php
-
-		-
 			message: "#^Caught class IPS\\\\Db\\\\Exception not found\\.$#"
 			count: 1
 			path: setup/install.php

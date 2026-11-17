@@ -5,6 +5,16 @@ All notable changes to the IPS Community Plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-11-17
+
+- Ship the native frontend statistics widget template and installable theme/language/JavaScript resources.
+- Apply repaired legacy settings and log-column migrations to existing 1.0.4 installations without replacing administrator values.
+- Include strict bypass-group matching, UTC statistics and widget error handling from T-101.
+- Treat malformed successful API replies as failed scans while allowing content through.
+- Use the native IPS uninstall lifecycle from CLI, including CSS, metadata and hook cleanup.
+- Generate manifest snapshots in the native IPS format and verify the exported widget resource.
+
+
 ## [Unreleased]
 
 ## [1.0.4] - 2026-10-10

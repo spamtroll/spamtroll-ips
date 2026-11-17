@@ -25,6 +25,10 @@ namespace IPS {
 
     abstract class Application
     {
+        public function delete(): void
+        {
+        }
+
         public string $directory = '';
         public string $title = '';
 

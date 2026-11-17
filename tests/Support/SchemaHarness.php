@@ -84,7 +84,7 @@ class Db
         }
         $key = $values['conf_key'];
         if (array_key_exists($key, self::$settings)) {
-            throw new \IPS\Db\Exception('Duplicate setting');
+            throw new \IPS\Db\Exception('Duplicate setting', 1062);
         }
         self::$settings[$key] = $values['conf_value'];
     }

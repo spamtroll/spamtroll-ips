@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+ <app key="spamtroll" version="10005">
+  <word key="__app_spamtroll" js="0">Spamtroll Anti-Spam</word>
+  <word key="module__spamtroll_spamtroll" js="0">Spamtroll</word>
+  <word key="menu__spamtroll_spamtroll" js="0">Spamtroll Anti-Spam</word>
+  <word key="menu__spamtroll_spamtroll_dashboard" js="0">Dashboard</word>
+  <word key="menu__spamtroll_spamtroll_settings" js="0">Settings</word>
+  <word key="menu__spamtroll_spamtroll_logs" js="0">Logs</word>
+  <word key="r__spamtroll" js="0">Spamtroll Anti-Spam</word>
+  <word key="r__spamtroll_dashboard" js="0">Can view dashboard?</word>
+  <word key="r__spamtroll_settings" js="0">Can manage settings?</word>
+  <word key="r__spamtroll_logs" js="0">Can view logs?</word>
+  <word key="spamtroll_tab_api" js="0">API Configuration</word>
+  <word key="spamtroll_tab_detection" js="0">Detection Settings</word>
+  <word key="spamtroll_tab_actions" js="0">Actions</word>
+  <word key="spamtroll_tab_bypass" js="0">Bypass</word>
+  <word key="spamtroll_tab_maintenance" js="0">Maintenance</word>
+  <word key="spamtroll_header_api_config" js="0">API Configuration</word>
+  <word key="spamtroll_header_thresholds" js="0">Detection</word>
+  <word key="spamtroll_header_content_types" js="0">What to Scan</word>
+  <word key="spamtroll_header_actions" js="0">Spam Actions</word>
+  <word key="spamtroll_header_bypass" js="0">Bypass</word>
+  <word key="spamtroll_header_logs" js="0">Log Settings</word>
+  <word key="spamtroll_enabled" js="0">Enable Spamtroll</word>
+  <word key="spamtroll_enabled_desc" js="0">Enable or disable spam checking globally.</word>
+  <word key="spamtroll_api_key" js="0">API Key</word>
+  <word key="spamtroll_api_key_desc" js="0">Enter your Spamtroll API key. Get one at https://spamtroll.io</word>
+  <word key="spamtroll_api_url" js="0">API URL</word>
+  <word key="spamtroll_api_url_desc" js="0">Base URL for the Spamtroll API.</word>
+  <word key="spamtroll_timeout" js="0">API Timeout</word>
+  <word key="spamtroll_timeout_desc" js="0">Timeout for API requests.</word>
+  <word key="spamtroll_seconds" js="0">seconds</word>
+  <word key="spamtroll_days" js="0">days</word>
+  <word key="spamtroll_posts_unit" js="0">posts</word>
+  <word key="spamtroll_spam_threshold" js="0">Spam Threshold</word>
+  <word key="spamtroll_spam_threshold_desc" js="0">Score above this value will be treated as spam (0.0 - 1.0).</word>
+  <word key="spamtroll_suspicious_threshold" js="0">Suspicious Threshold</word>
+  <word key="spamtroll_suspicious_threshold_desc" js="0">Score above this value will be treated as suspicious (0.0 - 1.0).</word>
+  <word key="spamtroll_check_posts" js="0">Check Forum Posts</word>
+  <word key="spamtroll_check_posts_desc" js="0">Enable spam checking for forum posts.</word>
+  <word key="spamtroll_check_registrations" js="0">Check Registrations</word>
+  <word key="spamtroll_check_registrations_desc" js="0">Enable spam checking during member registration.</word>
+  <word key="spamtroll_action_blocked" js="0">Action for Spam</word>
+  <word key="spamtroll_action_blocked_desc" js="0">Action to take when spam is detected.</word>
+  <word key="spamtroll_action_suspicious" js="0">Action for Suspicious</word>
+  <word key="spamtroll_action_suspicious_desc" js="0">Action to take when suspicious content is detected.</word>
+  <word key="spamtroll_action_block" js="0">Block</word>
+  <word key="spamtroll_action_moderate" js="0">Send to Moderation</word>
+  <word key="spamtroll_action_warn" js="0">Warn Only</word>
+  <word key="spamtroll_action_allow" js="0">Allow</word>
+  <word key="spamtroll_bypass_groups" js="0">Bypass Groups</word>
+  <word key="spamtroll_bypass_groups_desc" js="0">Members in these groups will not be checked for spam. Administrators are always bypassed.</word>
+  <word key="spamtroll_bypass_min_posts" js="0">Bypass users with more than X posts</word>
+  <word key="spamtroll_bypass_min_posts_desc" js="0">Members who have written more than this many forum posts will not be scanned. Set to 0 to disable this threshold.</word>
+  <word key="spamtroll_log_retention_days" js="0">Log Retention</word>
+  <word key="spamtroll_log_retention_days_desc" js="0">Number of days to keep spam logs.</word>
+  <word key="spamtroll_sensitivity" js="0">Sensitivity</word>
+  <word key="spamtroll_sensitivity_desc" js="0">How aggressively to flag content. &quot;Balanced&quot; is recommended for most forums.</word>
+  <word key="spamtroll_sensitivity_lenient" js="0">Lenient (fewer false positives)</word>
+  <word key="spamtroll_sensitivity_balanced" js="0">Balanced (recommended)</word>
+  <word key="spamtroll_sensitivity_strict" js="0">Strict (catches more spam)</word>
+  <word key="spamtroll_scan_scope" js="0">What to scan</word>
+  <word key="spamtroll_scan_scope_desc" js="0">Which content types Spamtroll should check. Private messages are never scanned.</word>
+  <word key="spamtroll_scope_all" js="0">Posts and new registrations</word>
+  <word key="spamtroll_scope_posts_only" js="0">Forum posts only</word>
+  <word key="spamtroll_scope_off" js="0">Off (keep installed but do not scan)</word>
+  <word key="spamtroll_dashboard_title" js="0">Spamtroll Dashboard</word>
+  <word key="spamtroll_dashboard_stats" js="0">Statistics (Last 7 Days)</word>
+  <word key="spamtroll_dashboard_recent" js="0">Recent Activity</word>
+  <word key="spamtroll_dashboard_api_status" js="0">API Status</word>
+  <word key="spamtroll_stat_total" js="0">Total Scans</word>
+  <word key="spamtroll_stat_blocked" js="0">Blocked</word>
+  <word key="spamtroll_stat_suspicious" js="0">Suspicious</word>
+  <word key="spamtroll_stat_safe" js="0">Safe</word>
+  <word key="spamtroll_api_online" js="0">Online</word>
+  <word key="spamtroll_api_offline" js="0">Offline</word>
+  <word key="spamtroll_api_error" js="0">Error</word>
+  <word key="spamtroll_api_not_configured" js="0">Not Configured</word>
+  <word key="spamtroll_chart_title" js="0">Scan Activity</word>
+  <word key="spamtroll_chart_total" js="0">Total</word>
+  <word key="spamtroll_chart_blocked" js="0">Blocked</word>
+  <word key="spamtroll_not_configured_message" js="0">Spamtroll is not configured. Please enter your API key in the settings.</word>
+  <word key="spamtroll_disabled_message" js="0">Spamtroll is currently disabled. Enable it in the settings to start protecting your community.</word>
+  <word key="spamtroll_go_to_settings" js="0">Go to Settings</word>
+  <word key="spamtroll_spam_defense_off_message" js="0">Registration scanning is switched on here, but the Suite's own spam defence is off — and the Suite only asks a spam service about a registration when that setting is enabled. No registration is being scanned.</word>
+  <word key="spamtroll_go_to_spam_settings" js="0">Open Spam Prevention settings</word>
+  <word key="spamtroll_logs_title" js="0">Spam Logs</word>
+  <word key="spamtroll_log_id" js="0">ID</word>
+  <word key="spamtroll_log_member_id" js="0">Member</word>
+  <word key="spamtroll_log_content_type" js="0">Type</word>
+  <word key="spamtroll_log_status" js="0">Status</word>
+  <word key="spamtroll_log_spam_score" js="0">Score</word>
+  <word key="spamtroll_log_action_taken" js="0">Action</word>
+  <word key="spamtroll_log_ip_address" js="0">IP Address</word>
+  <word key="spamtroll_log_date" js="0">Date</word>
+  <word key="spamtroll_log_submission_id" js="0">Scan UUID</word>
+  <word key="spamtroll_copied" js="0">Copied</word>
+  <word key="spamtroll_log_content_preview" js="0">Content Preview</word>
+  <word key="spamtroll_log_symbols" js="0">Detection Symbols</word>
+  <word key="spamtroll_log_threat_categories" js="0">Threat Categories</word>
+  <word key="spamtroll_log_details" js="0">Log Details</word>
+  <word key="spamtroll_filter_all" js="0">All Logs</word>
+  <word key="spamtroll_filter_blocked" js="0">Blocked Only</word>
+  <word key="spamtroll_filter_suspicious" js="0">Suspicious Only</word>
+  <word key="spamtroll_filter_safe" js="0">Safe Only</word>
+  <word key="spamtroll_filter_posts" js="0">Posts Only</word>
+  <word key="spamtroll_filter_registrations" js="0">Registrations Only</word>
+  <word key="spamtroll_status_blocked" js="0">Blocked</word>
+  <word key="spamtroll_status_suspicious" js="0">Suspicious</word>
+  <word key="spamtroll_status_safe" js="0">Safe</word>
+  <word key="spamtroll_content_type_post" js="0">Forum Post</word>
+  <word key="spamtroll_content_type_message" js="0">Private Message</word>
+  <word key="spamtroll_content_type_registration" js="0">Registration</word>
+  <word key="spamtroll_view_details" js="0">View Details</word>
+  <word key="spamtroll_delete_log_confirm" js="0">Are you sure you want to delete this log entry?</word>
+  <word key="spamtroll_log_not_found" js="0">Log entry not found.</word>
+  <word key="spamtroll_logs_cleared" js="0">All logs have been cleared.</word>
+  <word key="spamtroll_clear_all_logs" js="0">Clear All Logs</word>
+  <word key="spamtroll_export_logs" js="0">Export Logs</word>
+  <word key="spamtroll_guest" js="0">Guest</word>
+  <word key="spamtroll_deleted_member" js="0">Deleted Member</word>
+  <word key="spamtroll_test_connection" js="0">Test Connection</word>
+  <word key="spamtroll_testing" js="0">Testing...</word>
+  <word key="spamtroll_connection_success" js="0">Connection successful! API is working correctly.</word>
+  <word key="spamtroll_connection_failed" js="0">Connection failed. Please check your API key and URL.</word>
+  <word key="block_spamtrollStats" js="0">Spamtroll Statistics</word>
+  <word key="block_spamtrollStats_desc" js="0">Shows recent spam detection statistics.</word>
+  <word key="spamtroll_no_data" js="0">No data available</word>
+  <word key="spamtroll_refresh" js="0">Refresh</word>
+  <word key="spamtroll_loading" js="0">Loading...</word>
+ </app>
+</language>
